@@ -1,0 +1,133 @@
+.header {
+    height: 500px;
+    position: relative;
+    animation: fadeInBottom 2s;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden; /* Keep the video contained */
+}
+  
+.background-video {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    z-index: 1;
+    opacity: 1; /* 20% opacity */
+}
+
+.header-contents {
+    position: relative; /* Add this */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 1.5vw;
+    text-align: center;
+    z-index: 3; /* Update z-index to be higher than video */
+    margin: 0 auto; /* Center horizontally */
+}
+  
+.header-contents p {
+    color: rgb(207, 207, 207);
+    font-size: 1.5rem;
+    animation: fadeIn 2s;
+    text-align: center;
+    max-width: 60ch; /* Character width unit - approximately 60 characters */
+    width: 100%;
+    line-height: 1.5;
+    margin: 0 auto;
+    display: -webkit-box;
+    line-clamp: 3;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+  
+.header-contents button {
+    background-color: #27ae60;
+    color: white;
+    border: none;
+    padding: 1.1vw 2.3vw;
+    border-radius: 30px;
+    font-size: max(1vw, 13px);
+    cursor: pointer;
+    animation: fadeInBottom 2s;
+}
+
+.header-contents button:hover {
+    background-color: #39b16b;
+}
+
+.vegetable-img {
+    position: absolute;
+    left: 50px;
+    bottom: 100px;
+    width: 350px;
+    z-index: 3;
+    animation: float 5s infinite ease-in-out;
+}
+
+.egg-img {
+    position: absolute;
+    right: 50px;
+    bottom: 0;
+    width: 450px;
+    z-index: 3;
+    animation: float 6s infinite ease-in-out;
+}
+
+.bread-img {
+    position: absolute;
+    left: 450px;
+    bottom: -20px;
+    width: 300px;
+    z-index: 3;
+    animation: float 6s infinite ease-in-out;
+}
+
+.milk-img {
+    position: absolute;
+    right: 450px;
+    bottom: -60px;
+    width: 300px;
+    z-index: 3;
+    animation: float 6s infinite ease-in-out;
+}
+
+/* Add the float animation if it doesn't exist */
+@keyframes float {
+    0% {
+        transform: translateY(0px);
+    }
+    50% {
+        transform: translateY(-20px);
+    }
+    100% {
+        transform: translateY(0px);
+    }
+}
+
+@media (max-width: 1050px) {
+
+    .vegetable-img, .egg-img {
+        width: 200px; /* Smaller on medium screens */
+    }
+}
+
+@media (max-width: 750px) {
+    
+    .header-contents p {
+        display: none;
+    }
+    .header-contents button {
+        padding: 2vw 4vw;
+    }
+    .vegetable-img, .egg-img {
+        width: 150px; /* Even smaller on mobile */
+    }
+}
