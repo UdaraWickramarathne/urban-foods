@@ -1,10 +1,15 @@
 import './App.css'
+import FeaturesSection from './components/FeatureSection/FeaturesSection'
+import ProductSection from './components/ProductSection/ProductSection'
+import OfferSection from './components/OfferSection/OfferSection'
 
 function App() {
 
   return (
     <>
-      <h1>Urban Foods</h1>
+      <FeaturesSection />
+      <ProductSection />
+      <OfferSection />
     </>
   )
 }

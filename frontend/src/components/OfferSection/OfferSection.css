@@ -1,0 +1,84 @@
+.deal-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: #f3f4f6;
+    padding: 40px;
+    background-image: url('src/images/bg_3.jpg');
+    background-size: cover;
+    background-position: center;
+  }
+  
+  .image-container {
+    flex: 1;
+  }
+  
+  .vegetable-image {
+    width: 100%;
+    max-width: 300px;
+  }
+  
+  .deal-info {
+    flex: 1;
+    text-align: left;
+  }
+  
+  .best-price {
+    color: #16a34a;
+    font-style: italic;
+    font-weight: bold;
+  }
+  
+  .deal-title {
+    font-size: 2.5rem;
+    font-weight: bold;
+  }
+  
+  .deal-description {
+    color: #6b7280;
+    margin-top: 10px;
+  }
+  
+  .product-name {
+    font-size: 1.5rem;
+    font-style: italic;
+    margin-top: 20px;
+  }
+  
+  .price {
+    font-size: 1.2rem;
+    font-weight: bold;
+  }
+  
+  .old-price {
+    color: #2563eb;
+    text-decoration: line-through;
+  }
+  
+  .new-price {
+    color: #dc2626;
+    margin-left: 10px;
+  }
+  
+  .countdown {
+    display: flex;
+    gap: 20px;
+    margin-top: 20px;
+    text-align: center;
+    font-weight: bold;
+  }
+  
+  .time-box {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+  
+  .time-value {
+    font-size: 2rem;
+  }
+  
+  .time-label {
+    font-size: 0.875rem;
+  }
+  
