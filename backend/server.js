@@ -4,8 +4,8 @@ import OracleDB from 'oracledb';
 const app = express();
 
 const dbConfig = {
-    user: 'demo1',
-    password: 'demo1',
+    user: 'udara',
+    password: 'u1',
     connectString: 'localhost:1521/FREEPDB1'
 }
 
@@ -22,7 +22,7 @@ app.get('/employees', (req, res) => {
             return res.status(500).send('Error connecting to the database');
         }
 
-        connection.execute('SELECT * FROM students', (err, result) => {
+        connection.execute('SELECT * FROM suppliers', (err, result) => {
             if (err) {
                 console.error(err.message);
                 return res.status(500).send('Error executing query');
