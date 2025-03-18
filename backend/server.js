@@ -1,13 +1,7 @@
 import express from 'express';
-import OracleDB from 'oracledb';
+import userRoutes from './routes/userRoutes.js';
 
 const app = express();
-
-const dbConfig = {
-    user: 'urbanfood_user',
-    password: 'hello123',
-    connectString: 'localhost:1521/FREEPDB1'
-}
 
 app.use(express.json());
 
@@ -15,23 +9,7 @@ app.get('/', (req, res) => {
     res.send('API is running...');
 })
 
-app.get('/employees', (req, res) => {
-    OracleDB.getConnection(dbConfig, (err, connection) => {
-        if (err) {
-            console.error(err.message);
-            return res.status(500).send('Error connecting to the database');
-        }
-
-        connection.execute('SELECT * FROM users', (err, result) => {
-            if (err) {
-                console.error(err.message);
-                return res.status(500).send('Error executing query');
-            }
-            console.log(result);
-            res.json(result.rows);
-        })
-    })
-})
+app.use("/api/users", userRoutes);
 
 app.listen(5000, () => {
     console.log('Server started on http://localhost:5000');
