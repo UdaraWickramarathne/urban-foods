@@ -9,10 +9,10 @@ import TrueFocus from "../TrueFocus/TrueFocus";
 const HeroSection = () => {
   return (
     <div className="header">
-      {/* <img className="vegetable-img" src={vegetablesImg} alt="" />
+      <img className="vegetable-img" src={vegetablesImg} alt="" />
       <img className="egg-img" src={eggImg} alt="" />
       <img className="bread-img" src={breadImg} alt="" />
-      <img className="milk-img" src={milkImg} alt="" /> */}
+      <img className="milk-img" src={milkImg} alt="" />
       <video className="background-video" autoPlay loop muted>
     <source src="/src/assets/hero-video.mp4" type="video/mp4" />
     Your browser does not support the video tag.

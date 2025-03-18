@@ -2,11 +2,12 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    background-color: #f3f4f6;
     padding: 40px;
     background-image: url('src/images/bg_3.jpg');
     background-size: cover;
     background-position: center;
+    max-width: 1400px;
+    margin: 0 auto;
   }
   
   .image-container {

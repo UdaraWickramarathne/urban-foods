@@ -12,7 +12,6 @@
     position: relative;
     font-size: 3rem;
     font-weight: 900;
-    color: white;
     cursor: pointer;
     transition:
       filter 0.3s ease,

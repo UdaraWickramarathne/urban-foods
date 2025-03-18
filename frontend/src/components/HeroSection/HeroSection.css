@@ -17,7 +17,7 @@
     height: 100%;
     object-fit: cover;
     z-index: 1;
-    opacity: 1; /* 20% opacity */
+    opacity: 0.4; /* 20% opacity */
 }
 
 .header-contents {
