@@ -50,6 +50,9 @@
   .feature-card img {
     width: 150px;
     margin-bottom: 15px;
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
   }
 
   .feature-card h3 {
