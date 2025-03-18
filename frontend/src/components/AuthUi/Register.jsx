@@ -3,6 +3,7 @@ import "./Register.css";
 import LoginPage from "./Login";
 
 const Register = ({ onClose }) => {
+  const [step, setStep] = useState(1);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [otp, setOtp] = useState("");
@@ -11,6 +12,7 @@ const Register = ({ onClose }) => {
 
   const handleSendOtp = () => {
     console.log(`OTP sent to ${email}`);
+    setStep(2);
   };
 
   const handleVerifyOtp = () => {
