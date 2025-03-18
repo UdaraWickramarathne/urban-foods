@@ -18,7 +18,7 @@ const LoginPage = ({ onClose }) => {
           ) : (
             <div className="card">
               <div className="left-section">
-                <h2>Success starts here</h2>
+                <h2>Sign in here</h2>
                 <ul>
                   <li>✔ Over 700 categories</li>
                   <li>✔ Organic And Fresh</li>
