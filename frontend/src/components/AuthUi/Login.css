@@ -1,0 +1,136 @@
+.container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  background-color: transparent;
+}
+
+.card {
+  display: flex;
+  width: 800px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.left-section {
+  width: 50%;
+  background-color: #2e8b4d;
+  color: white;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+.left-section-image {
+  width: 100%;
+  height: auto;
+  margin-bottom: 20px;
+}
+
+.left-section h2 {
+  font-size: 24px;
+  font-weight: bold;
+  margin-bottom: 10px;
+}
+
+.left-section ul {
+  list-style: none;
+  padding: 0;
+}
+
+.left-section li {
+  margin-bottom: 8px;
+}
+
+.right-section {
+  width: 50%;
+  background-color: white;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+.right-section h2 {
+  font-size: 20px;
+  font-weight: bold;
+}
+
+.right-section p {
+  color: gray;
+  font-size: 14px;
+  margin-bottom: 10px;
+}
+
+.right-section a {
+  color: #007bff;
+  text-decoration: none;
+}
+
+.google-btn,
+.email-btn,
+.apple-btn,
+.facebook-btn {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #ccc;
+  background: white;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  margin-bottom: 10px;
+  cursor: pointer;
+}
+
+.divider {
+  text-align: center;
+  margin: 10px 0;
+  color: gray;
+}
+
+.social-buttons {
+  display: flex;
+  gap: 10px;
+}
+
+.apple-btn,
+.facebook-btn {
+  flex: 1;
+}
+
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.modal-content {
+  padding: 20px;
+  border-radius: 8px;
+  position: relative;
+  background: transparent;
+}
+
+.close-btn {
+  position: absolute;
+  top: 200px;
+  right: 10px;
+  background: none;
+  border: none;
+  font-size: 16px;
+  cursor: pointer;
+}

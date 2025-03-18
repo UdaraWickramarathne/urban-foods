@@ -1,16 +1,23 @@
 import './App.css'
-import FeaturesSection from './components/FeatureSection/FeaturesSection'
-import ProductSection from './components/ProductSection/ProductSection'
-import OfferSection from './components/OfferSection/OfferSection'
+import React, { useState } from 'react';
 import Navbar from './components/Navbar/Navbar'
 import { Route, Routes } from 'react-router-dom'
 import Homepage from './pages/Homepage/Homepage'
+import LoginPage from './components/AuthUi/Login'
 
 function App() {
 
+  const [showLogin, setShowLogin] = useState(false);
+
+  const handleUserIconClick = () => {
+    setShowLogin(!showLogin);
+  };
+
+
   return (
     <>  
-      <Navbar/>
+      <Navbar onUserIconClick={handleUserIconClick}/>
+      {showLogin && <LoginPage />}
       <Routes>
         <Route path="/" element={<Homepage/>}/>
       </Routes>

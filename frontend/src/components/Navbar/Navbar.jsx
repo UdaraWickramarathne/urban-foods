@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import "./Navbar.css";
 import { Link } from "react-router-dom";
 
-const Navbar = () => {
+const Navbar = ({ onUserIconClick }) => {
   const [menu, setMenu] = useState("home");
 
   return (
@@ -54,7 +54,7 @@ const Navbar = () => {
 
         {/* User and Cart Icons */}
         <div className="navbar-icons">
-          <a href="/account" className="icon-user">
+          <a onClick={onUserIconClick} className="icon-user">
             <svg
               xmlns="http://www.w3.org/2000/svg"
               width="20"
