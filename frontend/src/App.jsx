@@ -12,12 +12,15 @@ function App() {
   const handleUserIconClick = () => {
     setShowLogin(!showLogin);
   };
+  const handleCloseLogin = () => {
+    setShowLogin(false);
+  };
 
 
   return (
     <>  
       <Navbar onUserIconClick={handleUserIconClick}/>
-      {showLogin && <LoginPage />}
+      {showLogin && <LoginPage  onClose={handleCloseLogin} />}
       <Routes>
         <Route path="/" element={<Homepage/>}/>
       </Routes>
