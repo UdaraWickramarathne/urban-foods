@@ -1,12 +1,12 @@
 class Customer {
-    constructor(customerId, first_name, last_name, email, phone, address, image_url) {
+    constructor(customerId, firstName, lastName, email, phone, address, imageUrl) {
         this.customerId = customerId;
-        this.first_name = first_name;
-        this.last_name = last_name;
+        this.firstName = firstName;
+        this.lastName = lastName;
         this.email = email;
         this.phone = phone;
         this.address = address;
-        this.image_url = image_url;
+        this.imageUrl = imageUrl;
     }
 
     static fromDbRow(row, metadata) {
