@@ -1,7 +1,8 @@
 class User {
-  constructor(userId, username, role) {
+  constructor(userId, username, password, role) {
     this.userId = userId;
     this.username = username;
+    this.password = password;
     this.role = role;
   }
 
@@ -13,6 +14,7 @@ class User {
     // Initialize with default values
     let userId = null;
     let username = null;
+    let password = null;
     let role = null;
     
     // Check which columns are available in the query results
@@ -24,6 +26,9 @@ class User {
         case 'USERNAME':
           username = row[index];
           break;
+        case 'PASSWORD':
+          password = row[index];
+          break;
         case 'ROLE':
           role = row[index];
           break;
@@ -31,7 +36,7 @@ class User {
     });
     
     // Create user with whatever data we have
-    return new User(userId, username, role);
+    return new User(userId, username, password, role);
   }
 }
 

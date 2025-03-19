@@ -13,7 +13,6 @@ function Homepage() {
       <Hero/>
       <FeaturesSection/>
       <ProductSection/>
-      <OfferSection/>
       <CusromerReview/>
       <Footer />
     </>
