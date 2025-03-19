@@ -8,10 +8,11 @@
   
   .register-box {
   display: flex;
-  width: 800px;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  width: 750px;
+  
   border-radius: 8px;
   overflow: hidden;
+  height: 500px;
   }
 
   .register-left {
@@ -21,19 +22,24 @@
     padding: 20px;
     display: flex;
     flex-direction: column;
-    justify-content: center;
     align-items: center;
+    background-image: url('src/images/windows-5EQkyNai6L0-unsplash.jpg');
+    background-size: cover;
+    background-position: center;
   }
   
   .register-left h2 {
   font-size: 24px;
   font-weight: bold;
   margin-bottom: 10px;
+  color: #2e8b4d;
   }
   
   .register-left ul {
   list-style: none;
   padding: 0;
+  color: #2e8b4d;
+  font-size: 18px;
   }
   
   .register-left ul li {
@@ -108,14 +114,6 @@
     cursor: pointer;
   }
   
-  .apple-btn {
-    background-color: black;
-  }
-  
-  .facebook-btn {
-    background-color: #1877f2;
-  }
-  
   .verify-btn {
     width: 100%;
     background-color: green;
@@ -126,8 +124,22 @@
     border-radius: 4px;
     cursor: pointer;
   }
-  .left-section-image {
+  .back-btn {
+    cursor: pointer;
+  }
+  .resend-btn {
+    cursor: pointer;
+    color: cadetblue;
+  }
+  .loading-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
     width: 100%;
-    height: auto;
-    margin-bottom: 20px;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
   }
