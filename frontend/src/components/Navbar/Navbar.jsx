@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import "./Navbar.css";
 import { Link } from "react-router-dom";
+import TrueFocus from "../TrueFocus/TrueFocus";
 
 const Navbar = ({ onUserIconClick }) => {
   const [menu, setMenu] = useState("home");
@@ -10,7 +11,14 @@ const Navbar = ({ onUserIconClick }) => {
       <div className="navbar-container">
         {/* Logo */}
         <div className="navbar-logo">
-          <a href="/">UrbanFoods</a>
+        <TrueFocus
+          sentence="Urban Foods"
+          manualMode={false}
+          blurAmount={5}
+          borderColor="green"
+          animationDuration={2}
+          pauseBetweenAnimations={1}
+        />
         </div>
         <div className="navbar-links">
           <ul>
