@@ -1,6 +1,6 @@
 @import url("https://fonts.googleapis.com/css2?family=Outfit:wght@100..900&display=swap");
 @import "tailwindcss";
-
+@import "tw-animate-css";
 
 * {
   padding: 0;
@@ -10,12 +10,10 @@
   scroll-behavior: smooth;
 }
 
-
 a {
   text-decoration: none;
   color: inherit;
 }
-
 
 @keyframes fadeIn {
   0% {
@@ -77,4 +75,5 @@ a {
     transform: translateX(0);
   }
 }
+
 

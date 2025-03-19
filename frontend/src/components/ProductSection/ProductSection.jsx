@@ -1,95 +1,59 @@
-import React, { useState } from "react";
-import Slider from "react-slick";
-import "./ProductSection.css";
-import "slick-carousel/slick/slick.css";
-import "slick-carousel/slick/slick-theme.css";
-
-const products = [
-  {
-    id: 1,
-    name: "Fresh Orange",
-    price: "Rs.390.50",
-    image: "src/images/product-1.png",
-    rating: 4.5,
-  },
-  {
-    id: 2,
-    name: "Onion",
-    price: "Rs.120.00",
-    image: "src/images/product-2.png",
-    rating: 4.5,
-  },
-  {
-    id: 3,
-    name: "Meat",
-    price: "Rs.390.50",
-    image: "src/images/product-3.png",
-    rating: 4.5,
-  },
-  {
-    id: 4,
-    name: "Onion",
-    price: "Rs.390.50",
-    image: "src/images/product-4.png",
-    rating: 4.5,
-  },
-  {
-    id: 5,
-    name: "Meat",
-    price: "Rs.120.00",
-    image: "src/images/product-5.png",
-    rating: 4.5,
-  },
-];
+import React, { useState, useEffect, useRef } from 'react';
+import './ProductSection.css';
+import ProductCard from '../ProductCard/ProductCard';
 
 const ProductSection = () => {
-  const [autoPlay, setAutoPlay] = useState(true);
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const sliderRef = useRef(null);
+  
+  // Sample product data
+  const products = [
+    { id: 1, name: 'Coconut', price: 'Rs 205.00', image: 'https://placehold.co/200x200' },
+    { id: 2, name: 'Banana', price: 'Rs 80.00', image: 'https://placehold.co/200x200' },
+    { id: 3, name: 'Apple', price: 'Rs 150.00', image: 'https://placehold.co/200x200' },
+    { id: 4, name: 'Orange', price: 'Rs 120.00', image: 'https://placehold.co/200x200' },
+    { id: 5, name: 'Mango', price: 'Rs 250.00', image: 'https://placehold.co/200x200' },
+    { id: 6, name: 'Pineapple', price: 'Rs 180.00', image: 'https://placehold.co/200x200' },
+    { id: 7, name: 'Watermelon', price: 'Rs 300.00', image: 'https://placehold.co/200x200' },
+    { id: 8, name: 'Papaya', price: 'Rs 190.00', image: 'https://placehold.co/200x200' },
+    { id: 9, name: 'Guava', price: 'Rs 130.00', image: 'https://placehold.co/200x200' },
+    { id: 10, name: 'Dragon Fruit', price: 'Rs 350.00', image: 'https://placehold.co/200x200' }
+  ];
 
-  const settings = {
-    dots: false,
-    infinite: true,
-    speed: 500,
-    slidesToShow: 5,
-    slidesToScroll: 1,
-    autoplay: autoPlay,
-    autoplaySpeed: 2000,
-    responsive: [
-      {
-        breakpoint: 768,
-        settings: {
-          slidesToShow: 1,
-          slidesToScroll: 1,
-        },
-      },
-    ],
-  };
+  // Auto-slide effect
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setCurrentIndex((prevIndex) => {
+        const newIndex = prevIndex + 1;
+        if (newIndex >= products.length - 3) {
+          return 0; // Reset to beginning when reaching end
+        }
+        return newIndex;
+      });
+    }, 3000); // Change slide every 3 seconds
+
+    return () => clearInterval(interval);
+  }, [products.length]);
+
+  // Update scroll position when currentIndex changes
+  useEffect(() => {
+    if (sliderRef.current) {
+      sliderRef.current.scrollTo({
+        left: currentIndex * 220, // 220px is the width of each product card + margin
+        behavior: 'smooth'
+      });
+    }
+  }, [currentIndex]);
 
   return (
-    <section className="products-section">
-      <h2>
-        Our <span>Products</span>
-      </h2>
-      <Slider
-        {...settings}
-        className="products-container"
-        onMouseEnter={() => setAutoPlay(true)}
-        onMouseLeave={() => setAutoPlay(false)}
-      >
+    <div className="product-slider-container">
+      <h2>Featured Products</h2>
+      <div className="product-slider" ref={sliderRef}>
         {products.map((product) => (
-          <div className="product-card" key={product.id}>
-            <img
-              src={product.image}
-              alt={product.name}
-              className="product-image"
-            />
-            <h3>{product.name}</h3>
-            <p>{product.price}</p>
-            <div className="rating">⭐ ⭐ ⭐ ⭐ ⭐</div>
-            <button>Add To Cart</button>
-          </div>
+          <ProductCard key={product.id} product={product} />
         ))}
-      </Slider>
-    </section>
+      </div>
+    </div>
   );
 };
 
