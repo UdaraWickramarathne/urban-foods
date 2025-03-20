@@ -98,7 +98,6 @@ const Register = ({ onClose }) => {
   };
 
   const handleRegister = () => {
-    // Handle the final registration step here
     alert("Registration Successful!");
   };
 
