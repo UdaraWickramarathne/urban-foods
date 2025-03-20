@@ -102,3 +102,6 @@ CREATE TABLE Deliveries (
     tracking_number VARCHAR2(50) UNIQUE NOT NULL,
     FOREIGN KEY (order_id) REFERENCES Orders(order_id) ON DELETE CASCADE
 );
+
+
+Select * from customers

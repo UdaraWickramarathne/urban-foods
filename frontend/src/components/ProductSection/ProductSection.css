@@ -6,9 +6,20 @@
   overflow: hidden;
 }
 
-h2 {
-  margin-bottom: 20px;
+.product-section h2 {
+  font-size: 24px;
+  font-weight: bold;
+  color: #2d3748;
   text-align: center;
+}
+
+.product-section h2 span {
+  background-color: #2f9e44;
+  color: white;
+  padding: 5px 10px;
+  border-radius: 5px;
+  display: inline-block;
+  font-weight: bold;
 }
 
 .product-slider {

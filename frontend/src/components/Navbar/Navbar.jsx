@@ -2,9 +2,13 @@ import React, { useState } from "react";
 import "./Navbar.css";
 import { Link } from "react-router-dom";
 import TrueFocus from "../TrueFocus/TrueFocus";
+import Button from "@mui/material/Button";
+import LoginIcon from "@mui/icons-material/Login";
 
 const Navbar = ({ onUserIconClick }) => {
   const [menu, setMenu] = useState("home");
+
+  const [token, setToken] = useState('');
 
   return (
     <nav className="navbar">
@@ -62,7 +66,7 @@ const Navbar = ({ onUserIconClick }) => {
 
         {/* User and Cart Icons */}
         <div className="navbar-icons">
-          <a onClick={onUserIconClick} className="icon-user">
+          {token ? (<a onClick={onUserIconClick} className="icon-user">
             <svg
               xmlns="http://www.w3.org/2000/svg"
               width="20"
@@ -77,7 +81,8 @@ const Navbar = ({ onUserIconClick }) => {
               <circle cx="12" cy="8" r="5"></circle>
               <path d="M20 21a8 8 0 0 0-16 0"></path>
             </svg>
-          </a>
+          </a>): (<Button  sx={{backgroundColor: "#4CAF50", color: "white", borderRadius: "20px"}} variant="contained" startIcon={<LoginIcon />}>Login</Button>)}
+          
           <a href="/cart" className="icon-cart">
             <div className="cart-container">
               <svg
