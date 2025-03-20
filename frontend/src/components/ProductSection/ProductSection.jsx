@@ -39,19 +39,23 @@ const ProductSection = () => {
   useEffect(() => {
     if (sliderRef.current) {
       sliderRef.current.scrollTo({
-        left: currentIndex * 220, // 220px is the width of each product card + margin
+        left: currentIndex * 275, // 220px is the width of each product card + margin
         behavior: 'smooth'
       });
     }
   }, [currentIndex]);
 
   return (
-    <div className="product-slider-container">
-      <h2>Featured Products</h2>
-      <div className="product-slider" ref={sliderRef}>
-        {products.map((product) => (
-          <ProductCard key={product.id} product={product} />
-        ))}
+    <div className="product-section">
+      <h2>
+      Featured <span>Products</span>
+      </h2>
+      <div className="product-slider-container">
+        <div className="product-slider" ref={sliderRef}>
+          {products.map((product) => (
+            <ProductCard key={product.id} product={product} />
+          ))}
+        </div>
       </div>
     </div>
   );
