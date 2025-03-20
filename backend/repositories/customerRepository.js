@@ -1,90 +1,61 @@
-const mongoose = require('mongoose');
-const validator = require('validator');
+import { getConnection } from "../db/dbConnection.js";
+import Customer from "../models/customer.js";
 
-const AddressSchema = new mongoose.Schema({
-    street: String,
-    city: String,
-    state: String,
-    country: String,
-    postalCode: String
-});
-
-const CustomerSchema = new mongoose.Schema({
-    customerId: {
-        type: String,
-        required: true,
-        unique: true,
-        default: () => 'CUST' + Math.random().toString(36).substr(2, 9).toUpperCase()
-    },
-
-    firstName: {
-        type: String,
-        required: [true, 'First name is required'],
-        trim: true
-    },
-
-    lastName: {
-        type: String,
-        required: [true, 'Last name is required'],
-        trim: true
-    },
-
-    email: {
-        type: String,
-        required: [true, 'Email is required'],
-        unique: true,
-        lowercase: true,
-        trim: true,
-        validate: {
-            validator: validator.isEmail,
-            message: 'Please provide a valid email'
-        }
-    },
-
-    address: AddressSchema
-}, { timestamps: true });
-
-const Customer = mongoose.model('Customer', CustomerSchema);
-
-// Repository methods
-class CustomerRepository {
-    // Update customer details
-    
-    async updateCustomer(customerId, updateData) {
-        try {
-            const customer = await Customer.findOneAndUpdate(
-                { customerId: customerId },
-                { $set: updateData },
-                { new: true, runValidators: true }
-            );
-            return customer;
-        } catch (error) {
-            throw error;
-        }
+const getCustomerById = async (customerId) => {
+  let connection;
+  try {
+    connection = await getConnection();
+    const result = await connection.execute(
+      "SELECT * FROM customers WHERE customer_id = :customerId",
+      {
+        customerId,
+      }
+    );
+    if (result.rows.length === 0) {
+      return null;
     }
-
-    // Update customer address
-    async updateCustomerAddress(customerId, addressData) {
-        try {
-            const customer = await Customer.findOneAndUpdate(
-                { customerId: customerId },
-                { $set: { address: addressData } },
-                { new: true, runValidators: true }
-            );
-            return customer;
-        } catch (error) {
-            throw error;
-        }
+    return Customer.fromDbRow(result.rows[0], result.metaData);
+  } catch (error) {
+    console.error("Error getting customer by ID:", error);
+    return null;
+  } finally {
+    if (connection) {
+      try {
+        await connection.close();
+      } catch (err) {
+        console.error("Error closing connection:", err.message);
+      }
     }
+  }
+};
 
-    // Get customer by ID
-    async getCustomerById(customerId) {
-        try {
-            return await Customer.findOne({ customerId: customerId });
-        } catch (error) {
-            throw error;
-        }
+const getCustomerByEmail = async (email) => {
+  let connection;
+  try {
+    connection = await getConnection();
+    const result = await connection.execute(
+      "SELECT * FROM customers WHERE email = :email",
+      {
+        email,
+      }
+    );
+    if (result.rows.length === 0) {
+      return null;
     }
-}
+    return Customer.fromDbRow(result.rows[0], result.metaData);
+  } catch (error) {
+    console.error("Error getting customer by email:", error);
+    return null;
+  } finally {
+    if (connection) {
+      try {
+        await connection.close();
+      } catch (err) {
+        console.error("Error closing connection:", err.message);
+      }
+    }
+  }
+};
 
-module.exports = new CustomerRepository(); 
+
+export default { getCustomerById, getCustomerByEmail };
