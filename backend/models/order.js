@@ -1,4 +1,4 @@
-class Oder{
+class Order{
     constructor(orderId, customerId, totalAmount, orderDate, status){
         this.orderId = orderId;
         this.customerId = customerId;
@@ -37,6 +37,8 @@ class Oder{
             }
         });
 
-        return new Oder(orderId, customerId, totalAmount, orderDate, status);
+        return new Order(orderId, customerId, totalAmount, orderDate, status);
     }
 }
+
+export default Order;
