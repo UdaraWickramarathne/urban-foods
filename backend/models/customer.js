@@ -4,7 +4,7 @@ class Customer {
         this.firstName = firstName;
         this.lastName = lastName;
         this.email = email;
-        this.phone = phone;
+        //this.phone = phone;
         this.address = address;
         this.imageUrl = imageUrl;
     }
@@ -19,7 +19,7 @@ class Customer {
         let firstName = null;
         let lastName = null;
         let email = null;
-        let phone = null;
+        //let phone = null;
         let address = null;
         let imageUrl = null;
 
@@ -38,9 +38,9 @@ class Customer {
                 case 'EMAIL':
                     email = row[index];
                     break;
-                case 'PHONE':
-                    phone = row[index];
-                    break;
+                // case 'PHONE':
+                //     phone = row[index];
+                //     break;
                 case 'ADDRESS':
                     address = row[index];
                     break;
@@ -51,7 +51,7 @@ class Customer {
         });
 
         // Create user with whatever data we have
-        return new Customer(customerId, firstName, lastName, email, phone, address, imageUrl);
+        return new Customer(customerId, firstName, lastName, email, address, imageUrl);
     }
 }
 
