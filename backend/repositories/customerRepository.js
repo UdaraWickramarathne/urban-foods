@@ -57,5 +57,24 @@ const getCustomerByEmail = async (email) => {
   }
 };
 
+const getAllCustomers = async () => {
+  let connection;
+  try {
+    connection = await getConnection();
+    const result = await connection.execute("SELECT * FROM customers");
+    return result.rows.map((row) => Customer.fromDbRow(row, result.metaData));
+  } catch (error) {
+    console.error("Error getting all customers:", error);
+    return [];
+  } finally {
+    if (connection) {
+      try {
+        await connection.close();
+      } catch (err) {
+        console.error("Error closing connection:", err.message);
+      }
+    }
+  }
+}
 
-export default { getCustomerById, getCustomerByEmail };
+export default { getCustomerById, getCustomerByEmail, getAllCustomers };

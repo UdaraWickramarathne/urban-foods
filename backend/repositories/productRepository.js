@@ -127,5 +127,26 @@ const updateProduct = async (productId, updatedData) => {
   }
 };
 
+const searchProducts = async (keyword) => {
+  console.log("keyword", keyword);
+  let connection;
+  try {
+    connection = await getConnection();
+    const result = await connection.execute(
+      `SELECT * FROM products WHERE name LIKE :keyword`,
+      { keyword: `%${keyword}%` }
+    );
+    const products = result.rows.map((row) => Product.fromDbRow(row, result.metaData));
+    return products;
+  } catch (error) {
+    console.error("Error searching products:", error.message);
+    return [];
+  } finally {
+    if (connection) {
+      await connection.close();
+    }
+  }
+}
 
-export default { getAllProducts,getProductById, insertProduct, deleteProduct, updateProduct };
+
+export default { getAllProducts,getProductById, insertProduct, deleteProduct, updateProduct, searchProducts };
