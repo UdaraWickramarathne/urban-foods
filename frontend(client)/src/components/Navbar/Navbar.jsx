@@ -8,7 +8,7 @@ import LoginIcon from "@mui/icons-material/Login";
 const Navbar = ({ onUserIconClick }) => {
   const [menu, setMenu] = useState("home");
 
-  const [token, setToken] = useState('');
+  const [token, setToken] = useState('1');
 
   return (
     <nav className="navbar">
