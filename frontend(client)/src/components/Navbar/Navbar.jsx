@@ -5,10 +5,13 @@ import TrueFocus from "../TrueFocus/TrueFocus";
 import Button from "@mui/material/Button";
 import LoginIcon from "@mui/icons-material/Login";
 
+
 const Navbar = ({ onUserIconClick }) => {
   const [menu, setMenu] = useState("home");
 
   const [token, setToken] = useState('1');
+
+  const [category, setCategory] = useState("All");
 
   return (
     <nav className="navbar">
@@ -34,9 +37,9 @@ const Navbar = ({ onUserIconClick }) => {
               Home
             </Link>
             <Link
-              to="/shop"
-              className={menu === "shop" ? "active" : ""}
-              onClick={() => setMenu("shop")}
+              to="/explore"
+              className={menu === "explore" ? "active" : ""}
+              onClick={() => setMenu("explore")}
             >
               Shop
             </Link>

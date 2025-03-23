@@ -5,6 +5,8 @@ import { Route, Routes } from 'react-router-dom';
 import Homepage from './pages/Homepage/Homepage';
 import LoginPage from './components/AuthUi/Login';
 import Register from './components/AuthUi/Register';
+import ExplorePage from "./components/ExploreMenu/ExploreMenu.jsx";
+
 
 function App() {
   const [showLogin, setShowLogin] = useState(false);
@@ -44,6 +46,7 @@ function App() {
       )}
       <Routes>
         <Route path="/" element={<Homepage />} />
+        <Route path="/explore" element={<ExplorePage />} />
       </Routes>
     </>
   );
