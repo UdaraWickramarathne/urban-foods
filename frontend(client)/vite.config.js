@@ -18,4 +18,7 @@ export default defineConfig({
       ],
     },
   },
+  define: {
+    'process.env': {}, // Define process.env to avoid the error
+  },
 })
