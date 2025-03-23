@@ -5,6 +5,7 @@ import otpRoutes from './routes/otpRoutes.js';
 import orderRoutes from './routes/orderRoutes.js';
 import productRoutes from './routes/productRoutes.js';
 import customerRoutes from './routes/customerRoutes.js';
+import paymentRoutes from './routes/paymentRoutes.js';
 
 const app = express();
 
@@ -21,6 +22,7 @@ app.use("/api/otp", otpRoutes);
 app.use("/api/orders", orderRoutes);
 app.use("/api/products", productRoutes);
 app.use("/api/customers", customerRoutes);
+app.use('/api/payment', paymentRoutes);
 
 app.listen(5000, () => {
     console.log('Server started on http://localhost:5000');

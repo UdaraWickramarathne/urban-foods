@@ -12,6 +12,9 @@ const Navbar = ({ onUserIconClick }) => {
   const [token, setToken] = useState('1');
 
   const [category, setCategory] = useState("All");
+  const handleCartClick = () => {
+    navigate("/cart"); // Navigate to the shopping cart page
+  };
 
   return (
     <nav className="navbar">
