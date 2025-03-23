@@ -83,7 +83,7 @@ const Navbar = ({ onUserIconClick }) => {
             </svg>
           </a>): (<Button  sx={{backgroundColor: "#4CAF50", color: "white", borderRadius: "20px"}} variant="contained" startIcon={<LoginIcon />}>Login</Button>)}
           
-          <a href="/cart" className="icon-cart">
+          <a href="/Cart" className="icon-cart">
             <div className="cart-container">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
