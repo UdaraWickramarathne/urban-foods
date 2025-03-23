@@ -82,6 +82,27 @@ const updateProduct = async (req, res) => {
   }
 };
 
+const searchProducts = async (req, res) => {
+  console.log("query", req.query);
+  const keyword = req.query.keyword;
+  try {
+    const products = await productRepository.searchProducts(keyword);
+    if(!products){
+     return res.status(HttpStatus.NOT_FOUND).json({
+        success: false,
+        message: "No products found in this keyword",
+      });
+    }
+    res.status(HttpStatus.OK).json(products);
+  } catch (error) {
+    console.error("Error in searchProducts controller:", error.message);
+    res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
+      success: false,
+      message: "Error searching products",
+    });
+  }
+};
+
 
 export default {
   getAllProducts,
@@ -89,5 +110,5 @@ export default {
   insertProduct,
   deleteProduct,
   updateProduct,
-  
+  searchProducts
 };
