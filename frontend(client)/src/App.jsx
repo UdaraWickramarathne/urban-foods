@@ -6,6 +6,8 @@ import Homepage from './pages/Homepage/Homepage';
 import LoginPage from './components/AuthUi/Login';
 import Register from './components/AuthUi/Register';
 import ExplorePage from "./components/ExploreMenu/ExploreMenu.jsx";
+import ShoppingCart from "./components/Cartui/ShoppingCart";
+import PaymentSuccess from "./pages/PaymentSuccess/PaymentSuccess";
 
 
 function App() {
@@ -47,6 +49,8 @@ function App() {
       <Routes>
         <Route path="/" element={<Homepage />} />
         <Route path="/explore" element={<ExplorePage />} />
+        <Route path="/cart" element={<ShoppingCart />} />
+        <Route path="/payment-success" element={<PaymentSuccess />} />
       </Routes>
     </>
   );
