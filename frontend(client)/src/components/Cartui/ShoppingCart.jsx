@@ -3,7 +3,7 @@ import { loadStripe } from "@stripe/stripe-js";
 import './ShoppingCart.css';
 import '@fortawesome/fontawesome-free/css/all.min.css';
 
-const stripePromise = loadStripe(process.env.STRIPE_PUB_KEY);
+const stripePromise = loadStripe('pk_test_51R5u9kJ876iVEC9LUJi4esXkhUVctPpIS8rASj04w8NkM42T8PuH3jpiQWeiSt6dRHD26uUxFdp05yEV628nMIOU00RpX2RhI9');
 
 export default function ShoppingCart() {
   const [cartItems, setCartItems] = useState([
