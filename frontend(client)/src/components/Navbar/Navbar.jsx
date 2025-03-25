@@ -4,12 +4,13 @@ import { Link } from "react-router-dom";
 import TrueFocus from "../TrueFocus/TrueFocus";
 import Button from "@mui/material/Button";
 import LoginIcon from "@mui/icons-material/Login";
+import storeContext from "../../context/storeContext";
 
 
 const Navbar = ({ onUserIconClick }) => {
   const [menu, setMenu] = useState("home");
 
-  const [token, setToken] = useState('1');
+  const {token} = storeContext();
 
   const [category, setCategory] = useState("All");
   const handleCartClick = () => {
@@ -72,7 +73,7 @@ const Navbar = ({ onUserIconClick }) => {
 
         {/* User and Cart Icons */}
         <div className="navbar-icons">
-          {token ? (<a onClick={onUserIconClick} className="icon-user">
+          {token ? (<a  className="icon-user">
             <svg
               xmlns="http://www.w3.org/2000/svg"
               width="20"
@@ -87,7 +88,7 @@ const Navbar = ({ onUserIconClick }) => {
               <circle cx="12" cy="8" r="5"></circle>
               <path d="M20 21a8 8 0 0 0-16 0"></path>
             </svg>
-          </a>): (<Button  sx={{backgroundColor: "#4CAF50", color: "white", borderRadius: "20px"}} variant="contained" startIcon={<LoginIcon />}>Login</Button>)}
+          </a>): (<Button onClick={onUserIconClick} sx={{backgroundColor: "#4CAF50", color: "white", borderRadius: "20px"}} variant="contained" startIcon={<LoginIcon />}>Login</Button>)}
           
           <a href="/Cart" className="icon-cart">
             <div className="cart-container">
