@@ -38,9 +38,12 @@ const getProductById = async (req, res) => {
   }
 };
 
+
 const insertProduct = async (req, res) => {
   try {
+    const imageUrl = req.file ? req.file.filename : null;
     const productData = req.body;
+    productData.imageUrl = imageUrl;
     const result = await productRepository.insertProduct(productData);
     if (result.success) {
       res.status(201).json({ success: true, productId: result.productId });
@@ -53,6 +56,7 @@ const insertProduct = async (req, res) => {
   }
 };
 
+
 const deleteProduct = async (req, res) => {
   try {
     const result = await productRepository.deleteProduct(req.params.productId);
@@ -64,7 +68,6 @@ const deleteProduct = async (req, res) => {
     });
   }
 };
-
 
 
 const updateProduct = async (req, res) => {
