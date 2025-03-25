@@ -5,8 +5,8 @@ import customerRepository from '../repositories/customerRepository.js';
 const requestOtp = async (req, res) => {
   const { email } = req.body;
   const isEmailExists = await customerRepository.getCustomerByEmail(email);
-  if (!isEmailExists) {
-    return res.status(HttpStatus.BAD_REQUEST).json({ message: 'Email not found' });
+  if (isEmailExists) {
+    return res.status(HttpStatus.BAD_REQUEST).json({ message: 'Email is already used!' });
   }
   try {
     await sendOtp(email);

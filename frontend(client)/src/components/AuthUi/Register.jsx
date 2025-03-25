@@ -78,8 +78,72 @@ const Register = ({ onClose, onSwitchToLogin }) => {
     }
   };
 
-  const handleRegister = () => {
-    alert("Registration Successful!");
+  const handleRegister = async () => {
+    setIsLoading(true);
+    setError("");
+    
+    try {
+      // Validate input fields
+      if (userType === "customer") {
+        if (!name || !telephone || !address) {
+          setError("Please fill in all required fields");
+          setIsLoading(false);
+          return;
+        }
+        
+        // Make API call to register customer
+        const response = await axios.post("http://localhost:5000/api/users/register-customer", {
+          username: email,
+          password: password,
+          firstName: name.split(' ')[0], // Assuming first name is first part of full name
+          lastName: name.includes(' ') ? name.split(' ').slice(1).join(' ') : '', // Rest is last name
+          email: email,
+          phoneNumber: telephone,
+          address: address
+        });
+        
+        if (response.data.success) {
+          // Store token in localStorage
+          localStorage.setItem('token', response.data.token);
+          localStorage.setItem('userId', response.data.userId);
+          
+          // Close modal and refresh page or redirect
+          onClose();
+          window.location.reload();
+        }
+      } else if (userType === "supplier") {
+        if (!name || !age) {
+          setError("Please fill in all required fields");
+          setIsLoading(false);
+          return;
+        }
+        
+        // Make API call to register supplier
+        const response = await axios.post("http://localhost:5000/api/users/register-supplier", {
+          username: email,
+          password: password,
+          business_name: name,
+          email: email,
+          phoneNumber: "",
+          address: ""
+        });
+        
+        if (response.data.success) {
+          // Store token in localStorage
+          localStorage.setItem('token', response.data.token);
+          localStorage.setItem('userId', response.data.userId);
+          
+          // Close modal and refresh page or redirect
+          onClose();
+          window.location.reload();
+        }
+      }
+    } catch (error) {
+      console.error("Registration error:", error);
+      setError(error.response?.data?.message || "Failed to register. Please try again.");
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (

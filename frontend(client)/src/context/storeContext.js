@@ -1,7 +1,7 @@
 import {create} from 'zustand';
 import { VALIDATE_TOKEN } from './constants';
 
-const useStore = create((set, get) =>({
+const storeContext = create((set, get) =>({
     token: localStorage.getItem('token') || '',
     userId: localStorage.getItem('userId') || '',
     setToken: (token) => {
@@ -36,4 +36,4 @@ const useStore = create((set, get) =>({
     }
 }))
 
-export default useStore;
+export default storeContext;

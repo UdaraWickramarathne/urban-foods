@@ -21,4 +21,4 @@ const getConnection = async () => {
   }
 };
 
-export { dbConfig, getConnection };
+export { getConnection };
