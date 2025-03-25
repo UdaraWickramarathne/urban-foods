@@ -20,6 +20,7 @@
     "jsonwebtoken": "^9.0.2",
     "lottie-react": "^2.4.1",
     "mongoose": "^8.12.1",
+    "multer": "^1.4.5-lts.2",
     "nodemailer": "^6.10.0",
     "oracledb": "^6.8.0",
     "react-lottie": "^1.2.10",

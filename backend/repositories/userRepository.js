@@ -3,6 +3,7 @@ import User from "../models/user.js";
 import { hashPassword, verifyPassword } from "../utils/passwordUtils.js";
 import auth from "../middlewares/auth.js";
 import oracledb from "oracledb";
+import jwt from "jsonwebtoken";
 
 const { generateToken } = auth;
 
@@ -56,9 +57,11 @@ const getUserByUsername = async (username) => {
       }
     }
   }
-}
+};
 
 const saveCustomer = async ({ userData, customerData }) => {
+  console.log("Saving customer:", userData, customerData);
+  
   // Validate required fields
   if (!userData.username || !userData.password) {
     return {
@@ -241,6 +244,79 @@ const saveSupplier = async ({ userData, supplierData }) => {
   }
 };
 
+const saveAdmin = async ({ userData }) => {
+  // Validate required fields
+  console.log(userData.username);
+    
+  if (!userData.username || !userData.password) {
+    return {
+      success: false,
+      message: "Username and password are required",
+    };
+  }
+
+  let connection;
+  try {
+    connection = await getConnection();
+    const hashedPassword = await hashPassword(userData.password);
+
+    connection.autoCommit = false;
+
+    const result = await connection.execute(
+      "INSERT INTO users (username, password, role) VALUES (:username, :password, :role) RETURNING user_id INTO :user_id",
+      {
+        username: userData.username,
+        password: hashedPassword,
+        role: userData.role || "admin", // Default role if not provided
+        user_id: { type: oracledb.NUMBER, dir: oracledb.BIND_OUT },
+      }
+    );
+
+    const userId = result.outBinds.user_id[0];
+
+    await connection.commit();
+
+    const token = generateToken(userId, userData.role || "admin");
+
+    return {
+      token: token,
+      userId: userId,
+      success: true,
+      message: "Admin registration successful",
+    };
+  } catch (error) {
+    if (connection) {
+      try {
+        await connection.rollback();
+      } catch (rollbackError) {
+        console.error("Rollback error:", rollbackError.message);
+      }
+    }
+
+    console.error("Error saving admin:", error.message);
+
+    if (error.message.includes("unique constraint")) {
+      return {
+        success: false,
+        message: "Username already exists",
+      };
+    }
+
+    return {
+      success: false,
+      message: "Error registering admin",
+    };
+  } finally {
+    if (connection) {
+      try {
+        await connection.close();
+      } catch (err) {
+        console.error("Error closing connection:", err.message);
+      }
+    }
+  }
+};
+
 const login = async ({ username, password }) => {
   if (!username || !password) {
     return {
@@ -303,4 +379,45 @@ const login = async ({ username, password }) => {
   }
 };
 
-export default { getAllUsers, saveCustomer, saveSupplier, login, getUserByUsername };
+const validateToken = async (token) => {
+  if (!token) {
+    return {
+      success: false,
+      message: "Token is required"
+    };
+  }
+
+  try {
+    // Since the auth middleware's verifyToken doesn't return a value,
+    // we need to use jwt directly to verify and decode the token
+  
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    console.log(decoded);
+    
+    
+    return {
+      success: true,
+      message: "Token is valid",
+      data: {
+        userId: decoded.userId,
+        role: decoded.role
+      }
+    };
+  } catch (error) {
+    console.log("Token validation error:", error.message);
+    return {
+      success: false,
+      message: error.message || "Invalid token"
+    };
+  }
+};
+
+export default {
+  getAllUsers,
+  saveCustomer,
+  saveSupplier,
+  login,
+  getUserByUsername,
+  saveAdmin,
+  validateToken
+};

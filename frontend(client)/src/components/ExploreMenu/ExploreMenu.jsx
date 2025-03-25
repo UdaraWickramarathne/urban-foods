@@ -4,14 +4,29 @@ import { menu_list } from "../../assets/assets";
 import ProductCard from "../ProductCard/ProductCard";
 
 const products = [
-  { id: 1, name: "Caesar Salad", category: "Salad", price: "$10", image: "src/assets/tomato.png" },
-  { id: 2, name: "Veggie Roll", category: "Rolls", price: "$8", image: "src/assets/tomato.png" },
-  { id: 3, name: "Chocolate Cake", category: "Cake", price: "$15", image: "src/assets/tomato.png" },
-  { id: 4, name: "Fruit Salad", category: "Salad", price: "$12", image: "src/assets/tomato.png" },
-  { id: 5, name: "Cheese Sandwich", category: "Sandwich", price: "$7", image: "src/assets/tomato.png" },
-  { id: 3, name: "Chocolate Cake", category: "Cake", price: "$15", image: "src/assets/tomato.png" },
-  { id: 4, name: "Fruit Salad", category: "Salad", price: "$12", image: "src/assets/tomato.png" },
-  { id: 5, name: "Cheese Sandwich", category: "Sandwich", price: "$7", image: "src/assets/tomato.png" },
+  {
+    id: 1,
+    name: "Caesar Salad",
+    image: "src/assets/tomato.png",
+    price: "$10",
+    description: "A classic Caesar Salad with fresh lettuce, croutons, and Caesar dressing.",
+    rating: 4.5,
+    reviewsCount: 45,
+    reviews: [
+      {
+        reviewer: "John D.",
+        date: "Reviewed yesterday",
+        rating: 5,
+        text: "Fresh and delicious! The dressing was perfect."
+      },
+      {
+        reviewer: "Emily R.",
+        date: "Reviewed 2 days ago",
+        rating: 4,
+        text: "Great salad, but could use more croutons."
+      }
+    ]
+  },
 ];
 
 const ExploreMenu = ({ category, setCategory }) => {

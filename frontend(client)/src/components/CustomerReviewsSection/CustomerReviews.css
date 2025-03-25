@@ -61,3 +61,17 @@
   color: #f4b400;
   font-size: 20px;
 }
+
+.add-review-btn {
+  background-color: #4caf50;
+  color: white;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  margin-bottom: 20px;
+}
+
+.add-review-btn:hover {
+  background-color: #45a049;
+}
