@@ -170,4 +170,4 @@ const deleteCustomer = async (customerId) => {
   }
 };
 
-export default { getCustomerById, getCustomerByEmail, getAllCustomers };
+export default { getCustomerById, getCustomerByEmail, getAllCustomers,deleteCustomer,editCustomer };

@@ -11,10 +11,11 @@ const Register = ({ onClose, onSwitchToLogin }) => {
   const [showEmailPassword, setShowEmailPassword] = useState(false);
   const [error, setError] = useState("");
   const [userType, setUserType] = useState("");
-  const [name, setName] = useState("");
-  const [telephone, setTelephone] = useState("");
+  const [fname, setfName] = useState("");
+  const [lname, setlName] = useState("");
+  const [bname, setbName] = useState("");
+  const [username, setUsername] = useState("");
   const [address, setAddress] = useState("");
-  const [age, setAge] = useState("");
   const [isLoading, setIsLoading] = useState(false);
 
   const handleSendOtp = async () => {
@@ -80,67 +81,46 @@ const Register = ({ onClose, onSwitchToLogin }) => {
 
   const handleRegister = async () => {
     setIsLoading(true);
-    setError("");
-    
     try {
-      // Validate input fields
-      if (userType === "customer") {
-        if (!name || !telephone || !address) {
-          setError("Please fill in all required fields");
-          setIsLoading(false);
-          return;
-        }
-        
-        // Make API call to register customer
-        const response = await axios.post("http://localhost:5000/api/users/register-customer", {
-          username: email,
-          password: password,
-          firstName: name.split(' ')[0], // Assuming first name is first part of full name
-          lastName: name.includes(' ') ? name.split(' ').slice(1).join(' ') : '', // Rest is last name
-          email: email,
-          phoneNumber: telephone,
-          address: address
-        });
-        
-        if (response.data.success) {
-          // Store token in localStorage
-          localStorage.setItem('token', response.data.token);
-          localStorage.setItem('userId', response.data.userId);
-          
-          // Close modal and refresh page or redirect
-          onClose();
-          window.location.reload();
-        }
-      } else if (userType === "supplier") {
-        if (!name || !age) {
-          setError("Please fill in all required fields");
-          setIsLoading(false);
-          return;
-        }
-        
-        // Make API call to register supplier
-        const response = await axios.post("http://localhost:5000/api/users/register-supplier", {
-          username: email,
-          password: password,
-          business_name: name,
-          email: email,
-          phoneNumber: "",
-          address: ""
-        });
-        
-        if (response.data.success) {
-          // Store token in localStorage
-          localStorage.setItem('token', response.data.token);
-          localStorage.setItem('userId', response.data.userId);
-          
-          // Close modal and refresh page or redirect
-          onClose();
-          window.location.reload();
-        }
+      const endpoint =
+        userType === "customer"
+          ? "http://localhost:5000/api/users/customer"
+          : "http://localhost:5000/api/users/supplier";
+  
+      const payload =
+        userType === "customer"
+          ? { 
+              firstName: fname, 
+              lastName: lname, 
+              username : username, 
+              address : address, 
+              email : email, 
+              password :password, 
+              imageUrl: null 
+            }
+          : { 
+              business_name: bname, 
+              address: address, 
+              email:email, 
+              password:password, 
+              imageUrl: null 
+            };
+  
+      console.log("Payload being sent:", payload);
+  
+      const response = await axios.post(endpoint, payload);
+  
+      if (response.status === 201) {
+        alert("Registration Successful!");
+        onClose();
+      } else {
+        setError(response.data.message || "Registration failed");
       }
     } catch (error) {
-      console.error("Registration error:", error);
-      setError(error.response?.data?.message || "Failed to register. Please try again.");
+      console.error("Error during registration:", error);
+      setError(
+        error.response?.data?.message || "Registration failed. Please try again."
+      );
     } finally {
       setIsLoading(false);
     }
@@ -239,16 +219,23 @@ const Register = ({ onClose, onSwitchToLogin }) => {
                       <h2>Register as Customer</h2>
                       <input
                         type="text"
-                        placeholder="Enter your name"
-                        value={name}
-                        onChange={(e) => setName(e.target.value)}
+                        placeholder="Enter your first name"
+                        value={fname}
+                        onChange={(e) => setfName(e.target.value)}
                         className="input-field"
                       />
                       <input
                         type="text"
-                        placeholder="Enter your telephone"
-                        value={telephone}
-                        onChange={(e) => setTelephone(e.target.value)}
+                        placeholder="Enter your last name"
+                        value={lname}
+                        onChange={(e) => setlName(e.target.value)}
+                        className="input-field"
+                      />
+                      <input
+                        type="text"
+                        placeholder="Enter your User Name"
+                        value={username}
+                        onChange={(e) => setUsername(e.target.value)}
                         className="input-field"
                       />
                       <input
@@ -271,15 +258,15 @@ const Register = ({ onClose, onSwitchToLogin }) => {
                       <input
                         type="text"
                         placeholder="Enter your name"
-                        value={name}
-                        onChange={(e) => setName(e.target.value)}
+                        value={bname}
+                        onChange={(e) => setbName(e.target.value)}
                         className="input-field"
                       />
                       <input
                         type="text"
-                        placeholder="Enter your age"
-                        value={age}
-                        onChange={(e) => setAge(e.target.value)}
+                        placeholder="Enter your address"
+                        value={address}
+                        onChange={(e) => setAddress(e.target.value)}
                         className="input-field"
                       />
                       <button onClick={handleRegister} className="continue-btn">

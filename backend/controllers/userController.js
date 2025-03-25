@@ -25,8 +25,11 @@ const registerCustomer = async (req, res) => {
     const { username, password, role } = req.body;
 
     // Extract customer profile fields
-    const { firstName, lastName, email, phoneNumber, address, imageUrl } =
+    const { firstName, lastName, email, address, imageUrl } =
       req.body;
+
+      console.log("Pass req.body");
+      
 
     // Basic validation
     if (!username || !password || !email || !firstName || !lastName) {
@@ -36,7 +39,7 @@ const registerCustomer = async (req, res) => {
           "Missing required fields: username, password, email, firstName, and lastName are required",
       });
     }
-
+    console.log("Pass req.body");
     // Validate password strength
     if (password.length < 8) {
       return res.status(HttpStatus.BAD_REQUEST).json({
@@ -78,13 +81,15 @@ const registerCustomer = async (req, res) => {
         message: "Username is already exists",
       });
     }
-
+    console.log("Pass username");
+    
     // Pass both data objects to repository
     const result = await userRepository.saveCustomer({
       userData,
       customerData,
     });
-
+    console.log("Pass saveCustomer");
+    
     if (!result) {
       return res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
         success: false,
@@ -118,9 +123,9 @@ const registerSupplier = async (req, res) => {
   try {
     const { username, password, role } = req.body;
 
-    const { business_name, email, phoneNumber, address, imageUrl } = req.body;
+    const { businessName, email, phoneNumber, address, imageUrl } = req.body;
 
-    if (!username || !password || !email || !business_name) {
+    if (!username || !password || !email || !businessName) {
       return res.status(HttpStatus.BAD_REQUEST).json({
         success: false,
         message:
