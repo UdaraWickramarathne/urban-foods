@@ -1,4 +1,4 @@
-import adminRepository from "../repositories/adminRepository";
+import adminRepository from "../repositories/adminRepository.js";
 
 const addOrcleUser = async (req, res) => {
     try {

@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import axios from "axios";
 import "./Register.css";
 import loadingImage from "../../images/loading.gif";
+import storeContext from "../../context/storeContext";
 
 const Register = ({ onClose, onSwitchToLogin }) => {
   const [step, setStep] = useState(1);
@@ -11,12 +12,14 @@ const Register = ({ onClose, onSwitchToLogin }) => {
   const [showEmailPassword, setShowEmailPassword] = useState(false);
   const [error, setError] = useState("");
   const [userType, setUserType] = useState("");
-  const [fname, setfName] = useState("");
-  const [lname, setlName] = useState("");
+  const [firstName, setfName] = useState("");
+  const [lastName, setlName] = useState("");
   const [bname, setbName] = useState("");
   const [username, setUsername] = useState("");
   const [address, setAddress] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+
+  const {setToken} = storeContext();
 
   const handleSendOtp = async () => {
     setIsLoading(true);
@@ -80,49 +83,47 @@ const Register = ({ onClose, onSwitchToLogin }) => {
   };
 
   const handleRegister = async () => {
-    setIsLoading(true);
-    try {
-      const endpoint =
-        userType === "customer"
-          ? "http://localhost:5000/api/users/customer"
-          : "http://localhost:5000/api/users/supplier";
-  
-      const payload =
-        userType === "customer"
-          ? { 
-              firstName: fname, 
-              lastName: lname, 
-              username : username, 
-              address : address, 
-              email : email, 
-              password :password, 
-              imageUrl: null 
-            }
-          : { 
-              business_name: bname, 
-              address: address, 
-              email:email, 
-              password:password, 
-              imageUrl: null 
-            };
-  
-      console.log("Payload being sent:", payload);
-  
-      const response = await axios.post(endpoint, payload);
-  
-      if (response.status === 201) {
-        alert("Registration Successful!");
-        onClose();
-      } else {
-        setError(response.data.message || "Registration failed");
+    if(userType === "customer") {
+      setIsLoading(true);
+      try {
+        const response = await axios.post("http://localhost:5000/api/users/customer", {
+          email: email,
+          password: password,
+          firstName: firstName,
+          lastName: lastName,
+          username: username,
+          address: address,
+          role: 'customer',
+        });
+        if (response.status === 201) {
+          const result = response.data;
+          setToken(result.token);
+          console.log(result);
+          onClose();
+        }
+      } catch (error) {
+        setError("Failed to register");
+      } finally {
+        setIsLoading(false);
       }
-    } catch (error) {
-      console.error("Error during registration:", error);
-      setError(
-        error.response?.data?.message || "Registration failed. Please try again."
-      );
-    } finally {
-      setIsLoading(false);
+    }else if(userType === "supplier") {
+      setIsLoading(true);
+      try {
+        const response = await axios.post("http://localhost:5000/api/users/supplier", {
+          email: email,
+          password: password,
+          bname: bname,
+          address: address,
+          role: 'supplier',
+        });
+        if (response.status === 200) {
+          onClose();
+        }
+      } catch (error) {
+        setError("Failed to register");
+      } finally {
+        setIsLoading(false);
+      }
     }
   };
 
@@ -220,14 +221,14 @@ const Register = ({ onClose, onSwitchToLogin }) => {
                       <input
                         type="text"
                         placeholder="Enter your first name"
-                        value={fname}
+                        value={firstName}
                         onChange={(e) => setfName(e.target.value)}
                         className="input-field"
                       />
                       <input
                         type="text"
                         placeholder="Enter your last name"
-                        value={lname}
+                        value={lastName}
                         onChange={(e) => setlName(e.target.value)}
                         className="input-field"
                       />
