@@ -10,16 +10,22 @@
     "dev": "nodemon backend/server.js"
   },
   "dependencies": {
+    "@fortawesome/fontawesome-free": "^6.7.2",
+    "@stripe/stripe-js": "^6.1.0",
     "axios": "^1.8.3",
     "bcrypt": "^5.1.1",
     "cors": "^2.8.5",
+    "date-fns": "^4.1.0",
     "dotenv": "^16.4.7",
     "express": "^4.21.2",
     "jsonwebtoken": "^9.0.2",
+    "lottie-react": "^2.4.1",
     "mongoose": "^8.12.1",
     "multer": "^1.4.5-lts.2",
     "nodemailer": "^6.10.0",
-    "oracledb": "^6.8.0"
+    "oracledb": "^6.8.0",
+    "react-lottie": "^1.2.10",
+    "stripe": "^17.7.0"
   },
   "devDependencies": {
     "nodemon": "^3.1.9"

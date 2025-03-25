@@ -5,10 +5,16 @@ import TrueFocus from "../TrueFocus/TrueFocus";
 import Button from "@mui/material/Button";
 import LoginIcon from "@mui/icons-material/Login";
 
+
 const Navbar = ({ onUserIconClick }) => {
   const [menu, setMenu] = useState("home");
 
   const [token, setToken] = useState('1');
+
+  const [category, setCategory] = useState("All");
+  const handleCartClick = () => {
+    navigate("/cart"); // Navigate to the shopping cart page
+  };
 
   return (
     <nav className="navbar">
@@ -34,9 +40,9 @@ const Navbar = ({ onUserIconClick }) => {
               Home
             </Link>
             <Link
-              to="/shop"
-              className={menu === "shop" ? "active" : ""}
-              onClick={() => setMenu("shop")}
+              to="/explore"
+              className={menu === "explore" ? "active" : ""}
+              onClick={() => setMenu("explore")}
             >
               Shop
             </Link>
@@ -83,7 +89,7 @@ const Navbar = ({ onUserIconClick }) => {
             </svg>
           </a>): (<Button  sx={{backgroundColor: "#4CAF50", color: "white", borderRadius: "20px"}} variant="contained" startIcon={<LoginIcon />}>Login</Button>)}
           
-          <a href="/cart" className="icon-cart">
+          <a href="/Cart" className="icon-cart">
             <div className="cart-container">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
