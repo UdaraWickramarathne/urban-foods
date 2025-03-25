@@ -59,6 +59,8 @@ const getUserByUsername = async (username) => {
 }
 
 const saveCustomer = async ({ userData, customerData }) => {
+  console.log("Saving customer:", userData, customerData);
+  
   // Validate required fields
   if (!userData.username || !userData.password) {
     return {
