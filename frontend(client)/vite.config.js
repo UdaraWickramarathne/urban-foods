@@ -17,6 +17,7 @@ export default defineConfig({
         path.resolve(__dirname, ".."),
       ],
     },
+    port: 5174,
   },
   define: {
     'process.env': {}, // Define process.env to avoid the error
