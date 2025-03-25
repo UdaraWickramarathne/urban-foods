@@ -6,6 +6,7 @@ import orderRoutes from './routes/orderRoutes.js';
 import productRoutes from './routes/productRoutes.js';
 import customerRoutes from './routes/customerRoutes.js';
 import paymentRoutes from './routes/paymentRoutes.js';
+import cartRoutes from './routes/cartRoutes.js';
 
 const app = express();
 
@@ -23,7 +24,8 @@ app.use("/api/orders", orderRoutes);
 app.use("/api/products", productRoutes);
 app.use("/api/customers", customerRoutes);
 app.use('/api/payment', paymentRoutes);
+app.use("/api/cart", cartRoutes);
 
 app.listen(5000, () => {
     console.log('Server started on http://localhost:5000');
-})
+});
