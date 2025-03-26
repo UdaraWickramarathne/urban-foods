@@ -9,6 +9,7 @@ import categoryRoutes from './routes/categoryRoutes.js';
 import adminRoutes from './routes/adminRoutes.js';
 
 import paymentRoutes from './routes/paymentRoutes.js';
+import cartRoutes from './routes/cartRoutes.js';
 
 
 const app = express();
@@ -31,8 +32,9 @@ app.use("/api/category", categoryRoutes);
 app.use("/images/products", express.static("uploads/products"));
 app.use("/api/admin", adminRoutes);
 app.use('/api/payment', paymentRoutes);
+app.use("/api/cart", cartRoutes);
 
 
 app.listen(5000, () => {
     console.log('Server started on http://localhost:5000');
-})
+});
