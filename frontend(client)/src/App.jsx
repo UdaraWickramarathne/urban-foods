@@ -10,6 +10,7 @@ import ShoppingCart from "./components/Cartui/ShoppingCart";
 import PaymentSuccess from "./pages/PaymentSuccess/PaymentSuccess";
 import ProductDetails from "./pages/ProductDtails/ProductDtails";
 import Profile from './components/ProfileUi/Profile.jsx';
+import About from './components/About/About.jsx';
 
 
 function App() {
@@ -55,6 +56,7 @@ function App() {
         <Route path="/payment-success" element={<PaymentSuccess />} />
         <Route path="/product/:id" element={<ProductDetails />} />
         <Route path="/profile"  element={<Profile />} />
+        <Route path="/about"  element={<About />} />
       </Routes>
     </>
   );
