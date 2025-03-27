@@ -7,12 +7,8 @@ const getAllSuppliersWithDetails = async () => {
         // Get a connection from the pool
         connection = await getConnection();
         
-        // Execute the stored procedure
-        // Since this stored procedure doesn't return values directly but uses DBMS_OUTPUT,
-        // we need to enable serverOutput and then retrieve it after execution
         await connection.execute(`BEGIN DBMS_OUTPUT.ENABLE(NULL); END;`);
         
-        // Execute the stored procedure
         await connection.execute(`BEGIN get_suppliers_details; END;`);
         
         // Get the output buffer
@@ -96,5 +92,36 @@ const getAllSuppliersWithDetails = async () => {
         }
     }
 };
+
+const updateSupplier = async (supplierId, supplier) => {
+    let connection;
+    try {
+        connection = await getConnection();
+        
+        const result = await connection.execute(
+            `UPDATE suppliers SET business_name = :businessName, email = :email, address = :address WHERE supplier_id = :supplierId`,
+            {
+                businessName: supplier.businessName,
+                email: supplier.email,
+                address: supplier.address,
+                supplierId
+            },
+            { autoCommit: true }
+        );
+        
+        return result;
+    } catch (error) {
+        console.error('Error updating supplier:', error);
+        return null;
+    } finally {
+        if (connection) {
+            try {
+                await connection.close();
+            } catch (error) {
+                console.error('Error closing connection:', error);
+            }
+        }
+    }
+}
 
 export default { getAllSuppliersWithDetails };

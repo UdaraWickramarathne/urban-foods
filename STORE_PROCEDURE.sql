@@ -61,13 +61,14 @@ CREATE OR REPLACE PROCEDURE get_suppliers_details
 IS
     -- Declare a cursor to select all supplier ids
     CURSOR supplier_cursor IS
-        SELECT supplier_id, business_name, address
+        SELECT supplier_id, business_name, address, email
         FROM suppliers;
     
     -- Variables to hold supplier data for each record
     v_supplier_id NUMBER;
     v_supplier_name VARCHAR2(50);
     v_supplier_address VARCHAR2(255);
+    v_supplier_email VARCHAR2(50);
     v_product_count NUMBER;
     v_total_sales NUMBER(10,2);
     v_success_order_count NUMBER;
@@ -78,7 +79,7 @@ BEGIN
     
     -- Loop through each supplier in the cursor
     LOOP
-        FETCH supplier_cursor INTO v_supplier_id, v_supplier_name, v_supplier_address;
+        FETCH supplier_cursor INTO v_supplier_id, v_supplier_name, v_supplier_address, v_supplier_email;
         
         EXIT WHEN supplier_cursor%NOTFOUND;
 
@@ -107,6 +108,7 @@ BEGIN
         -- Output the results for the current supplier
         DBMS_OUTPUT.PUT_LINE('Supplier ID: ' || v_supplier_id);
         DBMS_OUTPUT.PUT_LINE('Supplier Name: ' || v_supplier_name);
+        DBMS_OUTPUT.PUT_LINE('Supplier Email: ' || v_supplier_email);
         DBMS_OUTPUT.PUT_LINE('Supplier Address: ' || v_supplier_address);
         DBMS_OUTPUT.PUT_LINE('Product Count: ' || v_product_count);
         DBMS_OUTPUT.PUT_LINE('Total Sales: ' || v_total_sales);
