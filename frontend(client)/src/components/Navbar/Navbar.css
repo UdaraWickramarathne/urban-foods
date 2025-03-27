@@ -116,3 +116,37 @@
     justify-content: space-between;
   }
 }
+.user-icon-container {
+  position: relative;
+}
+
+.dropdown-menu {
+  position: absolute;
+  top: 40px;
+  right: 0;
+  border-radius: 8px;
+  z-index: 1000;
+  width: 150px;
+}
+
+.dropdown-item {
+  padding: 10px 25px;
+  color: #333;
+  text-decoration: none;
+  align-items: center;
+  display: block;
+  cursor: pointer;
+}
+.dropdown-item1{
+  padding: 10px 25px;
+  padding-left: 45px;
+  color: #333;
+  cursor: pointer;
+}
+
+.dropdown-item:hover {
+  color: #46cb74;
+}
+.dropdown-item1:hover {
+  color: #46cb74;
+}

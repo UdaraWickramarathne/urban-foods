@@ -56,16 +56,16 @@ const getCustomerById = async (req, res) => {
     try {
         const customerId = req.params.customerId;
         const result = await customerRepository.getCustomerById(customerId);
-
-        if (result.success) {
+        
+        if (result) {
             res.status(HttpStatus.OK).json({
                 success: true,
-                data: result.data
+                data: result
             });
         } else {
             res.status(HttpStatus.NOT_FOUND).json({
                 success: false,
-                message: result.message
+                message: 'Customer not found'
             });
         }
     } catch (error) {
