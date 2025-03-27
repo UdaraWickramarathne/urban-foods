@@ -28,20 +28,20 @@ const registerCustomer = async (req, res) => {
     const { firstName, lastName, email, address, imageUrl } =
       req.body;
     
-    // Basic validation
-    // if (!username || !password || !email || !firstName || !lastName) {
-    //   return res.status(HttpStatus.BAD_REQUEST).json({
-    //     success: false,
-    //     message:
-    //       "Missing required fields: username, password, email, firstName, and lastName are required",
-    //   });
-    // }
-    // if (password.length < 8) {
-    //   return res.status(HttpStatus.BAD_REQUEST).json({
-    //     success: false,
-    //     message: "Password must be at least 8 characters long",
-    //   });
-    // }
+    //Basic validation
+    if (!username || !password || !email || !firstName || !lastName) {
+      return res.status(HttpStatus.BAD_REQUEST).json({
+        success: false,
+        message:
+          "Missing required fields: username, password, email, firstName, and lastName are required",
+      });
+    }
+    if (password.length < 8) {
+      return res.status(HttpStatus.BAD_REQUEST).json({
+        success: false,
+        message: "Password must be at least 8 characters long",
+      });
+    }
 
     // Create separate objects for different tables
     const userData = {

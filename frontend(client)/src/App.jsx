@@ -9,6 +9,7 @@ import ExplorePage from "./components/ExploreMenu/ExploreMenu.jsx";
 import ShoppingCart from "./components/Cartui/ShoppingCart";
 import PaymentSuccess from "./pages/PaymentSuccess/PaymentSuccess";
 import ProductDetails from "./pages/ProductDtails/ProductDtails";
+import Profile from './components/ProfileUi/Profile.jsx';
 
 
 function App() {
@@ -49,10 +50,11 @@ function App() {
       )}
       <Routes>
         <Route path="/" element={<Homepage />} />
-        <Route path="/explore" element={<ExplorePage />} />
+        <Route path="/shop" element={<ExplorePage />} />
         <Route path="/cart" element={<ShoppingCart />} />
         <Route path="/payment-success" element={<PaymentSuccess />} />
         <Route path="/product/:id" element={<ProductDetails />} />
+        <Route path="/profile"  element={<Profile />} />
       </Routes>
     </>
   );

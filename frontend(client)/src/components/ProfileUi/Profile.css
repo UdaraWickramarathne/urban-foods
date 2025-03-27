@@ -190,7 +190,7 @@
       width: 100%;
       max-width: 600px;
       display: flex;
-      justify-content: space-between;
+
       align-items: center;
       padding-bottom: 20px;
     }
@@ -212,21 +212,6 @@
     .email {
       color: gray;
       font-size: 16px;
-    }
-    
-    .edit-btn {
-      background-color: #007bff;
-      color: white;
-      border: none;
-      padding: 12px 20px;
-      font-size: 16px;
-      border-radius: 8px;
-      cursor: pointer;
-      transition: 0.3s;
-    }
-    
-    .edit-btn:hover {
-      background-color: #0056b3;
     }
     
     .profile-form {
@@ -327,3 +312,37 @@
     background-color: #218838;
   }
   
+  .button-group {
+    display: flex;
+    gap: 10px; /* Add spacing between buttons */
+  }
+  
+  .edit-btn {
+    background-color: #007bff;
+    color: white;
+    border: none;
+    padding: 12px 20px;
+    font-size: 16px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: 0.3s;
+  }
+  
+  .edit-btn:hover {
+    background-color: #0056b3;
+  }
+  
+  .delete-btn {
+    background-color: #e53e3e;
+    color: white;
+    border: none;
+    padding: 12px 20px;
+    font-size: 16px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: 0.3s;
+  }
+  
+  .delete-btn:hover {
+    background-color: #c53030;
+  }

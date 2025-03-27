@@ -14,12 +14,12 @@ const Register = ({ onClose, onSwitchToLogin }) => {
   const [userType, setUserType] = useState("");
   const [firstName, setfName] = useState("");
   const [lastName, setlName] = useState("");
-  const [bname, setbName] = useState("");
+  const [businessName, setbusinessName] = useState("");
   const [username, setUsername] = useState("");
   const [address, setAddress] = useState("");
   const [isLoading, setIsLoading] = useState(false);
 
-  const {setToken} = storeContext();
+  const {setToken,setUserId,setRole} = storeContext();
 
   const handleSendOtp = async () => {
     setIsLoading(true);
@@ -98,7 +98,9 @@ const Register = ({ onClose, onSwitchToLogin }) => {
         if (response.status === 201) {
           const result = response.data;
           setToken(result.token);
-          console.log(result);
+          setUserId(result.userId);
+          setRole(result.role || 'customer');
+          console.log(response.result);
           onClose();
         }
       } catch (error) {
@@ -107,20 +109,31 @@ const Register = ({ onClose, onSwitchToLogin }) => {
         setIsLoading(false);
       }
     }else if(userType === "supplier") {
+      if (!email || !password || !businessName || !username) {
+        setError("All fields are required");
+        return;
+      }
+  
       setIsLoading(true);
       try {
         const response = await axios.post("http://localhost:5000/api/users/supplier", {
           email: email,
           password: password,
-          bname: bname,
+          businessName: businessName,
+          username: username,
           address: address,
           role: 'supplier',
         });
-        if (response.status === 200) {
+        if (response.status === 201) {
+          const result = response.data;
+          setToken(result.token);
+          setRole(result.role || 'supplier');
+          setUserId(result.userId);
+          console.log(result);
           onClose();
         }
       } catch (error) {
-        setError("Failed to register");
+        setError(error.response?.data?.message || "Failed to register");
       } finally {
         setIsLoading(false);
       }
@@ -259,8 +272,15 @@ const Register = ({ onClose, onSwitchToLogin }) => {
                       <input
                         type="text"
                         placeholder="Enter your name"
-                        value={bname}
-                        onChange={(e) => setbName(e.target.value)}
+                        value={businessName}
+                        onChange={(e) => setbusinessName(e.target.value)}
+                        className="input-field"
+                      />
+                      <input
+                        type="text"
+                        placeholder="Enter your User Name"
+                        value={username}
+                        onChange={(e) => setUsername(e.target.value)}
                         className="input-field"
                       />
                       <input

@@ -14,6 +14,7 @@ const getCustomerById = async (customerId) => {
     if (result.rows.length === 0) {
       return null;
     }
+    
     return Customer.fromDbRow(result.rows[0], result.metaData);
   } catch (error) {
     console.error("Error getting customer by ID:", error);
@@ -129,15 +130,15 @@ const editCustomer = async (customerId, customerData) => {
   }
 };
 
-const deleteCustomer = async (customerId) => {
+const deleteCustomer = async (userId) => {
   let connection;
   try {
       connection = await getConnection();
       
       const result = await connection.execute(
-          `DELETE FROM customers WHERE customer_id = :customerId`,
+          `DELETE FROM users WHERE user_id = :userId`,
           {
-              customerId: customerId
+              userId: userId
           }
       );
 

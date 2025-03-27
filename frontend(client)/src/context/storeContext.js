@@ -12,6 +12,10 @@ const storeContext = create((set, get) =>({
         localStorage.setItem('userId', userId);
         set({userId});
     },
+    setRole: (role) => {
+        localStorage.setItem('role', role);
+        set({role});
+    },
     validateToken: async () => {
         const {token, setToken, setUserId} = get();
         try {

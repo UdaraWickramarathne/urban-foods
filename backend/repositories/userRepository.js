@@ -164,7 +164,7 @@ const saveSupplier = async ({ userData, supplierData }) => {
     };
   }
 
-  if (!supplierData.email || !supplierData.business_name) {
+  if (!supplierData.email || !supplierData.businessName) {
     return {
       success: false,
       message: "Email and business name are required",
@@ -178,25 +178,27 @@ const saveSupplier = async ({ userData, supplierData }) => {
 
     connection.autoCommit = false;
 
+    // Insert into `users` table
     const result = await connection.execute(
       "INSERT INTO users (username, password, role) VALUES (:username, :password, :role) RETURNING user_id INTO :user_id",
       {
         username: userData.username,
         password: hashedPassword,
-        role: userData.role || "supplier", // Default role if not provided
+        role: userData.role || "supplier",
         user_id: { type: oracledb.NUMBER, dir: oracledb.BIND_OUT },
       }
     );
 
     const userId = result.outBinds.user_id[0];
 
+    // Insert into `suppliers` table
     await connection.execute(
       "INSERT INTO suppliers (supplier_id, email, business_name, address, image_url) VALUES (:supplier_id, :email, :business_name, :address, :image_url)",
       {
         supplier_id: userId,
         email: supplierData.email,
-        business_name: supplierData.business_name,
-        address: supplierData.address || null, // Handle optional fields
+        business_name: supplierData.businessName,
+        address: supplierData.address || null,
         image_url: supplierData.imageUrl || null,
       }
     );

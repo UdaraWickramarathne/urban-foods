@@ -1,9 +1,8 @@
 class Supplier {
-  constructor(supplierID, name, address, phone, email) {
+  constructor(supplierID, name, address, email) {
     this.supplierID = supplierID;
     this.name = name;
     this.address = address;
-    this.phone = phone;
     this.email = email;
   }
 
@@ -14,7 +13,6 @@ class Supplier {
     let supplierId = null;
     let name = null;
     let address = null;
-    let phone = null;
     let email = null;
 
     metadata.forEach((meta, index) => {
@@ -28,16 +26,13 @@ class Supplier {
         case "ADDRESS":
           address = row[index];
           break;
-        case "PHONE":
-          phone = row[index];
-          break;
         case "EMAIL":
           email = row[index];
           break;
       }
     });
 
-    return new Supplier(supplierId, name, address, phone, email);
+    return new Supplier(supplierId, name, address, email);
   }
 }
 

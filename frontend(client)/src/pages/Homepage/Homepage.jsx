@@ -12,8 +12,6 @@ import Dashboard from '../../components/Dashboard/Dashboard.jsx'
 function Homepage() {
   return (
     <>
-      <Dashboard/>
-      <Profile/>
       <Hero/>
       <FeaturesSection/>
       <ProductSection/>

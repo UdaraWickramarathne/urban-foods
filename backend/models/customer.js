@@ -1,10 +1,9 @@
 class Customer {
-    constructor(customerId, firstName, lastName, email, phone, address, imageUrl) {
+    constructor(customerId, firstName, lastName, email, address, imageUrl) {
         this.customerId = customerId;
         this.firstName = firstName;
         this.lastName = lastName;
         this.email = email;
-        //this.phone = phone;
         this.address = address;
         this.imageUrl = imageUrl;
     }
@@ -49,7 +48,7 @@ class Customer {
                     break;
             }
         });
-
+        
         // Create user with whatever data we have
         return new Customer(customerId, firstName, lastName, email, address, imageUrl);
     }
