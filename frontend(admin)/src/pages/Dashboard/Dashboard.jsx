@@ -10,6 +10,9 @@ import SQLTriggerTable from "../../components/SQLTriggerTable/SQLTriggerTable";
 import SQLFunctionTable from "../../components/SQLFunctionTable/SQLFunctionTable";
 import NotificationTable from "../../components/NotificationTable/NotificationTable";
 import CategoryTable from "../../components/CategoryTable/CategoryTable";
+import { useAuth } from "../../context/authContext";
+import { hasPermission, PERMISSIONS } from "../../utils/permissions";
+import SupplierTable from "../../components/SupplierTable/SupplierTable";
 
 // Product shape:
 // id: number
@@ -295,13 +298,15 @@ const Dashboard = () => {
   ]);
 
   const [currentPage, setCurrentPage] = useState(1);
-  const [activeComponent, setActiveComponent] = useState("products");
+  const [activeComponent, setActiveComponent] = useState("dashboard");
 
   // Status Badge component
   const StatusBadge = ({ status }) => {
     const className = `status-badge status-${status.toLowerCase()}`;
     return <span className={className}>{status}</span>;
   };
+
+  const { logout, userPermissions } = useAuth();
 
   // Icons
   const SearchIcon = () => (
@@ -370,6 +375,10 @@ const Dashboard = () => {
 
   const handleNavClick = (component) => {
     setActiveComponent(component);
+  };
+
+  const handleLogout = () => {
+    logout();
   };
 
   return (
@@ -452,97 +461,128 @@ const Dashboard = () => {
               </div>
               Dashboard
             </li>
+            {hasPermission(userPermissions, PERMISSIONS.VIEW_PRODUCTS) && (
+              <li
+                className={`nav-item ${
+                  activeComponent === "products" ? "active" : ""
+                }`}
+                onClick={() => handleNavClick("products")}
+              >
+                <div className="nav-icon">
+                  <svg
+                    width="18"
+                    height="18"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    xmlns="http://www.w3.org/2000/svg"
+                  >
+                    <path
+                      d="M20 3H4C2.89 3 2 3.89 2 5V19C2 20.11 2.89 21 4 21H20C21.11 21 22 20.11 22 19V5C22 3.89 21.11 3 20 3ZM20 5V19H4V5H20Z"
+                      fill="currentColor"
+                    />
+                    <path d="M6 7H18V9H6V7Z" fill="currentColor" />
+                    <path d="M6 11H18V13H6V11Z" fill="currentColor" />
+                    <path d="M6 15H12V17H6V15Z" fill="currentColor" />
+                  </svg>
+                </div>
+                Products
+                <ChevronDownIcon />
+              </li>
+            )}
+            {hasPermission(userPermissions, PERMISSIONS.VIEW_PRODUCTS) && (
+              <li
+                className={`nav-item sub-item ${
+                  activeComponent === "products" ? "active-sub" : ""
+                }`}
+                onClick={() => handleNavClick("products")}
+              >
+                Product List
+              </li>
+            )}
+            {hasPermission(userPermissions, PERMISSIONS.VIEW_CATEGORIES) && (
+              <li
+                className={`nav-item sub-item ${
+                  activeComponent === "categories" ? "active-sub" : ""
+                }`}
+                onClick={() => handleNavClick("categories")}
+              >
+                Categories
+              </li>
+            )}
 
-            <li
-              className={`nav-item ${
-                activeComponent === "products" ? "active" : ""
-              }`}
-              onClick={() => handleNavClick("products")}
-            >
-              <div className="nav-icon">
-                <svg
-                  width="18"
-                  height="18"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  xmlns="http://www.w3.org/2000/svg"
-                >
-                  <path
-                    d="M20 3H4C2.89 3 2 3.89 2 5V19C2 20.11 2.89 21 4 21H20C21.11 21 22 20.11 22 19V5C22 3.89 21.11 3 20 3ZM20 5V19H4V5H20Z"
-                    fill="currentColor"
-                  />
-                  <path d="M6 7H18V9H6V7Z" fill="currentColor" />
-                  <path d="M6 11H18V13H6V11Z" fill="currentColor" />
-                  <path d="M6 15H12V17H6V15Z" fill="currentColor" />
-                </svg>
-              </div>
-              Products
-              <ChevronDownIcon />
-            </li>
+            {hasPermission(userPermissions, PERMISSIONS.VIEW_ORDERS) && (
+              <li
+                className={`nav-item ${
+                  activeComponent === "sales" ? "active" : ""
+                }`}
+                onClick={() => handleNavClick("sales")}
+              >
+                <div className="nav-icon">
+                  <svg
+                    width="18"
+                    height="18"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    xmlns="http://www.w3.org/2000/svg"
+                  >
+                    <path
+                      d="M19 3H5C3.9 3 3 3.9 3 5V19C3 20.1 3.9 21 5 21H19C20.1 21 21 20.1 21 19V5C21 3.9 20.1 3 19 3ZM9 17H7V10H9V17ZM13 17H11V7H13V17ZM17 17H15V13H17V17Z"
+                      fill="currentColor"
+                    />
+                  </svg>
+                </div>
+                Sales
+              </li>
+            )}
 
-            <li
-              className={`nav-item sub-item ${
-                activeComponent === "products" ? "active-sub" : ""
-              }`}
-              onClick={() => handleNavClick("products")}
-            >
-              Product List
-            </li>
-
-            <li
-              className={`nav-item sub-item ${
-                activeComponent === "categories" ? "active-sub" : ""
-              }`}
-              onClick={() => handleNavClick("categories")}
-            >
-              Categories
-            </li>
-
-            <li
-              className={`nav-item ${
-                activeComponent === "sales" ? "active" : ""
-              }`}
-              onClick={() => handleNavClick("sales")}
-            >
-              <div className="nav-icon">
-                <svg
-                  width="18"
-                  height="18"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  xmlns="http://www.w3.org/2000/svg"
-                >
-                  <path
-                    d="M19 3H5C3.9 3 3 3.9 3 5V19C3 20.1 3.9 21 5 21H19C20.1 21 21 20.1 21 19V5C21 3.9 20.1 3 19 3ZM9 17H7V10H9V17ZM13 17H11V7H13V17ZM17 17H15V13H17V17Z"
-                    fill="currentColor"
-                  />
-                </svg>
-              </div>
-              Sales
-            </li>
-
-            <li
-              className={`nav-item ${
-                activeComponent === "customers" ? "active" : ""
-              }`}
-              onClick={() => handleNavClick("customers")}
-            >
-              <div className="nav-icon">
-                <svg
-                  width="18"
-                  height="18"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  xmlns="http://www.w3.org/2000/svg"
-                >
-                  <path
-                    d="M12 12C14.21 12 16 10.21 16 8C16 5.79 14.21 4 12 4C9.79 4 8 5.79 8 8C8 10.21 9.79 12 12 12ZM12 6C13.1 6 14 6.9 14 8C14 9.1 13.1 10 12 10C10.9 10 10 9.1 10 8C10 6.9 10.9 6 12 6ZM12 13C9.33 13 4 14.34 4 17V20H20V17C20 14.34 14.67 13 12 13ZM18 18H6V17.01C6.2 16.29 9.3 15 12 15C14.7 15 17.8 16.29 18 17V18Z"
-                    fill="currentColor"
-                  />
-                </svg>
-              </div>
-              Customers
-            </li>
+            {hasPermission(userPermissions, PERMISSIONS.VIEW_CUSTOMERS) && (
+              <li
+                className={`nav-item ${
+                  activeComponent === "customers" ? "active" : ""
+                }`}
+                onClick={() => handleNavClick("customers")}
+              >
+                <div className="nav-icon">
+                  <svg
+                    width="18"
+                    height="18"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    xmlns="http://www.w3.org/2000/svg"
+                  >
+                    <path
+                      d="M12 12C14.21 12 16 10.21 16 8C16 5.79 14.21 4 12 4C9.79 4 8 5.79 8 8C8 10.21 9.79 12 12 12ZM12 6C13.1 6 14 6.9 14 8C14 9.1 13.1 10 12 10C10.9 10 10 9.1 10 8C10 6.9 10.9 6 12 6ZM12 13C9.33 13 4 14.34 4 17V20H20V17C20 14.34 14.67 13 12 13ZM18 18H6V17.01C6.2 16.29 9.3 15 12 15C14.7 15 17.8 16.29 18 17V18Z"
+                      fill="currentColor"
+                    />
+                  </svg>
+                </div>
+                Customers
+              </li>
+            )}
+            {hasPermission(userPermissions, PERMISSIONS.VIEW_SUPPLIERS) && (
+              <li
+                className={`nav-item ${
+                  activeComponent === "suppliers" ? "active" : ""
+                }`}
+                onClick={() => handleNavClick("suppliers")}
+              >
+                <div className="nav-icon">
+                  <svg
+                    width="18"
+                    height="18"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    xmlns="http://www.w3.org/2000/svg"
+                  >
+                    <path
+                      d="M20 8h-3V4H3c-1.1 0-2 .9-2 2v11h2c0 1.66 1.34 3 3 3s3-1.34 3-3h6c0 1.66 1.34 3 3 3s3-1.34 3-3h2v-5l-3-4zM6 18.5c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5zm13.5-9l1.96 2.5H17V9.5h2.5zm-1.5 9c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5z"
+                      fill="currentColor"
+                    />
+                  </svg>
+                </div>
+                Suppliers
+              </li>
+            )}
 
             <li
               className={`nav-item ${
@@ -573,7 +613,7 @@ const Dashboard = () => {
               </div>
               Store Procedures
             </li>
-            
+
             <li
               className={`nav-item ${
                 activeComponent === "dbusers" ? "active" : ""
@@ -681,7 +721,7 @@ const Dashboard = () => {
         </nav>
 
         <div className="logout-container">
-          <div className="logout-button">
+          <div className="logout-button" onClick={handleLogout}>
             <LogOutIcon />
             Log out
           </div>
@@ -743,7 +783,6 @@ const Dashboard = () => {
           )}
           {activeComponent === "customers" && (
             <CustomerTable
-              customers={customers}
               currentPage={currentPage}
               setCurrentPage={setCurrentPage}
             />
@@ -756,10 +795,16 @@ const Dashboard = () => {
             />
           )}
           {activeComponent === "analytics" && <StoreProcedure />}
-          {activeComponent === "dbusers" && <DbUserManagement/>}
+          {activeComponent === "dbusers" && <DbUserManagement />}
           {activeComponent === "sqltriggers" && <SQLTriggerTable />}
           {activeComponent === "sqlfunctions" && <SQLFunctionTable />}
-          {activeComponent === "notifications" && <NotificationTable/>}
+          {activeComponent === "notifications" && <NotificationTable />}
+          {activeComponent === "suppliers" && (
+            <SupplierTable
+              currentPage={currentPage}
+              setCurrentPage={setCurrentPage}
+            />
+          )}
           {activeComponent === "settings" && (
             <div className="settings-placeholder">
               <h2>Settings Content</h2>

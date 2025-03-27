@@ -76,4 +76,27 @@ const getCustomerById = async (req, res) => {
     }
 };
 
-export default { editCustomer, deleteCustomer, getCustomerById };
+const getCustomers = async (req, res) => {
+    try {
+        const customers = await customerRepository.getAllCustomers();
+
+        if (customers) {
+            res.status(HttpStatus.OK).json({
+                success: true,
+                data: customers
+            });
+        } else {
+            res.status(HttpStatus.NOT_FOUND).json({
+                success: false,
+                message: "No customers found"
+            });
+        }
+    } catch (error) {
+        res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
+            success: false,
+            message: "Error retrieving customers"
+        });
+    }
+}
+
+export default { editCustomer, deleteCustomer, getCustomerById, getCustomers };

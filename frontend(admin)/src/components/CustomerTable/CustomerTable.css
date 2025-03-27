@@ -323,6 +323,9 @@
   background-color: #fee2e2;
   color: #b91c1c;
   border: 1px solid #fecaca;
+  margin-right: auto; 
+  white-space: nowrap;
+  min-width: fit-content;
 }
 
 .btn-danger:hover {
