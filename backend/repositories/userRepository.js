@@ -391,17 +391,11 @@ const validateToken = async (token) => {
     // Since the auth middleware's verifyToken doesn't return a value,
     // we need to use jwt directly to verify and decode the token
   
-    const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    console.log(decoded);
-    
-    
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);    
     return {
       success: true,
       message: "Token is valid",
-      data: {
-        userId: decoded.userId,
-        role: decoded.role
-      }
+      userId: decoded.user_id,
     };
   } catch (error) {
     console.log("Token validation error:", error.message);

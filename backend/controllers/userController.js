@@ -312,7 +312,7 @@ const validateToken = async (req, res) => {
     return res.status(HttpStatus.OK).json({
       success: true,
       message: "Valid token",
-      user: result.user,
+      userId: result.userId,
     });
   } catch (error) {
     console.error("Token validation error:", error);

@@ -65,7 +65,7 @@ const getAllCustomers = async () => {
     return result.rows.map((row) => Customer.fromDbRow(row, result.metaData));
   } catch (error) {
     console.error("Error getting all customers:", error);
-    return [];
+    return null;
   } finally {
     if (connection) {
       try {

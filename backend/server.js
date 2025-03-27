@@ -7,6 +7,7 @@ import productRoutes from './routes/productRoutes.js';
 import customerRoutes from './routes/customerRoutes.js';
 import categoryRoutes from './routes/categoryRoutes.js';
 import adminRoutes from './routes/adminRoutes.js';
+import supplierRoutes from './routes/supplierRoutes.js';
 
 import paymentRoutes from './routes/paymentRoutes.js';
 
@@ -31,6 +32,9 @@ app.use("/api/category", categoryRoutes);
 app.use("/images/products", express.static("uploads/products"));
 app.use("/api/admin", adminRoutes);
 app.use('/api/payment', paymentRoutes);
+
+
+app.use('/api/suppliers', supplierRoutes);
 
 
 app.listen(5000, () => {
