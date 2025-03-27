@@ -19,7 +19,7 @@ const Register = ({ onClose, onSwitchToLogin }) => {
   const [address, setAddress] = useState("");
   const [isLoading, setIsLoading] = useState(false);
 
-  const {setToken} = storeContext();
+  const {setToken,setUserId,setRole} = storeContext();
 
   const handleSendOtp = async () => {
     setIsLoading(true);
@@ -98,7 +98,9 @@ const Register = ({ onClose, onSwitchToLogin }) => {
         if (response.status === 201) {
           const result = response.data;
           setToken(result.token);
-          console.log(result);
+          setUserId(result.userId);
+          setRole(result.role || 'customer');
+          console.log(response.result);
           onClose();
         }
       } catch (error) {
@@ -125,6 +127,8 @@ const Register = ({ onClose, onSwitchToLogin }) => {
         if (response.status === 201) {
           const result = response.data;
           setToken(result.token);
+          setRole(result.role || 'supplier');
+          setUserId(result.userId);
           console.log(result);
           onClose();
         }
