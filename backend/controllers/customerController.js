@@ -99,4 +99,28 @@ const getCustomers = async (req, res) => {
     }
 }
 
-export default { editCustomer, deleteCustomer, getCustomerById, getCustomers };
+const getCustomersWithSpends = async (req, res) => {
+    try {
+        const result = await customerRepository.getCustomersWithTotalSpends();
+        
+        if (result.success) {
+            res.status(HttpStatus.OK).json({
+                success: true,
+                data: result.data
+            });
+        } else {
+            res.status(HttpStatus.NOT_FOUND).json({
+                success: false,
+                message: "No customer spending data found"
+            });
+        }
+    } catch (error) {
+        res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
+            success: false,
+            message: "Error retrieving customer spending data",
+            error: error.message
+        });
+    }
+}
+
+export default { editCustomer, deleteCustomer, getCustomerById, getCustomers, getCustomersWithSpends };

@@ -1,9 +1,6 @@
 import HttpStatus from "../enums/httpsStatus.js";
 import productRepository from "../repositories/productRepository.js";
 
-
-
-
 const getAllProducts = async (req, res) => {
   try {
     const products = await productRepository.getAllProducts();

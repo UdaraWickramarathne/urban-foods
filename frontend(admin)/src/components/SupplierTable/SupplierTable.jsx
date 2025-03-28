@@ -1,18 +1,28 @@
 import React, { useState, useEffect } from "react";
 import "./SupplierTable.css";
 import { apiContext } from "../../context/apiContext";
+import { useNotification } from "../../context/notificationContext";
 
 const SupplierTable = ({ currentPage, setCurrentPage }) => {
-  // State for modal
+  // State for modals
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [selectedSupplier, setSelectedSupplier] = useState(null);
   const [editedSupplier, setEditedSupplier] = useState(null);
   const [suppliers, setSuppliers] = useState([]);
+  const [newSupplier, setNewSupplier] = useState({
+    businessName: '',
+    email: '',
+    address: '',
+    image: null
+  });
+  const [imagePreview, setImagePreview] = useState(null);
 
   // Pagination settings
   const suppliersPerPage = 10;
   const [paginatedSuppliers, setPaginatedSuppliers] = useState([]);
   const totalPages = Math.ceil(suppliers.length / suppliersPerPage);
+  const { showNotification } = useNotification();
 
   // Icons
   const ChevronDownIcon = () => (
@@ -119,7 +129,24 @@ const SupplierTable = ({ currentPage, setCurrentPage }) => {
       strokeLinejoin="round"
     >
       <polyline points="3 6 5 6 21 6"></polyline>
-      <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+      <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1-2-2h4a2 2 0 0 1-2 2v2"></path>
+    </svg>
+  );
+
+  const ImageIcon = () => (
+    <svg
+      width="18"
+      height="18"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
+      <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+      <circle cx="8.5" cy="8.5" r="1.5"></circle>
+      <polyline points="21 15 16 10 5 21"></polyline>
     </svg>
   );
 
@@ -130,7 +157,6 @@ const SupplierTable = ({ currentPage, setCurrentPage }) => {
       const endIndex = startIndex + suppliersPerPage;
       const paginatedData = suppliers.slice(startIndex, endIndex);
       setPaginatedSuppliers(paginatedData);
-      console.log("Updated paginatedSuppliers:", paginatedData);
     }
   }, [currentPage, suppliers, suppliersPerPage]);
 
@@ -139,10 +165,6 @@ const SupplierTable = ({ currentPage, setCurrentPage }) => {
     if (page < 1 || page > totalPages) return;
     setCurrentPage(page);
   };
-
-  useEffect(() => {
-    console.log("paginatedSuppliers", paginatedSuppliers);
-  }, [paginatedSuppliers]);
 
   // Generate page numbers array
   const getPageNumbers = () => {
@@ -181,7 +203,8 @@ const SupplierTable = ({ currentPage, setCurrentPage }) => {
     return pageNumbers;
   };
 
-  const { getAllSuppliersWithDetails } = apiContext();
+  const { getAllSuppliersWithDetails, updateSupplier, deleteSupplier, addSupplier } =
+    apiContext();
 
   useEffect(() => {
     fetchSuppliers();
@@ -190,10 +213,7 @@ const SupplierTable = ({ currentPage, setCurrentPage }) => {
   const fetchSuppliers = async () => {
     try {
       const response = await getAllSuppliersWithDetails();
-      console.log("API Response:", response);
-
       if (response && response.data) {
-        console.log("Suppliers retrieved successfully:", response.data);
         setSuppliers(response.data);
 
         // Make sure currentPage is set to 1 when data is first loaded
@@ -230,40 +250,18 @@ const SupplierTable = ({ currentPage, setCurrentPage }) => {
   };
 
   // Handle save changes
-  const handleSaveChanges = () => {
+  const handleSaveChanges = async () => {
     if (!editedSupplier) return;
 
-    // Here you would typically make an API call to update the supplier
-    // For now, we'll just update the local state
-    const updatedSuppliers = suppliers.map((supplier) =>
-      supplier.supplierId === editedSupplier.supplierId
-        ? editedSupplier
-        : supplier
+    const result = await updateSupplier(
+      editedSupplier.supplierId,
+      editedSupplier
     );
-
-    setSuppliers(updatedSuppliers);
-    setIsModalOpen(false);
-    setSelectedSupplier(null);
-    setEditedSupplier(null);
-
-    // Display a success message (in a real app, use a proper toast notification)
-    alert("Supplier updated successfully!");
-  };
-
-  // Handle delete supplier
-  const handleDeleteSupplier = () => {
-    if (!selectedSupplier) return;
-
-    // Confirm before deleting
-    if (
-      window.confirm(
-        `Are you sure you want to delete ${selectedSupplier.businessName}?`
-      )
-    ) {
-      // Here you would typically make an API call to delete the supplier
-      // For now, we'll just update the local state
-      const updatedSuppliers = suppliers.filter(
-        (supplier) => supplier.supplierId !== selectedSupplier.supplierId
+    if (result.success) {
+      const updatedSuppliers = suppliers.map((supplier) =>
+        supplier.supplierId === editedSupplier.supplierId
+          ? editedSupplier
+          : supplier
       );
 
       setSuppliers(updatedSuppliers);
@@ -272,7 +270,123 @@ const SupplierTable = ({ currentPage, setCurrentPage }) => {
       setEditedSupplier(null);
 
       // Display a success message (in a real app, use a proper toast notification)
-      alert("Supplier deleted successfully!");
+      showNotification(
+        `Supplier ${selectedSupplier.businessName} updated successfully!`
+      );
+    } else {
+      showNotification(
+        `Failed to update supplier ${selectedSupplier.businessName}`,
+        "error"
+      );
+    }
+  };
+
+  // Handle delete supplier
+  const handleDeleteSupplier = async () => {
+    if (!selectedSupplier) return;
+
+    // Confirm before deleting
+    if (
+      window.confirm(
+        `Are you sure you want to delete ${selectedSupplier.businessName}?`
+      )
+    ) {
+      const result = await deleteSupplier(selectedSupplier.supplierId);
+      if (result.success) {
+        const updatedSuppliers = suppliers.filter(
+          (supplier) => supplier.supplierId !== selectedSupplier.supplierId
+        );
+        showNotification(
+          `Supplier ${selectedSupplier.businessName} deleted successfully!`
+        );
+        setSuppliers(updatedSuppliers);
+        setIsModalOpen(false);
+        setSelectedSupplier(null);
+        setEditedSupplier(null);
+      } else {
+        showNotification(
+          `Failed to delete supplier ${selectedSupplier.businessName}`,
+          "error"
+        );
+      }
+    }
+  };
+
+  // Handle opening the add supplier modal
+  const handleAddSupplierClick = () => {
+    setNewSupplier({
+      businessName: '',
+      email: '',
+      address: '',
+      image: null
+    });
+    setImagePreview(null);
+    setIsAddModalOpen(true);
+  };
+
+  // Handle form input changes for new supplier
+  const handleNewSupplierChange = (e) => {
+    const { name, value } = e.target;
+    setNewSupplier({
+      ...newSupplier,
+      [name]: value,
+    });
+  };
+
+  // Handle image selection for new supplier
+  const handleImageChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      setNewSupplier({
+        ...newSupplier,
+        image: file
+      });
+
+      // Create a preview URL for the selected image
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setImagePreview(reader.result);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  // Handle save new supplier
+  const handleSaveNewSupplier = async () => {
+    // Basic validation
+    if (!newSupplier.businessName || !newSupplier.email) {
+      showNotification('Business name and email are required', 'error');
+      return;
+    }
+
+    // Email validation
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(newSupplier.email)) {
+      showNotification('Please enter a valid email address', 'error');
+      return;
+    }
+
+    try {
+      // Create form data to handle file upload
+      const formData = new FormData();
+      formData.append('businessName', newSupplier.businessName);
+      formData.append('email', newSupplier.email);
+      formData.append('address', newSupplier.address || '');
+      if (newSupplier.image) {
+        formData.append('image', newSupplier.image);
+      }
+
+      const result = await addSupplier(formData);
+      
+      if (result.success) {
+        setIsAddModalOpen(false);
+        showNotification(`Supplier ${newSupplier.businessName} added successfully!`);
+        fetchSuppliers();
+      } else {
+        showNotification(`Failed to add supplier: ${result.message}`, 'error');
+      }
+    } catch (error) {
+      showNotification(`Error adding supplier: ${error.message}`, 'error');
     }
   };
 
@@ -292,7 +406,10 @@ const SupplierTable = ({ currentPage, setCurrentPage }) => {
 
           <button className="btn btn-secondary">See All</button>
 
-          <button className="btn btn-primary btn-with-icon">
+          <button 
+            className="btn btn-primary btn-with-icon"
+            onClick={handleAddSupplierClick}
+          >
             <PlusIcon />
             Add Supplier
           </button>
@@ -535,14 +652,15 @@ const SupplierTable = ({ currentPage, setCurrentPage }) => {
             </div>
 
             <div className="modal-footer">
-              <button
-                className="btn btn-danger btn-with-icon"
-                onClick={handleDeleteSupplier}
-              >
-                <TrashIcon />
-                Delete Supplier
-              </button>
               <div className="modal-actions">
+                <button
+                  className="btn btn-danger btn-with-icon"
+                  onClick={handleDeleteSupplier}
+                >
+                  <TrashIcon />
+                  Delete Supplier
+                </button>
+
                 <button
                   className="btn btn-secondary"
                   onClick={() => setIsModalOpen(false)}
@@ -551,6 +669,124 @@ const SupplierTable = ({ currentPage, setCurrentPage }) => {
                 </button>
                 <button className="btn btn-primary" onClick={handleSaveChanges}>
                   Save Changes
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Add Supplier Modal */}
+      {isAddModalOpen && (
+        <div className="modal-overlay">
+          <div className="modal-container">
+            <div className="modal-header">
+              <h3>Add New Supplier</h3>
+              <button
+                className="modal-close-btn"
+                onClick={() => setIsAddModalOpen(false)}
+              >
+                <CloseIcon />
+              </button>
+            </div>
+
+            <div className="modal-body">
+              <div className="form-group">
+                <label htmlFor="new-supplier-businessName">Company Name <span className="required">*</span></label>
+                <input
+                  type="text"
+                  id="new-supplier-businessName"
+                  name="businessName"
+                  value={newSupplier.businessName}
+                  onChange={handleNewSupplierChange}
+                  placeholder="Enter company name"
+                  required
+                />
+              </div>
+
+              <div className="form-group">
+                <label htmlFor="new-supplier-email">Email <span className="required">*</span></label>
+                <input
+                  type="email"
+                  id="new-supplier-email"
+                  name="email"
+                  value={newSupplier.email}
+                  onChange={handleNewSupplierChange}
+                  placeholder="Enter email address"
+                  required
+                />
+              </div>
+
+              <div className="form-group">
+                <label htmlFor="new-supplier-address">Address</label>
+                <textarea
+                  id="new-supplier-address"
+                  name="address"
+                  value={newSupplier.address || ""}
+                  onChange={handleNewSupplierChange}
+                  placeholder="Enter supplier address"
+                  rows="3"
+                />
+              </div>
+
+              <div className="form-group">
+                <label htmlFor="new-supplier-image">Supplier Image</label>
+                <div className="image-upload-container">
+                  <div 
+                    className="image-upload-area"
+                    onClick={() => document.getElementById('new-supplier-image').click()}
+                  >
+                    {imagePreview ? (
+                      <div className="image-preview-container">
+                        <img 
+                          src={imagePreview} 
+                          alt="Preview" 
+                          className="image-preview" 
+                        />
+                      </div>
+                    ) : (
+                      <div className="upload-placeholder">
+                        <ImageIcon />
+                        <p>Click to upload image</p>
+                      </div>
+                    )}
+                  </div>
+                  <input
+                    type="file"
+                    id="new-supplier-image"
+                    name="image"
+                    onChange={handleImageChange}
+                    accept="image/*"
+                    style={{ display: 'none' }}
+                  />
+                </div>
+                {imagePreview && (
+                  <button 
+                    className="btn btn-text"
+                    onClick={() => {
+                      setNewSupplier({...newSupplier, image: null});
+                      setImagePreview(null);
+                    }}
+                  >
+                    Remove image
+                  </button>
+                )}
+              </div>
+            </div>
+
+            <div className="modal-footer">
+              <div className="modal-actions">
+                <button
+                  className="btn btn-secondary"
+                  onClick={() => setIsAddModalOpen(false)}
+                >
+                  Cancel
+                </button>
+                <button 
+                  className="btn btn-primary" 
+                  onClick={handleSaveNewSupplier}
+                >
+                  Add Supplier
                 </button>
               </div>
             </div>

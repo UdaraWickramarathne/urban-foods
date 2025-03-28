@@ -1,7 +1,8 @@
 import express from 'express';
 import productController from '../controllers/productController.js';
-import productUpload from '../middlewares/imageUpload.js';
+import imageUpload from "../middlewares/imageUpload.js";
 
+const { productUpload } = imageUpload;
 
 const { getAllProducts, getProductById, insertProduct, deleteProduct, updateProduct,searchProducts} = productController;
 

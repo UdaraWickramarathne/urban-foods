@@ -31,6 +31,8 @@ app.use("/api/customers", customerRoutes);
 
 app.use("/api/category", categoryRoutes);
 app.use("/images/products", express.static("uploads/products"));
+app.use("/images/suppliers", express.static("uploads/suppliers"));
+app.use("/images/customers", express.static("uploads/customers"));
 app.use("/api/admin", adminRoutes);
 app.use('/api/payment', paymentRoutes);
 app.use("/api/cart", cartRoutes);

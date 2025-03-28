@@ -307,7 +307,7 @@
 /* Optional: improve focus state for better accessibility */
 .input-with-prefix input:focus {
   outline: none;
-  border-color: #4A90E2;
+  border-color: #4a90e2;
   box-shadow: 0 0 0 2px rgba(74, 144, 226, 0.2);
 }
 
@@ -318,18 +318,92 @@
     align-items: flex-start;
     gap: 1rem;
   }
-  
+
   .card-actions {
     width: 100%;
     justify-content: space-between;
   }
-  
+
   .pagination-container {
     flex-direction: column;
     gap: 1rem;
   }
-  
+
   .modal-container {
     width: 90%;
   }
+}
+.image-upload-container {
+  margin-top: 10px;
+}
+
+.image-upload-area {
+  width: 100%;
+  cursor: pointer;
+  border: 2px dashed #ccc;
+  border-radius: 8px;
+  padding: 20px;
+  text-align: center;
+  transition: border-color 0.3s;
+}
+
+.image-upload-area:hover {
+  border-color: #666;
+}
+
+.upload-placeholder {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  color: #666;
+  height: 150px;
+}
+
+.upload-placeholder svg {
+  margin-bottom: 10px;
+}
+
+.upload-placeholder p {
+  margin: 0;
+}
+
+/* Fixed size image preview container */
+.image-preview-container {
+  width: 200px;
+  height: 200px;
+  margin: 0 auto;
+  overflow: hidden;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #f5f5f5;
+}
+
+.image-preview {
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+}
+
+/* For remove image button */
+.btn-text {
+  background: none;
+  border: none;
+  color: #5469d4;
+  margin-top: 10px;
+  cursor: pointer;
+  padding: 5px 0;
+  font-size: 14px;
+}
+
+.btn-text:hover {
+  text-decoration: underline;
+}
+
+/* Required field indicator */
+.required {
+  color: #e53935;
+  margin-left: 3px;
 }

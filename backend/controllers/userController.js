@@ -22,10 +22,11 @@ const getUsers = async (req, res) => {
 const registerCustomer = async (req, res) => {
   try {
     // Extract user authentication fields
+    const imageUrl = req.file ? req.file.filename : null;
     const { username, password, role } = req.body;
 
     // Extract customer profile fields
-    const { firstName, lastName, email, address, imageUrl } =
+    const { firstName, lastName, email, address } =
       req.body;
     
     //Basic validation
@@ -323,6 +324,30 @@ const validateToken = async (req, res) => {
   }
 }
 
+const deleteUser = async (req, res) => {
+  try {
+    const userId = req.params.userId;
+    const result = await userRepository.deleteUser(userId);
+
+    if (result) {
+      return res.status(HttpStatus.OK).json({
+        success: true,
+        message: "User deleted successfully",
+      });
+    } else {
+      return res.status(HttpStatus.NOT_FOUND).json({
+        success: false,
+        message: "User not found",
+      });
+    }
+  } catch (error) {
+    console.error("Error deleting user:", error);
+    return res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
+      success: false,
+      message: "Error deleting user",
+    });
+  }
+}
 
 export default {
   getUsers,
@@ -330,5 +355,6 @@ export default {
   registerSupplier,
   login,
   registerAdmin,
-  validateToken
+  validateToken,
+  deleteUser
 };
