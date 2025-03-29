@@ -56,7 +56,7 @@ const Profile = () => {
       const endpoint =
         userType === 'supplier'
           ? `http://localhost:5000/api/suppliers/editSupplier/${userId}`
-          : `http://localhost:5000/api/customers/editCustomer/${userId}`;
+          : `http://localhost:5000/api/customers/update/${userId}`;
       const response = await axios.put(endpoint, userData);
       if (response.data.success) {
         alert('Profile updated successfully!');
@@ -76,7 +76,7 @@ const Profile = () => {
         const endpoint =
           userType === 'supplier'
             ? `http://localhost:5000/api/suppliers/deleteSupplier/${userId}`
-            : `http://localhost:5000/api/customers/deleteCustomer/${userId}`;
+            : `http://localhost:5000/api/customers/delete/${userId}`;
         const response = await axios.delete(endpoint);
         if (response.data.success) {
           alert("Profile deleted successfully!");

@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import "./SupplierTable.css";
 import { apiContext } from "../../context/apiContext";
 import { useNotification } from "../../context/notificationContext";
+import { DEFAULT_IMAGE, SUPPLIER_IMAGES } from "../../context/constants";
 
 const SupplierTable = ({ currentPage, setCurrentPage }) => {
   // State for modals
@@ -14,9 +15,20 @@ const SupplierTable = ({ currentPage, setCurrentPage }) => {
     businessName: '',
     email: '',
     address: '',
-    image: null
+    image: null,
+    username: '',
+    password: ''
   });
   const [imagePreview, setImagePreview] = useState(null);
+  // Add state for edited supplier image
+  const [editedImagePreview, setEditedImagePreview] = useState(null);
+  const [editedImage, setEditedImage] = useState(null);
+  // Add states for OTP functionality
+  const [otpSent, setOtpSent] = useState(false);
+  const [otpVerified, setOtpVerified] = useState(false);
+  const [otp, setOtp] = useState('');
+  const [isVerifying, setIsVerifying] = useState(false);
+  const [isSendingOtp, setIsSendingOtp] = useState(false);
 
   // Pagination settings
   const suppliersPerPage = 10;
@@ -203,7 +215,8 @@ const SupplierTable = ({ currentPage, setCurrentPage }) => {
     return pageNumbers;
   };
 
-  const { getAllSuppliersWithDetails, updateSupplier, deleteSupplier, addSupplier } =
+  const { getAllSuppliersWithDetails, updateSupplier, deleteUser, addSupplier, requestOtp,
+    verifyOtp, } =
     apiContext();
 
   useEffect(() => {
@@ -230,9 +243,17 @@ const SupplierTable = ({ currentPage, setCurrentPage }) => {
 
   // Handle opening the modal with supplier details
   const handleDetailsClick = (supplier) => {
+    console.log("Supplier details clicked:", supplier);
+  
     setSelectedSupplier(supplier);
     setEditedSupplier({ ...supplier });
     setIsModalOpen(true);
+    if(supplier.imageUrl){
+      setEditedImagePreview(`${SUPPLIER_IMAGES}/${supplier.imageUrl}`);
+    }else{
+      setEditedImagePreview('');
+    }
+    setEditedImage(null);
   };
 
   // Handle form input changes
@@ -249,33 +270,58 @@ const SupplierTable = ({ currentPage, setCurrentPage }) => {
     });
   };
 
+  // Handle image change for existing supplier
+  const handleEditedImageChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      setEditedImage(file);
+
+      // Create a preview URL for the selected image
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setEditedImagePreview(reader.result);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
   // Handle save changes
   const handleSaveChanges = async () => {
     if (!editedSupplier) return;
 
-    const result = await updateSupplier(
-      editedSupplier.supplierId,
-      editedSupplier
-    );
-    if (result.success) {
-      const updatedSuppliers = suppliers.map((supplier) =>
-        supplier.supplierId === editedSupplier.supplierId
-          ? editedSupplier
-          : supplier
-      );
+    try {
+      // Create form data to handle file upload
+      const formData = new FormData();
+      formData.append('businessName', editedSupplier.businessName);
+      formData.append('email', editedSupplier.email);
+      formData.append('address', editedSupplier.address || '');
+      
 
-      setSuppliers(updatedSuppliers);
-      setIsModalOpen(false);
-      setSelectedSupplier(null);
-      setEditedSupplier(null);
-
-      // Display a success message (in a real app, use a proper toast notification)
+      if (editedImage) {
+        formData.append('image', editedImage);
+      }
+      
+      const result = await updateSupplier(editedSupplier.supplierId, formData);
+      
+      if (result.success) {
+        await fetchSuppliers();
+        setIsModalOpen(false);
+        setSelectedSupplier(null);
+        setEditedSupplier(null);
+        setEditedImage(null);
+        setEditedImagePreview(null);
+        showNotification(
+          `Supplier ${selectedSupplier.businessName} updated successfully!`
+        );
+      } else {
+        showNotification(
+          `Failed to update supplier ${selectedSupplier.businessName}: ${result.message || ''}`,
+          "error"
+        );
+      }
+    } catch (error) {
       showNotification(
-        `Supplier ${selectedSupplier.businessName} updated successfully!`
-      );
-    } else {
-      showNotification(
-        `Failed to update supplier ${selectedSupplier.businessName}`,
+        `Error updating supplier: ${error.message}`,
         "error"
       );
     }
@@ -291,7 +337,7 @@ const SupplierTable = ({ currentPage, setCurrentPage }) => {
         `Are you sure you want to delete ${selectedSupplier.businessName}?`
       )
     ) {
-      const result = await deleteSupplier(selectedSupplier.supplierId);
+      const result = await deleteUser(selectedSupplier.supplierId);
       if (result.success) {
         const updatedSuppliers = suppliers.filter(
           (supplier) => supplier.supplierId !== selectedSupplier.supplierId
@@ -318,10 +364,16 @@ const SupplierTable = ({ currentPage, setCurrentPage }) => {
       businessName: '',
       email: '',
       address: '',
-      image: null
+      image: null,
+      username: '',
+      password: '',
+      role: 'supplier'
     });
     setImagePreview(null);
     setIsAddModalOpen(true);
+    setOtpSent(false);
+    setOtpVerified(false);
+    setOtp('');
   };
 
   // Handle form input changes for new supplier
@@ -331,9 +383,15 @@ const SupplierTable = ({ currentPage, setCurrentPage }) => {
       ...newSupplier,
       [name]: value,
     });
+    
+    // If email changes, reset OTP status
+    if (name === 'email') {
+      setOtpSent(false);
+      setOtpVerified(false);
+      setOtp('');
+    }
   };
 
-  // Handle image selection for new supplier
   const handleImageChange = (e) => {
     const file = e.target.files[0];
     if (file) {
@@ -351,11 +409,64 @@ const SupplierTable = ({ currentPage, setCurrentPage }) => {
     }
   };
 
+  // Handle OTP input change
+  const handleOtpChange = (e) => {
+    setOtp(e.target.value);
+  };
+
+  // Handle send OTP
+  const handleSendOtp = async () => {
+    // Email validation
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(newSupplier.email)) {
+      showNotification('Please enter a valid email address', 'error');
+      return;
+    }
+    setIsSendingOtp(true);
+    try {
+      const response = await requestOtp(newSupplier.email);
+      if (response.success) {
+        setOtpSent(true);
+        setIsSendingOtp(false);
+        showNotification('OTP sent to your email');
+      }else{
+        showNotification('Failed to send OTP: ' + response.message, 'error');
+        setIsSendingOtp(false);
+      }
+    } catch (error) {
+      showNotification('Error sending OTP: ' + error.message, 'error');
+      setIsSendingOtp(false);
+    }
+  };
+
+  // Handle verify OTP
+  const handleVerifyOtp = async () => {
+    if (!otp) {
+      showNotification('Please enter the OTP', 'error');
+      return;
+    }
+
+    setIsVerifying(true);
+    try {
+      const response = await verifyOtp(newSupplier.email, otp);
+      if (response.success) {
+        setOtpVerified(true);
+        showNotification('Email verified successfully');
+      } else{
+        showNotification('Invalid OTP. Please try again.', 'error');
+      }
+      setIsVerifying(false);
+    } catch (error) {
+      showNotification('Error verifying OTP: ' + error.message, 'error');
+      setIsVerifying(false);
+    }
+  };
+
   // Handle save new supplier
   const handleSaveNewSupplier = async () => {
     // Basic validation
-    if (!newSupplier.businessName || !newSupplier.email) {
-      showNotification('Business name and email are required', 'error');
+    if (!newSupplier.businessName || !newSupplier.email || !newSupplier.username || !newSupplier.password) {
+      showNotification('Business name, email, username and password are required', 'error');
       return;
     }
 
@@ -366,12 +477,26 @@ const SupplierTable = ({ currentPage, setCurrentPage }) => {
       return;
     }
 
+    // Check if OTP is verified
+    if (!otpVerified) {
+      showNotification('Please verify your email with OTP before adding supplier', 'error');
+      return;
+    }
+
+    // Password validation - at least 6 characters
+    if (newSupplier.password.length < 6) {
+      showNotification('Password must be at least 6 characters long', 'error');
+      return;
+    }
+
     try {
       // Create form data to handle file upload
       const formData = new FormData();
       formData.append('businessName', newSupplier.businessName);
       formData.append('email', newSupplier.email);
       formData.append('address', newSupplier.address || '');
+      formData.append('username', newSupplier.username);
+      formData.append('password', newSupplier.password);
       if (newSupplier.image) {
         formData.append('image', newSupplier.image);
       }
@@ -558,6 +683,51 @@ const SupplierTable = ({ currentPage, setCurrentPage }) => {
             </div>
 
             <div className="modal-body">
+              {/* Add Image section first */}
+              <div className="form-group">
+                <label htmlFor="supplier-image">Supplier Image</label>
+                <div className="image-upload-container">
+                  <div 
+                    className="image-upload-area"
+                    onClick={() => document.getElementById('supplier-image').click()}
+                  >
+                    {editedImagePreview ? (
+                      <div className="image-preview-container">
+                        <img 
+                          src={editedImagePreview} 
+                          alt="Supplier" 
+                          className="image-preview" 
+                        />
+                      </div>
+                    ) : (
+                      <div className="upload-placeholder">
+                        <ImageIcon />
+                        <p>Click to upload image</p>
+                      </div>
+                    )}
+                  </div>
+                  <input
+                    type="file"
+                    id="supplier-image"
+                    name="image"
+                    onChange={handleEditedImageChange}
+                    accept="image/*"
+                    style={{ display: 'none' }}
+                  />
+                </div>
+                {editedImagePreview && editedImage && (
+                  <button 
+                    className="btn btn-text"
+                    onClick={() => {
+                      setEditedImage(null);
+                      setEditedImagePreview(selectedSupplier.image || null);
+                    }}
+                  >
+                    Revert to original
+                  </button>
+                )}
+              </div>
+
               <div className="form-group">
                 <label htmlFor="supplier-businessName">Company Name</label>
                 <input
@@ -705,17 +875,100 @@ const SupplierTable = ({ currentPage, setCurrentPage }) => {
               </div>
 
               <div className="form-group">
-                <label htmlFor="new-supplier-email">Email <span className="required">*</span></label>
+                <label htmlFor="new-supplier-username">Username <span className="required">*</span></label>
                 <input
-                  type="email"
-                  id="new-supplier-email"
-                  name="email"
-                  value={newSupplier.email}
+                  type="text"
+                  id="new-supplier-username"
+                  name="username"
+                  value={newSupplier.username}
                   onChange={handleNewSupplierChange}
-                  placeholder="Enter email address"
+                  placeholder="Enter username"
                   required
                 />
               </div>
+
+              <div className="form-group">
+                <label htmlFor="new-supplier-password">Password <span className="required">*</span></label>
+                <input
+                  type="password"
+                  id="new-supplier-password"
+                  name="password"
+                  value={newSupplier.password}
+                  onChange={handleNewSupplierChange}
+                  placeholder="Enter password"
+                  required
+                />
+                <small className="form-text text-muted">
+                  Password must be at least 6 characters long
+                </small>
+              </div>
+
+              <div className="form-group">
+                <label htmlFor="new-supplier-email">Email <span className="required">*</span></label>
+                <div className="email-with-verification">
+                  <input
+                    type="email"
+                    id="new-supplier-email"
+                    name="email"
+                    value={newSupplier.email}
+                    onChange={handleNewSupplierChange}
+                    placeholder="Enter email address"
+                    required
+                    disabled={otpSent}
+                  />
+                  {!otpSent ? (
+                    <button 
+                      className="btn btn-secondary" 
+                      onClick={handleSendOtp}
+                      disabled={!newSupplier.email || isSendingOtp}
+                    >
+                      {isSendingOtp ? 'Sending...' : 'Send OTP'}
+                    </button>
+                  ) : (
+                    <div className="verification-status">
+                      {otpVerified ? (
+                        <span className="verified-tag">Verified ✓</span>
+                      ) : (
+                        <button 
+                          className="btn btn-text" 
+                          onClick={() => {
+                            setOtpSent(false);
+                            setOtpVerified(false);
+                          }}
+                        >
+                          Change
+                        </button>
+                      )}
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              {otpSent && !otpVerified && (
+                <div className="form-group otp-group">
+                  <label htmlFor="email-otp">Verification Code</label>
+                  <div className="otp-verification">
+                    <input
+                      type="text"
+                      id="email-otp"
+                      value={otp}
+                      onChange={handleOtpChange}
+                      placeholder="Enter 6-digit OTP"
+                      maxLength={6}
+                    />
+                    <button 
+                      className="btn btn-primary" 
+                      onClick={handleVerifyOtp}
+                      disabled={!otp || isVerifying}
+                    >
+                      {isVerifying ? 'Verifying...' : 'Verify'}
+                    </button>
+                  </div>
+                  <small className="form-text text-muted">
+                    Enter the 6-digit code sent to your email
+                  </small>
+                </div>
+              )}
 
               <div className="form-group">
                 <label htmlFor="new-supplier-address">Address</label>

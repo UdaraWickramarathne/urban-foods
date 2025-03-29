@@ -364,8 +364,8 @@
 }
 
 .image-preview {
-  width: 100px;
-  height: 100px;
+  width: 250px;
+  height: 250px;
   border-radius: 4px;
   overflow: hidden;
   border: 1px solid #ddd;

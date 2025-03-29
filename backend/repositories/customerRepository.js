@@ -210,6 +210,7 @@ const getCustomersWithTotalSpends = async () => {
       const lastName = line.match(/Last Name: ([^,]+)/)?.[1]?.trim() || '';
       const email = line.match(/Email: ([^,]+)/)?.[1]?.trim() || '';
       const address = line.match(/Address: ([^,]+)/)?.[1]?.trim() || '';
+      const imageUrl = line.match(/Image Url: ([^,]+)/)?.[1]?.trim() || '';
       const totalSpends = parseFloat(line.match(/Total Spends: ([^ ]+)/)?.[1] || '0');
       
       return {
@@ -218,6 +219,7 @@ const getCustomersWithTotalSpends = async () => {
         lastName,
         email,
         address,
+        imageUrl,
         totalSpends
       };
     });

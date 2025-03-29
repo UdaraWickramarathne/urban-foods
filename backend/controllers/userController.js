@@ -1,7 +1,10 @@
 import HttpStatus from "../enums/httpsStatus.js";
 import userRepository from "../repositories/userRepository.js";
 import customerRepository from "../repositories/customerRepository.js";
-
+import fs from "fs";
+import path from "path";
+import imageUpload from "../middlewares/imageUpload.js";
+import supplierRepository from "../repositories/supplierRepository.js";
 
 const getUsers = async (req, res) => {
   try {
@@ -22,12 +25,10 @@ const getUsers = async (req, res) => {
 const registerCustomer = async (req, res) => {
   try {
     // Extract user authentication fields
-    const imageUrl = req.file ? req.file.filename : null;
     const { username, password, role } = req.body;
 
     // Extract customer profile fields
-    const { firstName, lastName, email, address } =
-      req.body;
+    const { firstName, lastName, email, address } = req.body;
     
     //Basic validation
     if (!username || !password || !email || !firstName || !lastName) {
@@ -44,20 +45,6 @@ const registerCustomer = async (req, res) => {
       });
     }
 
-    // Create separate objects for different tables
-    const userData = {
-      username,
-      password,
-      role: role || "customer", // Default role
-    };
-
-    const customerData = {
-      firstName,
-      lastName,
-      email,
-      address,
-      imageUrl,
-    };
     const isEmailExists = await customerRepository.getCustomerByEmail(email);
 
     if (isEmailExists) {
@@ -75,7 +62,27 @@ const registerCustomer = async (req, res) => {
         message: "Username is already exists",
       });
     }
-    console.log("Pass username");
+    
+    // Save image only after validation passes
+    let imageUrl = null;
+    if (req.file) {
+      imageUrl = imageUpload.saveCustomerImage(req.file.buffer, req.file.originalname);
+    }
+
+    // Create separate objects for different tables
+    const userData = {
+      username,
+      password,
+      role: role || "customer", // Default role
+    };
+
+    const customerData = {
+      firstName,
+      lastName,
+      email,
+      address,
+      imageUrl,
+    };
     
     // Pass both data objects to repository
     const result = await userRepository.saveCustomer({
@@ -84,6 +91,14 @@ const registerCustomer = async (req, res) => {
     });
     
     if (!result) {
+      // Delete the saved image if user creation fails
+      if (imageUrl) {
+        const imagePath = path.join(process.cwd(), "uploads", "customers", imageUrl);
+        if (fs.existsSync(imagePath)) {
+          fs.unlinkSync(imagePath);
+        }
+      }
+      
       return res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
         success: false,
         message: "An error occurred during registration",
@@ -91,6 +106,14 @@ const registerCustomer = async (req, res) => {
     }
 
     if (!result.success) {
+      // Delete the saved image if user creation fails
+      if (imageUrl) {
+        const imagePath = path.join(process.cwd(), "uploads", "customers", imageUrl);
+        if (fs.existsSync(imagePath)) {
+          fs.unlinkSync(imagePath);
+        }
+      }
+      
       return res.status(HttpStatus.BAD_REQUEST).json({
         success: false,
         message: result.message,
@@ -116,7 +139,7 @@ const registerSupplier = async (req, res) => {
   try {
     const { username, password, role } = req.body;
 
-    const { businessName, email, address, imageUrl } = req.body;
+    const { businessName, email, address } = req.body;
 
     if (!username || !password || !email || !businessName) {
       return res.status(HttpStatus.BAD_REQUEST).json({
@@ -132,6 +155,30 @@ const registerSupplier = async (req, res) => {
         message: "Password must be at least 6 characters long",
       });
     }
+
+    const isBusinessNameExists = await supplierRepository.getSupplierByBusinessName(businessName);
+    if (isBusinessNameExists) {
+      return res.status(HttpStatus.BAD_REQUEST).json({
+        success: false,
+        message: "Business name is already exists",
+      });
+    }
+
+    const isUsernameExists = await userRepository.getUserByUsername(username);
+
+    if (isUsernameExists) {
+      return res.status(HttpStatus.BAD_REQUEST).json({
+        success: false,
+        message: "Username is already exists",
+      });
+    }
+
+    let imageUrl = null;
+
+    if (req.file) {
+      imageUrl = imageUpload.saveSupplierImage(req.file.buffer, req.file.originalname);
+    }
+
 
     // Create separate objects for different tables
     const userData = {
@@ -154,6 +201,14 @@ const registerSupplier = async (req, res) => {
     });
 
     if (!result) {
+      // Delete the saved image if user creation fails
+      if (imageUrl) {
+        const imagePath = path.join(process.cwd(), "uploads", "suppliers", imageUrl);
+        if (fs.existsSync(imagePath)) {
+          fs.unlinkSync(imagePath);
+        }
+      }
+      
       return res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
         success: false,
         message: "An error occurred during registration",
@@ -161,6 +216,14 @@ const registerSupplier = async (req, res) => {
     }
 
     if (!result.success) {
+      // Delete the saved image if user creation fails
+      if (imageUrl) {
+        const imagePath = path.join(process.cwd(), "uploads", "suppliers", imageUrl);
+        if (fs.existsSync(imagePath)) {
+          fs.unlinkSync(imagePath);
+        }
+      }
+      
       return res.status(HttpStatus.BAD_REQUEST).json({
         success: false,
         message: result.message,
@@ -327,6 +390,25 @@ const validateToken = async (req, res) => {
 const deleteUser = async (req, res) => {
   try {
     const userId = req.params.userId;
+
+    const customer = await customerRepository.getCustomerById(userId);
+    if (!customer) {
+      return res.status(HttpStatus.NOT_FOUND).json({
+        success: false,
+        message: "Customer not found",
+      });
+    }
+    if(customer.imageUrl) {
+      const oldPath = path.join(
+        process.cwd(),
+        "uploads",
+        "customers",
+        customer.imageUrl
+      );
+      if (fs.existsSync(oldPath)) {
+        fs.unlinkSync(oldPath);
+      }
+    }
     const result = await userRepository.deleteUser(userId);
 
     if (result) {

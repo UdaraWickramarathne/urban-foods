@@ -2,27 +2,30 @@ import React, { useState, useEffect } from "react";
 import "./CustomerTable.css";
 import { apiContext } from "../../context/apiContext";
 import { useNotification } from "../../context/notificationContext";
+import { CUSTOMER_IMAGES, DEFAULT_IMAGE } from "../../context/constants";
 
 const CustomerTable = ({ currentPage, setCurrentPage }) => {
   // State for modal
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedCustomer, setSelectedCustomer] = useState(null);
   const [editedCustomer, setEditedCustomer] = useState(null);
+  const [editImagePreview, setEditImagePreview] = useState(null);
+  const [editImageFile, setEditImageFile] = useState(null);
 
   // Add Customer Modal States
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [newCustomer, setNewCustomer] = useState({
-    firstName: '',
-    lastName: '',
-    email: '',
-    username: '',
-    password: '',
-    address: '',
-    customerImage: null
+    firstName: "",
+    lastName: "",
+    email: "",
+    username: "",
+    password: "",
+    address: "",
+    customerImage: null,
   });
   const [emailVerified, setEmailVerified] = useState(false);
   const [otpSent, setOtpSent] = useState(false);
-  const [otp, setOtp] = useState('');
+  const [otp, setOtp] = useState("");
   const [imagePreview, setImagePreview] = useState(null);
 
   const [customers, setCustomers] = useState([]);
@@ -32,7 +35,14 @@ const CustomerTable = ({ currentPage, setCurrentPage }) => {
   const [paginatedCustomers, setPaginatedCustomers] = useState([]);
   const totalPages = Math.ceil(customers.length / customersPerPage);
 
-  const { getCustomers, addCustomer, requestOtp, verifyOtp, deleteCustomer } = apiContext();
+  const {
+    getCustomers,
+    addCustomer,
+    requestOtp,
+    verifyOtp,
+    deleteUser,
+    updateCustomer,
+  } = apiContext();
 
   const { showNotification } = useNotification();
 
@@ -211,39 +221,79 @@ const CustomerTable = ({ currentPage, setCurrentPage }) => {
   // Handle opening the modal with customer details
   const handleDetailsClick = (customer) => {
     setSelectedCustomer(customer);
+    console.log("Selected customer:", customer);
     setEditedCustomer({ ...customer });
     setIsModalOpen(true);
+    // Set image preview if customer has an image
+    if (customer.imageUrl) {
+      setEditImagePreview(`${CUSTOMER_IMAGES}/${customer.imageUrl}`);
+    }else{
+      setEditImagePreview('');
+    }
   };
 
   // Handle form input changes
   const handleInputChange = (e) => {
     if (!editedCustomer) return;
 
-    const { name, value } = e.target;
+    const { name, value, type, files } = e.target;
 
-    setEditedCustomer({
-      ...editedCustomer,
-      [name]: name === "totalSpends" ? parseFloat(value) : value,
-    });
+    if (type === "file" && files.length > 0) {
+      const file = files[0];
+      setEditImageFile(file);
+
+      // Create preview URL
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setEditImagePreview(reader.result);
+      };
+      reader.readAsDataURL(file);
+    } else {
+      setEditedCustomer({
+        ...editedCustomer,
+        [name]: name === "totalSpends" ? parseFloat(value) : value,
+      });
+    }
   };
 
   // Handle save changes
-  const handleSaveChanges = () => {
+  const handleSaveChanges = async () => {
     if (!editedCustomer) return;
 
-    // Here you would typically make an API call to update the customer
-    // For now, we'll just update the local state
-    const updatedCustomers = customers.map((customer) =>
-      customer.customerId === editedCustomer.customerId ? editedCustomer : customer
-    );
+    try {
+      // Create FormData if we have an image to upload
+      const formData = new FormData();
 
-    console.log("Updated customers:", updatedCustomers);
+      // Add all customer data fields
+      Object.keys(editedCustomer).forEach((key) => {
+        if (key !== "customerImage" && key !== "profileImage") {
+          formData.append(key, editedCustomer[key]);
+        }
+      });
 
-    setIsModalOpen(false);
-    setSelectedCustomer(null);
-    setEditedCustomer(null);
+      // Add the image file
+      formData.append("image", editImageFile);
 
-    alert("Customer updated successfully!");
+      const result = await updateCustomer(
+        selectedCustomer.customerId,
+        formData
+      );
+      if (result.success) {
+        console.log("Updated customer with new image:");
+        showNotification(result.message, "success");
+        setIsModalOpen(false);
+        setSelectedCustomer(null);
+        setEditedCustomer(null);
+        setEditImagePreview(null);
+        setEditImageFile(null);
+        await fetchCustomers();
+      } else {
+        showNotification(result.message, "error");
+      }
+    } catch (error) {
+      console.error("Failed to update customer:", error);
+      showNotification("Failed to update customer", "error");
+    }
   };
 
   // Handle delete customer
@@ -255,14 +305,14 @@ const CustomerTable = ({ currentPage, setCurrentPage }) => {
         `Are you sure you want to delete ${selectedCustomer.firstName} ${selectedCustomer.lastName}?`
       )
     ) {
-      const deleteResult = await deleteCustomer(selectedCustomer.customerId);
+      const deleteResult = await deleteUser(selectedCustomer.customerId);
       if (deleteResult.success) {
         setIsModalOpen(false);
         setSelectedCustomer(null);
         setEditedCustomer(null);
         showNotification("Customer deleted successfully", "success");
         await fetchCustomers();
-      }else{
+      } else {
         showNotification("Failed to delete customer", "error");
       }
     }
@@ -288,9 +338,9 @@ const CustomerTable = ({ currentPage, setCurrentPage }) => {
     if (file) {
       setNewCustomer({
         ...newCustomer,
-        customerImage: file
+        customerImage: file,
       });
-      
+
       const reader = new FileReader();
       reader.onloadend = () => {
         setImagePreview(reader.result);
@@ -305,10 +355,11 @@ const CustomerTable = ({ currentPage, setCurrentPage }) => {
       const otpResult = await requestOtp(newCustomer.email);
       if (otpResult.success) {
         setOtpSent(true);
-        showNotification("OTP sent to your email", "success");
+        showNotification(otpResult.message, "success");
+      } else{
+        showNotification(otpResult.message, "error");
       }
     } else {
-      alert("Please enter a valid email address");
       showNotification("Please enter a valid email address", "error");
     }
   };
@@ -326,44 +377,53 @@ const CustomerTable = ({ currentPage, setCurrentPage }) => {
 
   // Handle add new customer
   const handleAddCustomer = async () => {
-    if (!newCustomer.firstName || !newCustomer.lastName || !newCustomer.email || 
-        !newCustomer.username || !newCustomer.password || !emailVerified) {
-      alert("Please fill all required fields and verify your email");
+    if (
+      !newCustomer.firstName ||
+      !newCustomer.lastName ||
+      !newCustomer.email ||
+      !newCustomer.username ||
+      !newCustomer.password ||
+      !emailVerified ||
+      !newCustomer.address
+    ) {
+      showNotification(
+        "Please fill in all required fields",
+        "error"
+      );
       return;
     }
     //create a formdata object to send the image and other data
     const formData = new FormData();
-    formData.append('firstName', newCustomer.firstName);
-    formData.append('lastName', newCustomer.lastName);
-    formData.append('email', newCustomer.email);
-    formData.append('username', newCustomer.username);
-    formData.append('password', newCustomer.password);
-    formData.append('address', newCustomer.address);
-    formData.append('image', newCustomer.customerImage);
-    formData.append('role', 'customer');
-    
+    formData.append("firstName", newCustomer.firstName);
+    formData.append("lastName", newCustomer.lastName);
+    formData.append("email", newCustomer.email);
+    formData.append("username", newCustomer.username);
+    formData.append("password", newCustomer.password);
+    formData.append("address", newCustomer.address);
+    formData.append("image", newCustomer.customerImage);
+    formData.append("role", "customer");
+
     const result = await addCustomer(formData);
     if (result.success) {
       console.log("Customer added successfully", result.message);
       showNotification("Customer added successfully", "success");
       await fetchCustomers();
-    }else{
-      console.log("Failed to add customer", result.message);
-      showNotification("Failed to add customer", "error");
+    } else {
+      showNotification(result.message, "error");
       return;
     }
     setNewCustomer({
-      firstName: '',
-      lastName: '',
-      email: '',
-      username: '',
-      password: '',
-      address: '',
-      customerImage: null
+      firstName: "",
+      lastName: "",
+      email: "",
+      username: "",
+      password: "",
+      address: "",
+      customerImage: null,
     });
     setEmailVerified(false);
     setOtpSent(false);
-    setOtp('');
+    setOtp("");
     setImagePreview(null);
     setIsAddModalOpen(false);
   };
@@ -384,7 +444,10 @@ const CustomerTable = ({ currentPage, setCurrentPage }) => {
 
           <button className="btn btn-secondary">See All</button>
 
-          <button className="btn btn-primary btn-with-icon" onClick={handleOpenAddModal}>
+          <button
+            className="btn btn-primary btn-with-icon"
+            onClick={handleOpenAddModal}
+          >
             <PlusIcon />
             Add Customer
           </button>
@@ -509,6 +572,24 @@ const CustomerTable = ({ currentPage, setCurrentPage }) => {
             </div>
 
             <div className="modal-body">
+              <div className="form-group">
+                <label htmlFor="customer-image">Profile Image</label>
+                <div className="image-upload-container">
+                  <input
+                    type="file"
+                    id="customer-image"
+                    name="customerImage"
+                    accept="image/*"
+                    onChange={handleInputChange}
+                  />
+                  {editImagePreview && (
+                    <div className="image-preview">
+                      <img src={editImagePreview} alt="Customer preview" />
+                    </div>
+                  )}
+                </div>
+              </div>
+
               <div className="form-row">
                 <div className="form-group">
                   <label htmlFor="customer-firstName">First Name</label>
@@ -516,7 +597,7 @@ const CustomerTable = ({ currentPage, setCurrentPage }) => {
                     type="text"
                     id="customer-firstName"
                     name="firstName"
-                    value={editedCustomer.firstName || ''}
+                    value={editedCustomer.firstName || ""}
                     onChange={handleInputChange}
                     placeholder="Enter first name"
                     required
@@ -529,7 +610,7 @@ const CustomerTable = ({ currentPage, setCurrentPage }) => {
                     type="text"
                     id="customer-lastName"
                     name="lastName"
-                    value={editedCustomer.lastName || ''}
+                    value={editedCustomer.lastName || ""}
                     onChange={handleInputChange}
                     placeholder="Enter last name"
                     required
@@ -537,7 +618,7 @@ const CustomerTable = ({ currentPage, setCurrentPage }) => {
                 </div>
               </div>
 
-              <div className="form-group">
+              {/* <div className="form-group">
                 <label htmlFor="customer-email">Email</label>
                 <input
                   type="email"
@@ -548,7 +629,7 @@ const CustomerTable = ({ currentPage, setCurrentPage }) => {
                   placeholder="Enter email address"
                   required
                 />
-              </div>
+              </div> */}
 
               <div className="form-group">
                 <label htmlFor="customer-address">Address</label>
@@ -661,8 +742,8 @@ const CustomerTable = ({ currentPage, setCurrentPage }) => {
                     disabled={emailVerified}
                     className={emailVerified ? "verified-input" : ""}
                   />
-                  <button 
-                    className="btn btn-secondary" 
+                  <button
+                    className="btn btn-secondary"
                     onClick={handleRequestOTP}
                     disabled={emailVerified || !newCustomer.email}
                   >
@@ -683,8 +764,8 @@ const CustomerTable = ({ currentPage, setCurrentPage }) => {
                       placeholder="Enter OTP from email"
                       required
                     />
-                    <button 
-                      className="btn btn-secondary" 
+                    <button
+                      className="btn btn-secondary"
                       onClick={handleVerifyOTP}
                     >
                       Verify
@@ -760,8 +841,8 @@ const CustomerTable = ({ currentPage, setCurrentPage }) => {
                 >
                   Cancel
                 </button>
-                <button 
-                  className="btn btn-primary" 
+                <button
+                  className="btn btn-primary"
                   onClick={handleAddCustomer}
                   disabled={!emailVerified}
                 >

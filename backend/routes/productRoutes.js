@@ -2,7 +2,7 @@ import express from 'express';
 import productController from '../controllers/productController.js';
 import imageUpload from "../middlewares/imageUpload.js";
 
-const { productUpload } = imageUpload;
+const { memoryUpload } = imageUpload;
 
 const { getAllProducts, getProductById, insertProduct, deleteProduct, updateProduct,searchProducts} = productController;
 
@@ -17,7 +17,7 @@ router.get('/search', searchProducts);
 router.get('/:productId', getProductById);
 
 // Route to insert a new product
-router.post('/', productUpload.single("image"), insertProduct);
+router.post('/', memoryUpload.single("image"), insertProduct);
 
 // Route to delete a product by ID
 router.delete('/:productId', deleteProduct);

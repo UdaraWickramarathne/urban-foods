@@ -1,4 +1,5 @@
 import HttpStatus from "../enums/httpsStatus.js";
+import imageUpload from "../middlewares/imageUpload.js";
 import productRepository from "../repositories/productRepository.js";
 
 const getAllProducts = async (req, res) => {
@@ -35,24 +36,35 @@ const getProductById = async (req, res) => {
   }
 };
 
-
 const insertProduct = async (req, res) => {
   try {
-    const imageUrl = req.file ? req.file.filename : null;
     const productData = req.body;
+
+    let imageUrl = null;
+    if (req.file) {
+      imageUrl = imageUpload.saveProductImage(
+        req.file.buffer,
+        req.file.originalname
+      );
+    }
     productData.imageUrl = imageUrl;
+    productData.supplierId = '8';
+
     const result = await productRepository.insertProduct(productData);
     if (result.success) {
       res.status(201).json({ success: true, productId: result.productId });
     } else {
+      console.log("Error in insertProduct:", result.message);
+      
       res.status(500).json({ success: false, message: result.message });
     }
   } catch (error) {
     console.error("Error in insertProduct controller:", error.message);
-    res.status(500).json({ success: false, message: "Failed to insert product" });
+    res
+      .status(500)
+      .json({ success: false, message: "Failed to insert product" });
   }
 };
-
 
 const deleteProduct = async (req, res) => {
   try {
@@ -65,7 +77,6 @@ const deleteProduct = async (req, res) => {
     });
   }
 };
-
 
 const updateProduct = async (req, res) => {
   try {
@@ -87,8 +98,8 @@ const searchProducts = async (req, res) => {
   const keyword = req.query.keyword;
   try {
     const products = await productRepository.searchProducts(keyword);
-    if(!products){
-     return res.status(HttpStatus.NOT_FOUND).json({
+    if (!products) {
+      return res.status(HttpStatus.NOT_FOUND).json({
         success: false,
         message: "No products found in this keyword",
       });
@@ -103,12 +114,11 @@ const searchProducts = async (req, res) => {
   }
 };
 
-
 export default {
   getAllProducts,
   getProductById,
   insertProduct,
   deleteProduct,
   updateProduct,
-  searchProducts
+  searchProducts,
 };

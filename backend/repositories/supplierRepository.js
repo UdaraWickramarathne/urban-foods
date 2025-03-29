@@ -1,5 +1,6 @@
 import { getConnection } from "../db/dbConnection.js";
 import oracledb from "oracledb";
+import Supplier from "../models/supplier.js";
 
 const getAllSuppliersWithDetails = async () => {
   let connection;
@@ -55,7 +56,9 @@ const getAllSuppliersWithDetails = async () => {
           currentSupplier.email = line.replace("Supplier Email: ", "");
         } else if (line.startsWith("Supplier Address: ")) {
           currentSupplier.address = line.replace("Supplier Address: ", "");
-        } else if (line.startsWith("Product Count: ")) {
+        }else if(line.startsWith("Supplier Image: ")) {
+          currentSupplier.imageUrl = line.replace("Supplier Image: ", "");
+        }else if (line.startsWith("Product Count: ")) {
           currentSupplier.productCount = parseInt(
             line.replace("Product Count: ", "")
           );
@@ -112,16 +115,18 @@ const getAllSuppliersWithDetails = async () => {
 };
 
 const updateSupplier = async (supplierId, supplier) => {
+  
   let connection;
   try {
     connection = await getConnection();
 
     const result = await connection.execute(
-      `UPDATE suppliers SET business_name = :businessName, email = :email, address = :address WHERE supplier_id = :supplierId`,
+      `UPDATE suppliers SET business_name = :businessName, email = :email, address = :address, image_url = :imageUrl WHERE supplier_id = :supplierId`,
       {
         businessName: supplier.businessName,
         email: supplier.email,
         address: supplier.address,
+        imageUrl: supplier.imageUrl,
         supplierId,
       },
       { autoCommit: true }
@@ -214,4 +219,90 @@ const addSupplier = async (supplier) => {
   }
 }
 
-export default { getAllSuppliersWithDetails, updateSupplier, deleteSupplier, addSupplier };
+const  getSupplierByEmail = async (email) => {
+  let connection;
+  try {
+    connection = await getConnection();
+
+    const result = await connection.execute(
+      `SELECT * FROM suppliers WHERE email = :email`,
+      { email }
+    );
+
+    if (result.rows.length > 0) {
+      return result.rows[0];
+    } else {
+      return null; 
+    }
+  } catch (error) {
+    console.error("Error fetching supplier by email:", error);
+    return null;
+  } finally {
+    if (connection) {
+      try {
+        await connection.close();
+      } catch (error) {
+        console.error("Error closing connection:", error);
+      }
+    }
+  }
+}
+
+const getSupplierByBusinessName = async (businessName) => {
+  let connection;
+  try {
+    connection = await getConnection();
+
+    const result = await connection.execute(
+      `SELECT * FROM suppliers WHERE business_name = :businessName`,
+      { businessName }
+    );
+
+    if (result.rows.length > 0) {
+      return result.rows[0];
+    } else {
+      return null; 
+    }
+  } catch (error) {
+    console.error("Error fetching supplier by business name:", error);
+    return null;
+  } finally {
+    if (connection) {
+      try {
+        await connection.close();
+      } catch (error) {
+        console.error("Error closing connection:", error);
+      }
+    }
+  }
+}
+
+const getSupplierById = async (supplierId) => {
+  let connection;
+  try {
+    connection = await getConnection();
+
+    const result = await connection.execute(
+      `SELECT * FROM suppliers WHERE supplier_id = :supplierId`,
+      { supplierId }
+    );
+
+    if (result.rows.length > 0) {
+      return Supplier.fromDbRow(result.rows[0], result.metaData);
+    } else {
+      return null; 
+    }
+  } catch (error) {
+    console.error("Error fetching supplier by ID:", error);
+    return null;
+  } finally {
+    if (connection) {
+      try {
+        await connection.close();
+      } catch (error) {
+        console.error("Error closing connection:", error);
+      }
+    }
+  }
+}
+export default { getAllSuppliersWithDetails, updateSupplier, deleteSupplier, addSupplier, getSupplierByEmail, getSupplierByBusinessName, getSupplierById };

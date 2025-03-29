@@ -407,3 +407,77 @@
   color: #e53935;
   margin-left: 3px;
 }
+
+/* Email verification styles */
+.email-with-verification {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.email-with-verification input {
+  flex: 1;
+}
+
+.email-with-verification button {
+  white-space: nowrap;
+}
+
+.verification-status {
+  display: flex;
+  align-items: center;
+  margin-left: 10px;
+}
+
+.verified-tag {
+  display: inline-flex;
+  align-items: center;
+  padding: 4px 8px;
+  background-color: #e7f7ed;
+  color: #22863a;
+  border-radius: 4px;
+  font-size: 0.85em;
+  font-weight: 600;
+}
+
+.otp-group {
+  background-color: #f8f9fa;
+  padding: 15px;
+  border-radius: 6px;
+  border-left: 3px solid #0d6efd;
+  margin-bottom: 20px;
+}
+
+.otp-verification {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 5px;
+}
+
+.otp-verification input {
+  flex: 1;
+  font-size: 1.1em;
+  letter-spacing: 2px;
+  text-align: center;
+}
+
+/* Button states for OTP process */
+button:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+.btn-text {
+  background: none;
+  border: none;
+  color: #0d6efd;
+  padding: 0;
+  font-size: 0.9em;
+  cursor: pointer;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.btn-text:hover {
+  color: #0a58ca;
+}

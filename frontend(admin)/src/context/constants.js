@@ -10,3 +10,7 @@ export const ADD_ORACLE_USER = `${BASE_URL}/admin/users`;
 export const GET_CATEGORY = `${BASE_URL}/category`;
 export const CUSTOMERS = `${BASE_URL}/customers`;
 export const SUPPLIERS = `${BASE_URL}/suppliers`;
+export const CUSTOMER_IMAGES = `${BASE_URL}/images/customers`;
+export const SUPPLIER_IMAGES = `${BASE_URL}/images/suppliers`;
+export const DEFAULT_IMAGE = `${BASE_URL}/images/default/default-image.jpg`;
+export const PRODUCTS = `${BASE_URL}/products`;
