@@ -9,13 +9,17 @@ import storeContext from "../../context/storeContext";
 const Navbar = ({ onUserIconClick }) => {
   const [menu, setMenu] = useState("home");
   const [dropdownVisible, setDropdownVisible] = useState(false);
-  const { token, setToken, setUserId, role } = storeContext();
+  const { token, setToken, setRole, setUserId, role } = storeContext();
   const navigate = useNavigate();
 
   useEffect(() => {
     const savedToken = localStorage.getItem("token");
+    const savedRole = localStorage.getItem("role");
     if (savedToken) {
       setToken(savedToken);
+    }
+    if (savedRole) {
+      setRole(savedRole);
     }
   }, []);
 
@@ -26,6 +30,7 @@ const Navbar = ({ onUserIconClick }) => {
   const handleLogout = () => {
     setToken("");
     setUserId("");
+    setRole("");
     navigate("/");
   };
 

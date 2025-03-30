@@ -20,6 +20,8 @@ const LoginPage = ({ onClose, onSwitchToRegister }) => {
 
       if (response.status === 200) {
         const { token, userId, role } = response.data;
+        localStorage.setItem("userId", userId);
+        localStorage.setItem("role", role);
         setToken(token);
         console.log("Login successful:", { userId, role });
         setUserId(userId);
