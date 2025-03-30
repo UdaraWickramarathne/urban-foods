@@ -8,7 +8,6 @@ const DbUserManagement = () => {
     {
       id: 1,
       username: "admin_user",
-      role: "Administrator",
       createdDate: "2023-09-10",
       lastLogin: "2023-10-15",
       status: "Active",
@@ -16,7 +15,6 @@ const DbUserManagement = () => {
     {
       id: 2,
       username: "sales_manager",
-      role: "Sales Manager",
       createdDate: "2023-09-12",
       lastLogin: "2023-10-14",
       status: "Active",
@@ -24,7 +22,6 @@ const DbUserManagement = () => {
     {
       id: 3,
       username: "inventory_clerk",
-      role: "Inventory Clerk",
       createdDate: "2023-09-15",
       lastLogin: "2023-10-10",
       status: "Inactive",
@@ -32,7 +29,6 @@ const DbUserManagement = () => {
     {
       id: 4,
       username: "customer_support",
-      role: "Customer Support",
       createdDate: "2023-09-20",
       lastLogin: "2023-10-15",
       status: "Active",
@@ -40,7 +36,6 @@ const DbUserManagement = () => {
     {
       id: 5,
       username: "marketing_staff",
-      role: "Marketing Staff",
       createdDate: "2023-09-25",
       lastLogin: "2023-10-12",
       status: "Active",
@@ -48,7 +43,6 @@ const DbUserManagement = () => {
     {
       id: 6,
       username: "store_manager",
-      role: "Store Manager",
       createdDate: "2023-10-01",
       lastLogin: "2023-10-15",
       status: "Active",
@@ -56,7 +50,6 @@ const DbUserManagement = () => {
     {
       id: 7,
       username: "system_analyst",
-      role: "System Analyst",
       createdDate: "2023-10-05",
       lastLogin: "2023-10-14",
       status: "Active",
@@ -64,7 +57,6 @@ const DbUserManagement = () => {
     {
       id: 8,
       username: "temp_user",
-      role: "Temporary User",
       createdDate: "2023-10-08",
       lastLogin: "2023-10-09",
       status: "Inactive",
@@ -82,7 +74,6 @@ const DbUserManagement = () => {
   // New user form state
   const [newUser, setNewUser] = useState({
     username: "",
-    role: "User",
     password: "",
     status: "Active",
     permissions: {
@@ -116,18 +107,6 @@ const DbUserManagement = () => {
     "SUPPLIERS",
     "CATEGORIES",
     "DELIVERIES",
-  ];
-
-  // Available roles
-  const roles = [
-    "Administrator",
-    "Sales Manager",
-    "Inventory Clerk",
-    "Customer Support",
-    "Marketing Staff",
-    "Store Manager",
-    "System Analyst",
-    "User",
   ];
 
   // Status Badge component
@@ -226,7 +205,6 @@ const DbUserManagement = () => {
     const userToAdd = {
       username: newUser.username,
       password: newUser.password,
-      role: newUser.role,
       status: newUser.status,
       basicPrivileges: newUser.permissions.basicPrivileges,
       tablePermissions: newUser.permissions.tablePermissions, // Include permissions in the user object
@@ -237,7 +215,6 @@ const DbUserManagement = () => {
       setDbUsers([...dbUsers, userToAdd]);
       setNewUser({
         username: "",
-        role: "User",
         password: "",
         status: "Active",
         permissions: {
@@ -313,14 +290,12 @@ const DbUserManagement = () => {
                 <div className="th-content">Username</div>
               </th>
               <th>
-                <div className="th-content">Role</div>
-              </th>
-              <th>
                 <div className="th-content">Created Date</div>
               </th>
-              <th>
+              
+              {/* <th>
                 <div className="th-content">Last Login</div>
-              </th>
+              </th> */}
               <th>
                 <div className="th-content">Status</div>
               </th>
@@ -333,9 +308,8 @@ const DbUserManagement = () => {
             {dbUsers.map((user) => (
               <tr key={user.id}>
                 <td>{user.username}</td>
-                <td>{user.role}</td>
                 <td>{user.createdDate}</td>
-                <td>{user.lastLogin}</td>
+                {/* <td>{user.lastLogin}</td> */}
                 <td>
                   <StatusBadge status={user.status} />
                 </td>
@@ -422,21 +396,6 @@ const DbUserManagement = () => {
                   placeholder="Enter username"
                   required
                 />
-              </div>
-              <div className="form-group">
-                <label htmlFor="role">Role</label>
-                <select
-                  id="role"
-                  name="role"
-                  value={newUser.role}
-                  onChange={handleInputChange}
-                >
-                  {roles.map((role) => (
-                    <option key={role} value={role}>
-                      {role}
-                    </option>
-                  ))}
-                </select>
               </div>
               <div className="form-group">
                 <label htmlFor="password">Password</label>
@@ -727,21 +686,6 @@ const DbUserManagement = () => {
                   placeholder="Enter username"
                   required
                 />
-              </div>
-              <div className="form-group">
-                <label htmlFor="edit-role">Role</label>
-                <select
-                  id="edit-role"
-                  name="role"
-                  value={currentUser.role}
-                  onChange={handleInputChange}
-                >
-                  {roles.map((role) => (
-                    <option key={role} value={role}>
-                      {role}
-                    </option>
-                  ))}
-                </select>
               </div>
               <div className="form-group">
                 <label htmlFor="edit-status">Status</label>

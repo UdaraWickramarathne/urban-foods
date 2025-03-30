@@ -376,3 +376,7 @@
   height: 100%;
   object-fit: cover;
 }
+.btn-disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}

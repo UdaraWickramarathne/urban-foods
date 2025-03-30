@@ -23,7 +23,7 @@ router.post('/', memoryUpload.single("image"), insertProduct);
 router.delete('/:productId', deleteProduct);
 
 // Route to update a product by ID
-router.put('/:productId', updateProduct);
+router.put('/:productId', memoryUpload.single("image"), updateProduct);
 
 
 export default router;

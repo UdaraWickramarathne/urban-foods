@@ -481,3 +481,8 @@ button:disabled {
 .btn-text:hover {
   color: #0a58ca;
 }
+
+.btn-disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}

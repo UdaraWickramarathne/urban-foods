@@ -1,7 +1,11 @@
-import React from 'react';
+import React, { useState } from 'react';
 import './DashboardContent.css';
 
-const DashboardContent = ({ products, customers, sales }) => {
+const DashboardContent = () => {
+  const [products, setProducts] = useState([]);
+  const [sales, setSales] = useState([]);
+  const [customers, setCustomers] = useState([]);
+
   return (
     <div className="dashboard-content">
       {/* Summary Stats Row */}

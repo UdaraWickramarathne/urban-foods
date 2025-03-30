@@ -30,6 +30,8 @@ const addOrcleUser = async (req, res) => {
 const adminLogin = async (req, res) => {
     try {
       const { username, password } = req.body;
+      console.log("Login request:", req.body);
+      
   
       // Basic validation
       if (!username || !password) {
@@ -96,4 +98,28 @@ const  getUserPermissions = async (req, res) => {
     }
 }
 
-export default { addOrcleUser, adminLogin, getUserPermissions };
+const getAccountStatus = async (req, res) => {
+    try {
+        const username = req.params.username;
+        const result = await adminRepository.getAccountStatus(username);
+
+        if (result.success) {
+            res.status(HttpStatus.OK).json({
+                success: true,
+                data: result.data
+            });
+        } else {
+            res.status(HttpStatus.BAD_REQUEST).json({
+                success: false,
+                message: result.message
+            });
+        }
+    } catch (error) {
+        res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
+            success: false,
+            message: "Error getting account status",
+        });
+    }
+}
+
+export default { addOrcleUser, adminLogin, getUserPermissions, getAccountStatus };

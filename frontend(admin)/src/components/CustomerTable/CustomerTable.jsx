@@ -3,6 +3,8 @@ import "./CustomerTable.css";
 import { apiContext } from "../../context/apiContext";
 import { useNotification } from "../../context/notificationContext";
 import { CUSTOMER_IMAGES, DEFAULT_IMAGE } from "../../context/constants";
+import { useAuth } from "../../context/authContext";
+import { hasPermission, PERMISSIONS } from "../../utils/permissions";
 
 const CustomerTable = ({ currentPage, setCurrentPage }) => {
   // State for modal
@@ -29,6 +31,8 @@ const CustomerTable = ({ currentPage, setCurrentPage }) => {
   const [imagePreview, setImagePreview] = useState(null);
 
   const [customers, setCustomers] = useState([]);
+
+  const { userPermissions, handlePermissionCheck } = useAuth();
 
   // Pagination settings
   const customersPerPage = 10;
@@ -227,8 +231,8 @@ const CustomerTable = ({ currentPage, setCurrentPage }) => {
     // Set image preview if customer has an image
     if (customer.imageUrl) {
       setEditImagePreview(`${CUSTOMER_IMAGES}/${customer.imageUrl}`);
-    }else{
-      setEditImagePreview('');
+    } else {
+      setEditImagePreview("");
     }
   };
 
@@ -356,7 +360,7 @@ const CustomerTable = ({ currentPage, setCurrentPage }) => {
       if (otpResult.success) {
         setOtpSent(true);
         showNotification(otpResult.message, "success");
-      } else{
+      } else {
         showNotification(otpResult.message, "error");
       }
     } else {
@@ -386,10 +390,7 @@ const CustomerTable = ({ currentPage, setCurrentPage }) => {
       !emailVerified ||
       !newCustomer.address
     ) {
-      showNotification(
-        "Please fill in all required fields",
-        "error"
-      );
+      showNotification("Please fill in all required fields", "error");
       return;
     }
     //create a formdata object to send the image and other data
@@ -445,8 +446,18 @@ const CustomerTable = ({ currentPage, setCurrentPage }) => {
           <button className="btn btn-secondary">See All</button>
 
           <button
-            className="btn btn-primary btn-with-icon"
-            onClick={handleOpenAddModal}
+            className={`btn btn-primary btn-with-icon ${
+              !hasPermission(userPermissions, PERMISSIONS.CREATE_CUSTOMERS)
+                ? "btn-disabled"
+                : ""
+            }`}
+            onClick={() => {
+              handlePermissionCheck(
+                PERMISSIONS.CREATE_CUSTOMERS,
+                handleOpenAddModal,
+                "You don't have permission to add a customer."
+              );
+            }}
           >
             <PlusIcon />
             Add Customer
@@ -664,8 +675,16 @@ const CustomerTable = ({ currentPage, setCurrentPage }) => {
             <div className="modal-footer">
               <div className="modal-actions">
                 <button
-                  className="btn btn-danger btn-with-icon"
-                  onClick={handleDeleteCustomer}
+                  className={`btn btn-danger btn-with-icon ${!hasPermission(
+                    userPermissions, PERMISSIONS.DELETE_CUSTOMERS
+                  ) ? "btn-disabled" : ""}`}
+                  onClick={()=>{
+                    handlePermissionCheck(
+                      PERMISSIONS.DELETE_CUSTOMERS,
+                      handleDeleteCustomer,
+                      "You don't have permission to delete a customer."
+                    );
+                  }}
                 >
                   <TrashIcon />
                   Delete Customer
@@ -677,7 +696,13 @@ const CustomerTable = ({ currentPage, setCurrentPage }) => {
                 >
                   Cancel
                 </button>
-                <button className="btn btn-primary" onClick={handleSaveChanges}>
+                <button className={`btn btn-primary ${!hasPermission(userPermissions, PERMISSIONS.EDIT_CUSTOMERS)}`} onClick={()=>{
+                  handlePermissionCheck(
+                    PERMISSIONS.EDIT_CUSTOMERS,
+                    handleSaveChanges,
+                    "You don't have permission to edit a customer."
+                  );
+                }}>
                   Save Changes
                 </button>
               </div>
