@@ -4,6 +4,7 @@ import { VALIDATE_TOKEN } from './constants';
 const storeContext = create((set, get) =>({
     token: localStorage.getItem('token') || '',
     userId: localStorage.getItem('userId') || '',
+    role: localStorage.getItem('role') || '',
     setToken: (token) => {
         localStorage.setItem('token', token);
         set({token});

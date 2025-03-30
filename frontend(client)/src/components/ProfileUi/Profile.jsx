@@ -3,6 +3,8 @@ import { useNavigate } from "react-router-dom";
 import axios from 'axios';
 import './Profile.css';
 import storeContext from "../../context/storeContext";
+import { CUSTOMERS, SUPPLIERS, CUSTOMER_IMAGES, SUPPLIER_IMAGES, } from '../../context/constants';
+import { FaPencilAlt } from 'react-icons/fa';
 
 const Profile = () => {
   const [userData, setUserData] = useState({
@@ -11,12 +13,13 @@ const Profile = () => {
     address: '',
     email: '',
     businessName: '',
+    imageUrl: '',
   });
 
   const [isEditing, setIsEditing] = useState(false);
   const userId = localStorage.getItem('userId');
   const userType = localStorage.getItem('userType');
-  const {setToken, setUserId, setRole} = storeContext();
+  const { setToken, setUserId, setRole } = storeContext();
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -24,11 +27,16 @@ const Profile = () => {
       try {
         const endpoint =
           userType === 'supplier'
-            ? `http://localhost:5000/api/suppliers/${userId}`
-            : `http://localhost:5000/api/customers/${userId}`;
+            ? `${SUPPLIERS}/${userId}`
+            : `${CUSTOMERS}/${userId}`;
         const response = await axios.get(endpoint);
         if (response.data.success) {
-          setUserData(response.data.data);
+          const userData = response.data.data;
+          if (userData.imageUrl && !userData.imageUrl.startsWith('http')) {
+            userData.imageUrl = `${userType === 'supplier' ? SUPPLIER_IMAGES : CUSTOMER_IMAGES}/${userData.imageUrl}`;
+          }
+          console.log('Fetched User Data:', userData);
+          setUserData(userData);
         } else {
           console.error('Failed to fetch user data:', response.data.message);
         }
@@ -47,6 +55,17 @@ const Profile = () => {
     setUserData({ ...userData, [name]: value });
   };
 
+  const handleImageChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setUserData({ ...userData, imageUrl: reader.result });
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
   const handleEditClick = () => {
     setIsEditing(true);
   };
@@ -55,12 +74,39 @@ const Profile = () => {
     try {
       const endpoint =
         userType === 'supplier'
-          ? `http://localhost:5000/api/suppliers/editSupplier/${userId}`
-          : `http://localhost:5000/api/customers/update/${userId}`;
-      const response = await axios.put(endpoint, userData);
+          ? `${SUPPLIERS}/editSupplier/${userId}`
+          : `${CUSTOMERS}/update/${userId}`;
+  
+      const formData = new FormData();
+      Object.keys(userData).forEach((key) => {
+        if (key !== 'imageUrl') {
+          formData.append(key, userData[key]);
+        }
+      });
+  
+      const fileInput = document.querySelector('input[type="file"]');
+      if (fileInput && fileInput.files[0]) {
+        formData.append('image', fileInput.files[0]);
+      }
+  
+      const response = await axios.put(endpoint, formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      });
+  
       if (response.data.success) {
         alert('Profile updated successfully!');
         setIsEditing(false);
+
+        const updatedImageUrl = response.data.data.imageUrl.startsWith('http')
+          ? response.data.data.imageUrl
+          : `${userType === 'supplier' ? SUPPLIER_IMAGES : CUSTOMER_IMAGES}/${response.data.data.imageUrl}`;
+  
+        setUserData((prevData) => ({
+          ...prevData,
+          imageUrl: updatedImageUrl,
+        }));
       } else {
         alert('Failed to update profile: ' + response.data.message);
       }
@@ -75,8 +121,8 @@ const Profile = () => {
       try {
         const endpoint =
           userType === 'supplier'
-            ? `http://localhost:5000/api/suppliers/deleteSupplier/${userId}`
-            : `http://localhost:5000/api/customers/delete/${userId}`;
+            ? `${SUPPLIERS}/deleteSupplier/${userId}`
+            : `${CUSTOMERS}/delete/${userId}`;
         const response = await axios.delete(endpoint);
         if (response.data.success) {
           alert("Profile deleted successfully!");
@@ -106,11 +152,28 @@ const Profile = () => {
         <div className="profile-header">
           <div className="profile-info">
             <div className="pro">
-              <img
-                src={userData.imageUrl || 'https://via.placeholder.com/150'}
-                alt="Profile"
-                className="profile-pic"
-              />
+              <div className="profile-pic-container">
+                <img
+                  src={userData.imageUrl ? userData.imageUrl : 'assets/egg.png'}
+                  alt="Profile"
+                  className="profile-pic"
+                />
+                {isEditing && (
+                  <div
+                    className="edit-icon"
+                    onClick={() => document.getElementById('profile-pic-input').click()}
+                  >
+                    <FaPencilAlt />
+                  </div>
+                )}
+                <input
+                  id="profile-pic-input"
+                  type="file"
+                  accept="image/*"
+                  onChange={handleImageChange}
+                  style={{ display: 'none' }}
+                />
+              </div>
             </div>
             <div className="pro">
               <h2>{`${userData.firstName} ${userData.lastName}`}</h2>
