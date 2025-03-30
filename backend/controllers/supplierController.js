@@ -4,6 +4,7 @@ import supplierRepository from "../repositories/supplierRepository.js";
 import fs from "fs";
 import path from "path";
 
+
 const getAllSuppliersWithDetails = async (req, res) => {
   try {
     const result = await supplierRepository.getAllSuppliersWithDetails();
@@ -149,9 +150,36 @@ const addSupplier = async (req, res) => {
     });
   }
 };
+
+const getSupplierById = async (req, res) => {
+  try {
+    const supplierId = req.params.supplierId;
+    const result = await supplierRepository.getSupplierById(supplierId); // Correct repository
+
+    if (result) {
+      res.status(HttpStatus.OK).json({
+        success: true,
+        data: result,
+      });
+    } else {
+      res.status(HttpStatus.NOT_FOUND).json({
+        success: false,
+        message: "Supplier not found",
+      });
+    }
+  } catch (error) {
+    res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
+      success: false,
+      message: "Error retrieving supplier",
+    });
+  }
+};
+
+
 export default {
   getAllSuppliersWithDetails,
   updateSupplier,
   deleteSupplier,
   addSupplier,
+  getSupplierById
 };

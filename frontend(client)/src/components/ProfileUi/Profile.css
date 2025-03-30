@@ -27,6 +27,8 @@
   .profile-pic-container {
     position: relative;
     display: inline-block;
+    border-radius: 50%;
+    border: 5px solid #0c6510;
   }
   
   .profile-pic {
