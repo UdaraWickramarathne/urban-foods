@@ -378,3 +378,8 @@
   background-color: #f3f4f6;
   border-color: #d1d5db;
 }
+
+.btn-disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}

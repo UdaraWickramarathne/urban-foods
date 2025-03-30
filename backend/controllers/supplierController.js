@@ -1,6 +1,8 @@
 import HttpStatus from "../enums/httpsStatus.js";
 import imageUpload from "../middlewares/imageUpload.js";
 import supplierRepository from "../repositories/supplierRepository.js";
+import fs from "fs";
+import path from "path";
 
 const getAllSuppliersWithDetails = async (req, res) => {
   try {
@@ -27,7 +29,6 @@ const getAllSuppliersWithDetails = async (req, res) => {
 
 const updateSupplier = async (req, res) => {
   try {
-
     
     const supplierId = req.params.supplierId;
     const supplierData = req.body;

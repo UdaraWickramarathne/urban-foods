@@ -8,10 +8,10 @@ const getAllProducts = async () => {
     connection = await getConnection();
     const result = await connection.execute(`SELECT * FROM products`);
     const products = result.rows.map((row) => Product.fromDbRow(row, result.metaData));
-    return products;
+    return {success: true, data: products};
   } catch (error) {
     console.error("Error retrieving products:", error.message);
-    return [];
+    return {success: false, message: "Error retrieving products"};
   } finally {
     if (connection) {
       await connection.close();
@@ -77,9 +77,12 @@ const deleteProduct = async (productId) => {
   let connection;
   try {
     connection = await getConnection();
-    await connection.execute("DELETE FROM products WHERE product_id = :productId", {
+    const  result = await connection.execute("DELETE FROM products WHERE product_id = :productId", {
       productId,
     });
+    if (result.rowsAffected === 0) {
+      return { success: false, message: "Product not found" };
+    }
     await connection.commit();
     return { success: true, message: "Product deleted successfully" };
   } catch (error) {

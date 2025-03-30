@@ -146,6 +146,22 @@ const login = async ({ username, password }) => {
         message: "Invalid username or password",
       };
     }
+
+    // Check account status
+    const accountStatusResult = await getAccountStatus(username);
+    if (!accountStatusResult.success) {
+      return {
+        success: false,
+        message: accountStatusResult.message,
+      };
+    }
+    if (accountStatusResult.data !== "OPEN") {
+      return {
+        success: false,
+        message: "Account is locked or expired",
+      };
+    }
+
     const token = generateToken(user.userId, user.role);
 
     if(username === process.env.DB_USER){
@@ -272,4 +288,34 @@ const mapDbPrivilegesToPermissionsList = (privilegesRows) => {
   return permissions;
 };
 
-export default { createOracleUser, listOracleUsers, login, getUserPermissions };
+
+const getAccountStatus = async (username) => {
+  let connection;
+  try {
+    connection = await getConnection();
+    
+    const result = await connection.execute(
+      `SELECT account_status FROM dba_users WHERE username = :username`,
+      { username: username.toUpperCase() }
+    );
+
+    if (result.rows.length === 0) {
+      return {success: false, message: "User Not Found"}; // User not found
+    }
+
+    return { success: true, data: result.rows[0][0] }; // Return account status
+  } catch (error) {
+    console.error("Error fetching account status:", error.message);
+    return { success: false, message: "Error fetching account status" };
+  } finally {
+    if (connection) {
+      try {
+        await connection.close();
+      } catch (err) {
+        console.error("Error closing connection:", err.message);
+      }
+    }
+  }
+};
+
+export default { createOracleUser, listOracleUsers, login, getUserPermissions, getAccountStatus };

@@ -6,22 +6,19 @@ import Login from "./pages/Login/Login";
 import Dashboard from "./pages/Dashboard/Dashboard";
 
 // Create a separate component that uses auth context
-function AppContent() {
-  const { isAuthenticated } = useAuth();
-
+function App() {
   return (
     <NotificationProvider>
-      {!isAuthenticated ? <Login /> : <Dashboard />}
+      <AuthProvider>
+        <AppContent />
+      </AuthProvider>
     </NotificationProvider>
   );
 }
 
-function App() {
-  return (
-    <AuthProvider>
-      <AppContent />
-    </AuthProvider>
-  );
+function AppContent() {
+  const { isAuthenticated } = useAuth();
+  return !isAuthenticated ? <Login /> : <Dashboard />;
 }
 
 export default App;

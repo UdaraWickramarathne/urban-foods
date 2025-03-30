@@ -19,7 +19,7 @@ function Login() {
     });
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     
     if (!credentials.username || !credentials.password) {
@@ -27,19 +27,16 @@ function Login() {
       return;
     }
     
-    login(credentials)
-      .then(response => {
-        if (response.status === 200) {
-          setError('');
-        } else {
-          setError('Invalid username or password');
-        }
-      })
-      .catch(error => {
-        setError('Invalid username or password');
+    try {
+      const result = await login(credentials);
+      if(!result.success){
+        setError(result.message);
+        return;
       }
-    );
-
+      setError('');
+    } catch (error) {
+      setError(error.message || 'An unexpected error occurred. Please try again later.');
+    }
   };
 
   return (

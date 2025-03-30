@@ -392,13 +392,14 @@ const deleteUser = async (req, res) => {
     const userId = req.params.userId;
 
     const customer = await customerRepository.getCustomerById(userId);
-    if (!customer) {
+    const supplier = await supplierRepository.getSupplierById(userId);
+    if (!customer && !supplier) {
       return res.status(HttpStatus.NOT_FOUND).json({
         success: false,
         message: "Customer not found",
       });
     }
-    if(customer.imageUrl) {
+    if(customer && customer.imageUrl ) {
       const oldPath = path.join(
         process.cwd(),
         "uploads",
@@ -408,7 +409,18 @@ const deleteUser = async (req, res) => {
       if (fs.existsSync(oldPath)) {
         fs.unlinkSync(oldPath);
       }
+    }else if(supplier && supplier.imageUrl) {
+      const oldPath = path.join(
+        process.cwd(),
+        "uploads",
+        "suppliers",
+        supplier.imageUrl
+      )
+      if (fs.existsSync(oldPath)) {
+        fs.unlinkSync(oldPath);
+      }
     }
+
     const result = await userRepository.deleteUser(userId);
 
     if (result) {
