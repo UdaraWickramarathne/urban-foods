@@ -80,6 +80,18 @@ export const apiContext = create((set, get) => ({
       }
     }
   },
+  updateCustomer: async (customerId, customer) => {
+    try {
+      const response = await axios.put(`${CUSTOMERS}/update/${customerId}`, customer);
+      return response.data; // This handles successful responses
+    } catch (error) {
+      if (error.response) {
+        return error.response.data;
+      } else {
+        return { success: false, message: "Failed to update customer" };
+      }
+    }
+  },
   requestOtp: async (email) => {
     try {
       const response = await axios.post(REQUEST_OTP, { email });
@@ -115,18 +127,7 @@ export const apiContext = create((set, get) => ({
       console.log("Failed to delete customer:", error);
     }
   },
-  updateCustomer: async (customerId, customer) => {
-    try {
-      const response = await axios.put(`${CUSTOMERS}/update/${customerId}`, customer);
-      return response.data; // This handles successful responses
-    } catch (error) {
-      if (error.response) {
-        return error.response.data;
-      } else {
-        return { success: false, message: "Failed to update customer" };
-      }
-    }
-  },
+  
   // Supplier API
   getAllSuppliersWithDetails: async () => {
     try {
@@ -142,7 +143,6 @@ export const apiContext = create((set, get) => ({
     }
   },
   updateSupplier: async (supplierId, supplier) => {
-    
     try {
       const response = await axios.put(`${SUPPLIERS}/${supplierId}`, supplier);
       return response.data;
@@ -189,5 +189,40 @@ export const apiContext = create((set, get) => ({
       }
       return { success: false, message: "Failed to add product" };
     }
-  }
+  },
+  getAllProducts: async () => {
+    try {
+      const response = await axios.get(PRODUCTS);
+      return response.data;
+    } catch (error) {
+      if (error.response) {
+        return error.response.data;
+      }
+      return { success: false, message: "Failed to retrieve products" };
+    }
+  },
+  updateProduct: async (productId, product) => {
+    try {
+      const response = await axios.put(`${PRODUCTS}/${productId}`, product);
+      return response.data;
+    } catch (error) {
+      if (error.response) {
+        return error.response.data;
+      } else {
+        return { success: false, message: "Failed to update product" };
+      }
+    }
+  },
+  deleteProduct: async (productId) => {
+    try {
+      const response = await axios.delete(`${PRODUCTS}/${productId}`);
+      return response.data;
+    } catch (error) {
+      if (error.response) {
+        return error.response.data;
+      }
+      return { success: false, message: "Failed to delete product" };
+    }
+  },
+
 }));

@@ -1,13 +1,23 @@
 import { apiContext } from "../../context/apiContext";
+import { PRODUCT_IMAGES } from "../../context/constants";
 import { useNotification } from "../../context/notificationContext";
 import "./ProductTable.css";
 import React, { useState, useEffect } from "react";
+import { useAuth } from "../../context/authContext";
+import { hasPermission, PERMISSIONS } from "../../utils/permissions";
 
-const ProductTable = ({ products, currentPage, setCurrentPage }) => {
+
+const ProductTable = ({ currentPage, setCurrentPage }) => {
   // State for modal
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState(null);
   const [editedProduct, setEditedProduct] = useState(null);
+  // Add state for edited product image
+  const [editedImagePreview, setEditedImagePreview] = useState(null);
+  const [editedImageFile, setEditedImageFile] = useState(null);
+
+  const [products, setProducts] = useState([]);
+
   // Add state for the add product modal
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [newProduct, setNewProduct] = useState({
@@ -24,8 +34,10 @@ const ProductTable = ({ products, currentPage, setCurrentPage }) => {
   const [isLoadingCategories, setIsLoadingCategories] = useState(false);
   const [categoryError, setCategoryError] = useState(null);
 
-  const { getAllCategories, addProduct } = apiContext();
+  const { getAllCategories, addProduct, getAllProducts, updateProduct, deleteProduct } = apiContext();
   const { showNotification } = useNotification();
+
+  const { userPermissions, handlePermissionCheck } = useAuth();
 
   // Fetch categories from database
   useEffect(() => {
@@ -46,16 +58,35 @@ const ProductTable = ({ products, currentPage, setCurrentPage }) => {
       }
     };
 
-    if (isAddModalOpen) {
+    if (isAddModalOpen || isModalOpen) {
       fetchCategories();
     }
-  }, [isAddModalOpen]);
+  }, [isAddModalOpen, isModalOpen, getAllCategories]);
 
   // Status Badge component
   const StatusBadge = ({ status }) => {
     const className = `status-badge status-${status.toLowerCase()}`;
     return <span className={className}>{status}</span>;
   };
+
+  // Create a reusable function to fetch and update products data
+  const fetchAndUpdateProducts = async () => {
+    try {
+      const response = await getAllProducts();
+      if (response.success) {
+        console.log("Products fetched successfully:", response.data);
+        setProducts(response.data);
+      } else {
+        console.error("Error fetching products:", response.message);
+      }
+    } catch (error) {
+      console.error("Error fetching products:", error);
+    }
+  };
+
+  useEffect(() => {
+    fetchAndUpdateProducts();
+  }, []); // Fetch products when component mounts
 
   // Icons
   const ChevronDownIcon = () => (
@@ -168,8 +199,15 @@ const ProductTable = ({ products, currentPage, setCurrentPage }) => {
 
   // Handle opening the modal with product details
   const handleDetailsClick = (product) => {
-    setSelectedProduct(product);
-    setEditedProduct({ ...product });
+    // Make sure we're consistent with category property naming
+    const productWithConsistentNames = {
+      ...product,
+      categoryId: product.categoryId || product.category // Ensure categoryId exists
+    };
+    setSelectedProduct(productWithConsistentNames);
+    setEditedProduct(productWithConsistentNames);
+    setEditedImagePreview(product.imageUrl ? `${PRODUCT_IMAGES}/${product.imageUrl}` : null);
+    setEditedImageFile(null);
     setIsModalOpen(true);
   };
 
@@ -178,58 +216,89 @@ const ProductTable = ({ products, currentPage, setCurrentPage }) => {
     if (!editedProduct) return;
 
     const { name, value } = e.target;
-
-    setEditedProduct({
-      ...editedProduct,
-      [name]: name === "price" || name === "stock" ? parseFloat(value) : value,
-    });
+    
+    // If changing category, update categoryId
+    if (name === "categoryId") {
+      setEditedProduct({
+        ...editedProduct,
+        categoryId: value
+      });
+    } else {
+      setEditedProduct({
+        ...editedProduct,
+        [name]: name === "price" || name === "stock" ? parseFloat(value) : value,
+      });
+    }
   };
 
   // Handle save changes
-  const handleSaveChanges = () => {
+  const handleSaveChanges = async () => {
     if (!editedProduct) return;
 
-    // Here you would typically make an API call to update the product
-    // For now, we'll just update the local state
-    const updatedProducts = products.map((product) =>
-      product.id === editedProduct.id ? editedProduct : product
-    );
+    // Create FormData with consistent property naming
+    const formData = new FormData();
+    formData.append('name', editedProduct.name);
+    formData.append('categoryId', editedProduct.categoryId); // Always use categoryId
+    formData.append('price', editedProduct.price);
+    formData.append('stock', editedProduct.stock);
+    
+    // If a new image was selected, append it to the form data
+    if (editedImageFile) {
+      formData.append('image', editedImageFile);
+    }
 
-    // Update products state (assuming this would be lifted up to parent component in real implementation)
-    // For now, this won't persist as we're not updating the parent state
-
-    setIsModalOpen(false);
-    setSelectedProduct(null);
-    setEditedProduct(null);
-
-    // Display a success message (in a real app, use a proper toast notification)
-    alert("Product updated successfully!");
+    const result = await updateProduct(selectedProduct.productId, formData);
+    if (result.success) {
+      showNotification("Product updated successfully!", "success");
+      setIsModalOpen(false);
+      setSelectedProduct(null);
+      setEditedProduct(null);
+      setEditedImagePreview(null);
+      setEditedImageFile(null);
+      
+      // Fetch updated product list
+      await fetchAndUpdateProducts();
+    }
+    else {
+      showNotification(result.message, "error");
+    }
   };
 
   // Handle delete product
-  const handleDeleteProduct = () => {
+  const handleDeleteProduct = async () => {
     if (!selectedProduct) return;
 
     // Confirm before deleting
     if (
       window.confirm(`Are you sure you want to delete ${selectedProduct.name}?`)
     ) {
-      // Here you would typically make an API call to delete the product
-      // For now, we'll just update the local state
-      const updatedProducts = products.filter(
-        (product) => product.id !== selectedProduct.id
-      );
-
-      // Update products state (assuming this would be lifted up to parent component in real implementation)
-      // For now, this won't persist as we're not updating the parent state
-
-      setIsModalOpen(false);
-      setSelectedProduct(null);
-      setEditedProduct(null);
-
-      // Display a success message (in a real app, use a proper toast notification)
-      alert("Product deleted successfully!");
+      const result = await deleteProduct(selectedProduct.productId);
+      if (result.success) {
+        setIsModalOpen(false);
+        setSelectedProduct(null);
+        setEditedProduct(null);
+        showNotification("Product deleted successfully!", "success");
+        await fetchAndUpdateProducts();
+      }else{
+        showNotification(result.message, "error");
+      }   
     }
+  };
+
+  // Handle file upload for edited product
+  const handleFileChange = (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    // Store the actual file
+    setEditedImageFile(file);
+
+    // Create a preview URL for the selected image
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      setEditedImagePreview(reader.result);
+    };
+    reader.readAsDataURL(file);
   };
 
   // Handle opening the add product modal
@@ -272,7 +341,14 @@ const ProductTable = ({ products, currentPage, setCurrentPage }) => {
       return;
     }
 
- 
+    // Here you would typically create a FormData object and append the form fields
+    const formData = new FormData();
+
+    formData.append("name", newProduct.name);
+    formData.append("categoryId", newProduct.category);
+    formData.append("price", newProduct.price);
+    formData.append("stock", newProduct.stock);
+    formData.append("image", imageFile);
 
     const result = await addProduct(formData);
     if (result.success) {
@@ -286,6 +362,9 @@ const ProductTable = ({ products, currentPage, setCurrentPage }) => {
       });
       setImagePreview(null);
       setImageFile(null);
+      
+      // Fetch updated product list
+      await fetchAndUpdateProducts();
     } else {
       showNotification(result.message, "error");
     }
@@ -321,8 +400,10 @@ const ProductTable = ({ products, currentPage, setCurrentPage }) => {
           <button className="btn btn-secondary">See All</button>
 
           <button
-            className="btn btn-primary btn-with-icon"
-            onClick={handleAddProductClick}
+            className={`btn btn-primary btn-with-icon ${!hasPermission(userPermissions, PERMISSIONS.CREATE_PRODUCTS) ? 'btn-disabled' : ''}`}
+            onClick={()=>{
+              handlePermissionCheck(PERMISSIONS.CREATE_PRODUCTS, handleAddProductClick, 'You do not have permission to add products.');
+            }}
           >
             <PlusIcon />
             Add Product
@@ -369,7 +450,7 @@ const ProductTable = ({ products, currentPage, setCurrentPage }) => {
                 <td className="name-cell">
                   <div className="product-info">
                     <div className="product-image">
-                      <img src={product.image} alt={product.name} />
+                      <img src={`${PRODUCT_IMAGES}/${product.imageUrl}`} alt={product.name} />
                     </div>
                     {product.name}
                   </div>
@@ -432,8 +513,8 @@ const ProductTable = ({ products, currentPage, setCurrentPage }) => {
               <div className="form-group">
                 <label htmlFor="product-image">Product Image</label>
                 <div className="product-image-preview">
-                  {editedProduct.image ? (
-                    <img src={editedProduct.image} alt={editedProduct.name} />
+                  {editedImagePreview ? (
+                    <img src={editedImagePreview} alt={editedProduct.name} />
                   ) : (
                     <div className="no-image-placeholder">No Image</div>
                   )}
@@ -454,6 +535,17 @@ const ProductTable = ({ products, currentPage, setCurrentPage }) => {
                     Upload Image
                   </label>
                 </div>
+                {editedImagePreview && editedImageFile && (
+                  <button 
+                    className="btn btn-text"
+                    onClick={() => {
+                      setEditedImagePreview(selectedProduct.imageUrl ? `${PRODUCT_IMAGES}/${selectedProduct.imageUrl}` : null);
+                      setEditedImageFile(null);
+                    }}
+                  >
+                    Reset image
+                  </button>
+                )}
               </div>
 
               <div className="form-group">
@@ -471,15 +563,30 @@ const ProductTable = ({ products, currentPage, setCurrentPage }) => {
 
               <div className="form-group">
                 <label htmlFor="product-category">Category</label>
-                <input
-                  type="text"
-                  id="product-category"
-                  name="category"
-                  value={editedProduct.category}
-                  onChange={handleInputChange}
-                  placeholder="Enter category"
-                  required
-                />
+                {isLoadingCategories ? (
+                  <p>Loading categories...</p>
+                ) : categoryError ? (
+                  <p className="error-message">
+                    Error loading categories: {categoryError}
+                  </p>
+                ) : (
+                  <select
+                    id="product-category"
+                    name="categoryId" // Change to categoryId for consistency
+                    value={editedProduct.categoryId || ""} // Use categoryId consistently
+                    onChange={handleInputChange}
+                    required
+                  >
+                    {categories.length === 0 && (
+                      <option value="">No categories available</option>
+                    )}
+                    {categories.map((category) => (
+                      <option key={category.id} value={category.id}>
+                        {category.name}
+                      </option>
+                    ))}
+                  </select>
+                )}
               </div>
 
               <div className="form-row">
@@ -514,8 +621,10 @@ const ProductTable = ({ products, currentPage, setCurrentPage }) => {
 
             <div className="modal-footer">
               <button
-                className="btn btn-danger btn-with-icon"
-                onClick={handleDeleteProduct}
+                className={`btn btn-danger btn-with-icon ${!hasPermission(userPermissions, PERMISSIONS.DELETE_PRODUCTS) ? 'btn-disabled' : ''}`}
+                onClick={()=>{
+                  handlePermissionCheck(PERMISSIONS.DELETE_PRODUCTS, handleDeleteProduct, 'You do not have permission to delete products.');
+                }}
               >
                 <TrashIcon />
                 Delete Product
@@ -527,7 +636,9 @@ const ProductTable = ({ products, currentPage, setCurrentPage }) => {
                 >
                   Cancel
                 </button>
-                <button className="btn btn-primary" onClick={handleSaveChanges}>
+                <button className={`btn btn-primary ${!hasPermission(userPermissions, PERMISSIONS.EDIT_PRODUCTS)}`} onClick={()=>{
+                  handlePermissionCheck(PERMISSIONS.EDIT_PRODUCTS, handleSaveChanges, 'You do not have permission to edit products.');
+                }}>
                   Save Changes
                 </button>
               </div>

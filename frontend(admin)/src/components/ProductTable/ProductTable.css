@@ -359,3 +359,7 @@
   font-size: 0.9rem;
   margin-top: 4px;
 }
+.btn-disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
