@@ -408,6 +408,48 @@ const validateToken = async (token) => {
   }
 };
 
+const deleteUser = async (userId) => {
+  let connection;
+  try {
+    connection = await getConnection();
+
+    const result = await connection.execute(
+      "DELETE FROM users WHERE user_id = :userId",
+      {
+        userId: userId,
+      }
+    );
+
+    if (result.rowsAffected === 0) {
+      return {
+        success: false,
+        message: "User not found",
+      };
+    }
+
+    await connection.commit();
+
+    return {
+      success: true,
+      message: "User deleted successfully",
+    };
+  } catch (error) {
+    console.error("Error deleting user:", error.message);
+    return {
+      success: false,
+      message: "Error deleting user",
+    };
+  } finally {
+    if (connection) {
+      try {
+        await connection.close();
+      } catch (err) {
+        console.error("Error closing connection:", err.message);
+      }
+    }
+  }
+}
+
 export default {
   getAllUsers,
   saveCustomer,
@@ -415,5 +457,6 @@ export default {
   login,
   getUserByUsername,
   saveAdmin,
-  validateToken
+  validateToken,
+  deleteUser
 };
