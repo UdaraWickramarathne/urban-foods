@@ -1,67 +1,11 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import "./DbUserManagement.css";
-import { useAuth } from "../../context/authContext";
+import { apiContext } from "../../context/apiContext";
+import { useNotification } from "../../context/notificationContext";
 
 const DbUserManagement = () => {
   // Sample DB users data
-  const [dbUsers, setDbUsers] = useState([
-    {
-      id: 1,
-      username: "admin_user",
-      createdDate: "2023-09-10",
-      lastLogin: "2023-10-15",
-      status: "Active",
-    },
-    {
-      id: 2,
-      username: "sales_manager",
-      createdDate: "2023-09-12",
-      lastLogin: "2023-10-14",
-      status: "Active",
-    },
-    {
-      id: 3,
-      username: "inventory_clerk",
-      createdDate: "2023-09-15",
-      lastLogin: "2023-10-10",
-      status: "Inactive",
-    },
-    {
-      id: 4,
-      username: "customer_support",
-      createdDate: "2023-09-20",
-      lastLogin: "2023-10-15",
-      status: "Active",
-    },
-    {
-      id: 5,
-      username: "marketing_staff",
-      createdDate: "2023-09-25",
-      lastLogin: "2023-10-12",
-      status: "Active",
-    },
-    {
-      id: 6,
-      username: "store_manager",
-      createdDate: "2023-10-01",
-      lastLogin: "2023-10-15",
-      status: "Active",
-    },
-    {
-      id: 7,
-      username: "system_analyst",
-      createdDate: "2023-10-05",
-      lastLogin: "2023-10-14",
-      status: "Active",
-    },
-    {
-      id: 8,
-      username: "temp_user",
-      createdDate: "2023-10-08",
-      lastLogin: "2023-10-09",
-      status: "Inactive",
-    },
-  ]);
+  const [dbUsers, setDbUsers] = useState([]);
 
   // State for modals
   const [showAddModal, setShowAddModal] = useState(false);
@@ -69,7 +13,8 @@ const DbUserManagement = () => {
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [currentUser, setCurrentUser] = useState(null);
 
-  const { createOracleUser } = useAuth();
+  const {createOracleUser, getAllDbUsers, getCurrentPermissions, updateDbUser, deleteDbUser} = apiContext();
+  const { showNotification } = useNotification();
 
   // New user form state
   const [newUser, setNewUser] = useState({
@@ -109,20 +54,53 @@ const DbUserManagement = () => {
     "DELIVERIES",
   ];
 
+  const fetchDbUsers = async () => {
+   try {
+     const result = await getAllDbUsers();
+     if (result.success) {      
+       setDbUsers(result.data);
+     } else {
+       showNotification(result.message, "error");
+     }
+   } catch (error) {
+     console.error("Error fetching DB users:", error);
+     showNotification("Failed to fetch DB users", "error");
+   }
+  }
+
+  useEffect(() => {
+    fetchDbUsers();
+  },[]);
+
+
   // Status Badge component
   const StatusBadge = ({ status }) => {
-    const className = `status-badge status-${status.toLowerCase()}`;
+    let className = 'status-badge';
+    if(status === "OPEN"){
+      className = "status-badge status-active";
+    } else{
+      className = "status-badge status-inactive";
+    }
     return <span className={className}>{status}</span>;
   };
 
   // Handle input changes for new/edit user form
   const handleInputChange = (e) => {
     const { name, value } = e.target;
+    
     if (showEditModal) {
-      setCurrentUser({
-        ...currentUser,
-        [name]: value,
-      });
+      // Special handling for status field in edit mode
+      if (name === "status") {
+        setCurrentUser({
+          ...currentUser,
+          accoutStatus: value === "Active" ? "OPEN" : "LOCKED"
+        });
+      } else {
+        setCurrentUser({
+          ...currentUser,
+          [name]: value,
+        });
+      }
     } else {
       setNewUser({
         ...newUser,
@@ -145,8 +123,33 @@ const DbUserManagement = () => {
     });
   };
 
+  // Handle basic privilege change for edit modal
+  const handleEditBasicPrivilegeChange = (privilege) => {
+    setCurrentUser({
+      ...currentUser,
+      permissions: {
+        ...currentUser.permissions,
+        basicPrivileges: {
+          ...currentUser.permissions.basicPrivileges,
+          [privilege]: !currentUser.permissions.basicPrivileges[privilege],
+        },
+      },
+    });
+  };
+
   // Handle table permission input change
   const handleTablePermissionChange = (permissionType) => {
+    setTablePermission({
+      ...tablePermission,
+      permissions: {
+        ...tablePermission.permissions,
+        [permissionType]: !tablePermission.permissions[permissionType],
+      },
+    });
+  };
+
+  // Handle table permission input change for edit modal
+  const handleEditTablePermissionChange = (permissionType) => {
     setTablePermission({
       ...tablePermission,
       permissions: {
@@ -186,6 +189,38 @@ const DbUserManagement = () => {
     setShowTablePermissionModal(false);
   };
 
+  // Add table permission for edit modal
+  const handleAddEditTablePermission = () => {
+    if (!tablePermission.tableName) return;
+
+    const updatedPermissions = [
+      ...currentUser.permissions.tablePermissions,
+      { ...tablePermission },
+    ];
+
+    setCurrentUser({
+      ...currentUser,
+      permissions: {
+        ...currentUser.permissions,
+        tablePermissions: updatedPermissions,
+      },
+    });
+
+    setTablePermission({
+      tableName: "",
+      permissions: {
+        SELECT: false,
+        INSERT: false,
+        UPDATE: false,
+        DELETE: false,
+      },
+    });
+
+    setShowTablePermissionModal(false);
+  };
+
+
+
   // Remove table permission
   const handleRemoveTablePermission = (index) => {
     const updatedPermissions = [...newUser.permissions.tablePermissions];
@@ -195,6 +230,20 @@ const DbUserManagement = () => {
       ...newUser,
       permissions: {
         ...newUser.permissions,
+        tablePermissions: updatedPermissions,
+      },
+    });
+  };
+
+  // Remove table permission for edit modal
+  const handleRemoveEditTablePermission = (index) => {
+    const updatedPermissions = [...currentUser.permissions.tablePermissions];
+    updatedPermissions.splice(index, 1);
+
+    setCurrentUser({
+      ...currentUser,
+      permissions: {
+        ...currentUser.permissions,
         tablePermissions: updatedPermissions,
       },
     });
@@ -227,21 +276,69 @@ const DbUserManagement = () => {
         },
       });
       setShowAddModal(false);
+      showNotification("User added successfully", "success");
+      await fetchDbUsers();
+    }else{
+      showNotification(result.message, "error");
     }
   };
 
   // Edit existing user
-  const handleEditClick = (user) => {
-    setCurrentUser(user);
-    setShowEditModal(true);
+  const handleEditClick = async (user) => {
+    try {
+      const result = await getCurrentPermissions(user.username);
+      if (result.success) {
+        console.log("Fetched current permissions:", result.data);
+        
+        // Create userToEdit with permissions from API response
+        const userToEdit = {
+          ...user,
+          permissions: {
+            basicPrivileges: result.data.basicPrivileges || {
+              SESSION: false,
+              CREATE_VIEW: false,
+              CREATE_TABLE: false,
+            },
+            tablePermissions: result.data.tablePermissions || [],
+          },
+        };
+        
+        setCurrentUser(userToEdit);
+        setShowEditModal(true);
+      } else {
+        showNotification(result.message || "Failed to fetch user permissions", "error");
+      }
+    } catch (error) {
+      console.error("Error fetching user permissions:", error);
+      showNotification("Failed to fetch user permissions", "error");
+      
+      // Fallback to default permissions if API call fails
+      const userToEdit = {
+        ...user,
+        permissions: {
+          basicPrivileges: {
+            SESSION: false,
+            CREATE_VIEW: false,
+            CREATE_TABLE: false,
+          },
+          tablePermissions: [],
+        },
+      };
+      setCurrentUser(userToEdit);
+      setShowEditModal(true);
+    }
   };
 
   // Save edited user
-  const handleSaveEdit = () => {
-    setDbUsers(
-      dbUsers.map((user) => (user.id === currentUser.id ? currentUser : user))
-    );
-    setShowEditModal(false);
+  const handleSaveEdit = async () => {
+    const result = await updateDbUser(currentUser);
+    if (result.success) {
+      showNotification("User updated successfully", "success");
+      await fetchDbUsers();
+      setShowEditModal(false);
+    }else{
+      showNotification(result.message, "error");
+    }
   };
 
   // Delete confirmation
@@ -251,9 +348,16 @@ const DbUserManagement = () => {
   };
 
   // Confirm delete
-  const handleConfirmDelete = () => {
-    setDbUsers(dbUsers.filter((user) => user.id !== currentUser.id));
-    setShowDeleteModal(false);
+  const handleConfirmDelete = async () => {
+    const result = await deleteDbUser(currentUser.username);
+    if (result.success) {
+      setShowDeleteModal(false);
+      showNotification("User deleted successfully", "success");
+      await fetchDbUsers();
+    }else{
+      showNotification(result.message, "error");
+
+    }
   };
 
   return (
@@ -306,12 +410,12 @@ const DbUserManagement = () => {
           </thead>
           <tbody>
             {dbUsers.map((user) => (
-              <tr key={user.id}>
+              <tr key={user.username}>
                 <td>{user.username}</td>
-                <td>{user.createdDate}</td>
+                <td>{user.created}</td>
                 {/* <td>{user.lastLogin}</td> */}
                 <td>
-                  <StatusBadge status={user.status} />
+                  <StatusBadge status={user.accoutStatus} />
                 </td>
                 <td>
                   <div className="action-buttons">
@@ -361,7 +465,7 @@ const DbUserManagement = () => {
 
       {/* Add User Modal */}
       {showAddModal && (
-        <div className="modal-overlay">
+        <div className="modal-overlay" style={{ zIndex: 1000 }}>
           <div className="modal-container">
             <div className="modal-header">
               <h3>Add New Database User</h3>
@@ -542,7 +646,7 @@ const DbUserManagement = () => {
 
       {/* Table Permission Modal */}
       {showTablePermissionModal && (
-        <div className="modal-overlay">
+        <div className="modal-overlay" style={{ zIndex: showEditModal ? 1100 : 1000 }}>
           <div className="modal-container permission-modal">
             <div className="modal-header">
               <h3>Add Table Permission</h3>
@@ -639,7 +743,7 @@ const DbUserManagement = () => {
               </button>
               <button
                 className="btn btn-primary"
-                onClick={handleAddTablePermission}
+                onClick={showEditModal ? handleAddEditTablePermission : handleAddTablePermission}
                 disabled={!tablePermission.tableName}
               >
                 Add Permission
@@ -651,7 +755,7 @@ const DbUserManagement = () => {
 
       {/* Edit User Modal */}
       {showEditModal && currentUser && (
-        <div className="modal-overlay">
+        <div className="modal-overlay" style={{ zIndex: 1000 }}>
           <div className="modal-container">
             <div className="modal-header">
               <h3>Edit Database User</h3>
@@ -692,7 +796,7 @@ const DbUserManagement = () => {
                 <select
                   id="edit-status"
                   name="status"
-                  value={currentUser.status}
+                  value={currentUser.accoutStatus === "OPEN" ? "Active" : "Inactive"}
                   onChange={handleInputChange}
                 >
                   <option value="Active">Active</option>
@@ -705,8 +809,114 @@ const DbUserManagement = () => {
                   type="password"
                   id="edit-password"
                   name="password"
+                  value={currentUser.password || ""}
+                  onChange={handleInputChange}
                   placeholder="Leave blank to keep current password"
                 />
+              </div>
+
+              {/* DB Permissions Section */}
+              <div className="form-section">
+                <h4 className="section-title">Database Permissions</h4>
+
+                {/* Basic Privileges */}
+                <div className="form-group">
+                  <label>Basic Privileges</label>
+                  <div className="checkbox-group">
+                    <div className="checkbox-item">
+                      <input
+                        type="checkbox"
+                        id="edit-session-privilege"
+                        checked={currentUser.permissions.basicPrivileges.SESSION}
+                        onChange={() => handleEditBasicPrivilegeChange("SESSION")}
+                      />
+                      <label htmlFor="edit-session-privilege">SESSION</label>
+                    </div>
+                    <div className="checkbox-item">
+                      <input
+                        type="checkbox"
+                        id="edit-create-view-privilege"
+                        checked={currentUser.permissions.basicPrivileges.CREATE_VIEW}
+                        onChange={() => handleEditBasicPrivilegeChange("CREATE_VIEW")}
+                      />
+                      <label htmlFor="edit-create-view-privilege">CREATE VIEW</label>
+                    </div>
+                    <div className="checkbox-item">
+                      <input
+                        type="checkbox"
+                        id="edit-create-table-privilege"
+                        checked={currentUser.permissions.basicPrivileges.CREATE_TABLE}
+                        onChange={() => handleEditBasicPrivilegeChange("CREATE_TABLE")}
+                      />
+                      <label htmlFor="edit-create-table-privilege">CREATE TABLE</label>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Table Permissions */}
+                <div className="form-group">
+                  <div className="permission-header">
+                    <label>Table Permissions</label>
+                    <button
+                      type="button"
+                      className="btn btn-sm btn-outline"
+                      onClick={() => {
+                        setTablePermission({
+                          tableName: "",
+                          permissions: {
+                            SELECT: false,
+                            INSERT: false,
+                            UPDATE: false,
+                            DELETE: false,
+                          },
+                        });
+                        setShowTablePermissionModal(true);
+                      }}
+                    >
+                      + Add Table Permission
+                    </button>
+                  </div>
+
+                  {/* Table permissions list */}
+                  {currentUser.permissions.tablePermissions && currentUser.permissions.tablePermissions.length > 0 ? (
+                    <div className="table-permissions-list">
+                      {currentUser.permissions.tablePermissions.map(
+                        (perm, index) => (
+                          <div key={index} className="table-permission-item">
+                            <div className="permission-info">
+                              <span className="table-name">
+                                {perm.tableName}
+                              </span>
+                              <div className="permission-badges">
+                                {Object.entries(perm.permissions).map(
+                                  ([key, value]) =>
+                                    value && (
+                                      <span
+                                        key={key}
+                                        className="permission-badge"
+                                      >
+                                        {key}
+                                      </span>
+                                    )
+                                )}
+                              </div>
+                            </div>
+                            <button
+                              className="remove-permission-btn"
+                              onClick={() => handleRemoveEditTablePermission(index)}
+                            >
+                              &times;
+                            </button>
+                          </div>
+                        )
+                      )}
+                    </div>
+                  ) : (
+                    <div className="no-permissions">
+                      No table permissions added
+                    </div>
+                  )}
+                </div>
               </div>
             </div>
             <div className="modal-footer">
@@ -726,7 +936,7 @@ const DbUserManagement = () => {
 
       {/* Delete Confirmation Modal */}
       {showDeleteModal && currentUser && (
-        <div className="modal-overlay">
+        <div className="modal-overlay" style={{ zIndex: 1000 }}>
           <div className="modal-container delete-modal">
             <div className="modal-header">
               <h3>Confirm Deletion</h3>

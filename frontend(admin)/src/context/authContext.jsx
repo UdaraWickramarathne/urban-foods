@@ -1,9 +1,8 @@
 import React, { createContext, useContext, useState, useEffect } from "react";
 import axios from "axios";
 import {
-  ADD_ORACLE_USER,
+  ADMIN,
   GET_PERMISSIONS,
-  LOGIN,
   VALIDATE_TOKEN,
 } from "./constants";
 
@@ -37,7 +36,8 @@ export const AuthProvider = ({ children }) => {
             const permissionResponse = await axios.get(
               `${GET_PERMISSIONS}/${response.data.userId}`
             );
-            setUserPermissions(permissionResponse.data.data);
+            setUserPermissions(permissionResponse.data.permissions);
+            
           } else {
             console.log("setting isAuthenticated to false");
             setIsAuthenticated(false);
@@ -60,7 +60,7 @@ export const AuthProvider = ({ children }) => {
   // Login function
   const login = async (user) => {
     try {
-      const result = await axios.post(LOGIN, user);
+      const result = await axios.post(`${ADMIN}/login`, user);
       if (result.data.success) {
         const { token, permissions, userId } = result.data;
         setUserPermissions(permissions);
@@ -111,24 +111,12 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
-  const createOracleUser = async (userData) => {
-    const response = await axios.post(ADD_ORACLE_USER, userData);
-    if (response.data.success) {
-      console.log(response.data.message);
-      return response.data;
-    } else {
-      console.log(response.data.message);
-      return null;
-    }
-  };
-
   const value = {
     currentUserID,
     loading,
     login,
     logout,
     isAuthenticated,
-    createOracleUser,
     userPermissions,
     handlePermissionCheck,
   };
