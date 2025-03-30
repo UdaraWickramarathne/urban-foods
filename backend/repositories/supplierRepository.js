@@ -1,6 +1,7 @@
 import { getConnection } from "../db/dbConnection.js";
 import oracledb from "oracledb";
 import Supplier from "../models/supplier.js";
+import Supplier from "../models/supplier.js";
 
 const getAllSuppliersWithDetails = async () => {
   let connection;
