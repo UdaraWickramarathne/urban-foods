@@ -1,46 +1,35 @@
 import axios from "axios";
 import { create } from "zustand";
 import HttpStatus from "../enums/httpsStatus";
-import { GET_CATEGORY, GET_CUSTOMERS, GET_SUPPLIERS } from "./constants";
-
-
+import { GET_CATEGORY, CUSTOMERS, SUPPLIERS, REQUEST_OTP, VALIDATE_OTP, USERS, PRODUCTS } from "./constants";
 
 export const apiContext = create((set, get) => ({
   // Category API
   addCategory: async (category) => {
     try {
-      const response = await axios.post(
-        GET_CATEGORY,
-        category
-      );
-      if (response.status === HttpStatus.CREATED) {
-        console.log("Category added successfully", response.data);
-        return response.data;
-      } else {
-        console.log("Failed to add category");
-      }
+      const response = await axios.post(GET_CATEGORY, category);
+      return response.data;
     } catch (error) {
+      if (error.response) {
+        return error.response.data;
+      }
       console.log("Failed to add category:", error);
     }
   },
   getAllCategories: async () => {
     try {
       const response = await axios.get(GET_CATEGORY);
-      if (response.status === HttpStatus.OK) {
-        console.log("Categories retrieved successfully", response.data);
-        return response.data;
-      } else {
-        console.log("Failed to retrieve categories");
-      }
+      return response.data;
     } catch (error) {
+      if (error.response) {
+        return error.response.data;
+      }
       console.log("Failed to retrieve categories:", error);
     }
   },
   deleteCategory: async (categoryId) => {
     try {
-      const response = await axios.delete(
-        `${GET_CATEGORY}/${categoryId}`
-      );
+      const response = await axios.delete(`${GET_CATEGORY}/${categoryId}`);
       if (response.status === HttpStatus.OK) {
         console.log("Category deleted successfully", response.data);
         return response.data;
@@ -57,23 +46,20 @@ export const apiContext = create((set, get) => ({
         `${GET_CATEGORY}/${categoryId}`,
         category
       );
-      if (response.status === HttpStatus.OK) {
-        console.log("Category updated successfully", response.data);
-        return response.data;
-      } else {
-        console.log("Failed to update category");
-      }
+      return response.data; // This handles successful responses
     } catch (error) {
+      if (error.response) {
+        return error.response.data;
+      }
       console.log("Failed to update category:", error);
     }
   },
-  
+
   // Customer API
   getCustomers: async () => {
     try {
-      const response = await axios.get(GET_CUSTOMERS);
+      const response = await axios.get(CUSTOMERS);
       if (response.status === HttpStatus.OK) {
-        console.log("Customers retrieved successfully", response.data);
         return response.data;
       } else {
         console.log("Failed to retrieve customers");
@@ -82,13 +68,71 @@ export const apiContext = create((set, get) => ({
       console.log("Failed to retrieve customers:", error);
     }
   },
-
-
+  addCustomer: async (customer) => {
+    try {
+      const response = await axios.post(`${USERS}/customer`, customer);
+      return response.data; // This handles successful responses
+    } catch (error) {
+      if (error.response) {
+        return error.response.data;
+      }else{
+        return { success: false, message: "Failed to add customer" };
+      }
+    }
+  },
+  requestOtp: async (email) => {
+    try {
+      const response = await axios.post(REQUEST_OTP, { email });
+      return response.data; // This handles successful responses
+    } catch (error) {
+      if (error.response) {
+        return error.response.data;
+      } else {
+        return { success: false, message: "Failed to send OTP" };
+      }
+    }
+  },
+  verifyOtp: async (email, otp) => {
+    try {
+      const response = await axios.post(VALIDATE_OTP, { email, otp });
+      return response.data; // This handles successful responses
+    } catch (error) {
+      if (error.response) {
+        return error.response.data;
+      } else {
+        return { success: false, message: "Failed to verify OTP" };
+      }
+    }
+  },
+  deleteUser: async (customerId) => {
+    try {
+      const response = await axios.delete(`${USERS}/${customerId}`);
+      return response.data;
+    } catch (error) {
+      if (error.response) {
+        return error.response.data;
+      }
+      console.log("Failed to delete customer:", error);
+    }
+  },
+  updateCustomer: async (customerId, customer) => {
+    try {
+      const response = await axios.put(`${CUSTOMERS}/update/${customerId}`, customer);
+      return response.data; // This handles successful responses
+    } catch (error) {
+      if (error.response) {
+        return error.response.data;
+      } else {
+        return { success: false, message: "Failed to update customer" };
+      }
+    }
+  },
   // Supplier API
   getAllSuppliersWithDetails: async () => {
     try {
-      const response = await axios.get(GET_SUPPLIERS);
+      const response = await axios.get(SUPPLIERS);
       if (response.status === HttpStatus.OK) {
+        console.log("Suppliers retrieved successfully", response.data);
         return response.data;
       } else {
         console.log("Failed to retrieve suppliers");
@@ -97,6 +141,53 @@ export const apiContext = create((set, get) => ({
       console.log("Failed to retrieve suppliers:", error);
     }
   },
-
-
+  updateSupplier: async (supplierId, supplier) => {
+    
+    try {
+      const response = await axios.put(`${SUPPLIERS}/${supplierId}`, supplier);
+      return response.data;
+    } catch (error) {
+      if (error.response) {
+        return error.response.data;
+      } else {
+        return { success: false, message: "Failed to update supplier" };
+      }
+    }
+  },
+  deleteSupplier: async (supplierId) => {
+    try {
+      const response = await axios.delete(`${SUPPLIERS}/${supplierId}`);
+      if (response.status === HttpStatus.OK) {
+        console.log("Supplier deleted successfully", response.data);
+        return response.data;
+      } else {
+        console.log("Failed to delete supplier");
+      }
+    } catch (error) {
+      console.log("Failed to delete supplier:", error);
+    }
+  },
+  addSupplier: async (supplier) => {
+    try {
+      const response = await axios.post(`${USERS}/supplier`, supplier);
+      return response.data; 
+    } catch (error) {
+      if (error.response) {
+        return error.response.data;
+      } else {
+        return { success: false, message: "Failed to add supplier" };
+      }
+    }
+  },
+  addProduct: async (product) => {
+    try {
+      const response = await axios.post(`${PRODUCTS}`, product);
+      return response.data; // This handles successful responses
+    } catch (error) {
+      if (error.response) {
+        return error.response.data;
+      }
+      return { success: false, message: "Failed to add product" };
+    }
+  }
 }));

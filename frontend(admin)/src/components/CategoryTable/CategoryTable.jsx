@@ -280,14 +280,14 @@ const CategoryTable = ({ currentPage, setCurrentPage }) => {
     if (!editedCategory) return;
 
     const result = await updateCategory(selectedCategory.id, editedCategory);
-    if (result) {
+    if (result.success) {
       setIsModalOpen(false);
       setSelectedCategory(null);
       setEditedCategory(null);
       showNotification(`Category "${editedCategory.name}" updated successfully`);
       await getCategories();
     }else{
-      showNotification(`Error deleting category: ${error.message || "Unknown error"}`, "error");
+      showNotification(`Error deleting category: ${result.message || "Unknown error"}`, "error");
     }
   };
 
@@ -340,15 +340,28 @@ const CategoryTable = ({ currentPage, setCurrentPage }) => {
   // Handle add new category
   const handleAddCategory = async () => {
     setIsAddingCategory(true);
+    if (!newCategory.name) {
+      showNotification("Category name is required", "error");
+      setIsAddingCategory(false);
+      return;
+    }
+    if (!newCategory.description) {
+      showNotification("Category description is required", "error");
+      setIsAddingCategory(false);
+      return;
+    }
 
     try {
+      // Validate new category data
+      
       const response = await addCategory(newCategory);
-      console.log(response);
-      // Refresh categories list after successful addition
-      await getCategories();
-      showNotification(`Category "${newCategory.name}" added successfully`);
+      if(response.success){
+        await getCategories();
+        showNotification(`Category "${newCategory.name}" added successfully`);
+      }else{
+        showNotification(`Failed to add category: ${response.message || "Unknown error"}`, "error");
+      }
     } catch (error) {
-      console.log("Failed to add category:", error);
       showNotification(`Failed to add category: ${error.message || "Unknown error"}`, "error");
     } finally {
       // Reset loading state and close modal
