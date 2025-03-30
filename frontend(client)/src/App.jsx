@@ -11,6 +11,7 @@ import PaymentSuccess from "./pages/PaymentSuccess/PaymentSuccess";
 import ProductDetails from "./pages/ProductDtails/ProductDtails";
 import Profile from './components/ProfileUi/Profile.jsx';
 import About from './components/About/About.jsx';
+import Dashboard from './components/Dashboard/Dashboard.jsx';
 
 
 function App() {
@@ -57,6 +58,7 @@ function App() {
         <Route path="/product/:id" element={<ProductDetails />} />
         <Route path="/profile"  element={<Profile />} />
         <Route path="/about"  element={<About />} />
+        <Route path='/dashboard' element={<Dashboard/>}/>
       </Routes>
     </>
   );

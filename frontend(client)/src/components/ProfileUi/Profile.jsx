@@ -16,7 +16,7 @@ const Profile = () => {
   const [isEditing, setIsEditing] = useState(false);
   const userId = localStorage.getItem('userId');
   const userType = localStorage.getItem('userType');
-  const { setToken, setUserId, setRole } = storeContext();
+  const {setToken, setUserId, setRole} = storeContext();
   const navigate = useNavigate();
 
   useEffect(() => {
