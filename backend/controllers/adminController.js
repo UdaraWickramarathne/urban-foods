@@ -1,5 +1,6 @@
 import adminRepository from "../repositories/adminRepository.js";
 import HttpStatus from "../enums/httpsStatus.js";
+import getAffectedTables from "../services/logService.js";
 
 const addOrcleUser = async (req, res) => {
   try {
@@ -11,7 +12,6 @@ const addOrcleUser = async (req, res) => {
         message: "Username and password are required",
       });
     }
-
     const result = await adminRepository.createOracleUser(userData);
 
     if (result.success) {
@@ -83,15 +83,11 @@ const adminLogin = async (req, res) => {
 const getUserPermissions = async (req, res) => {
   try {
     const userId = req.params.userId;
-    const result = await adminRepository.getUserPermissions(userId);
-
+    const result = await adminRepository.getUserPermissions(userId);    
     if (result.success) {
       res.status(HttpStatus.OK).json({
         success: true,
-        data: {
-          permissions: result.permissions,
-          basicPermissions: result.basicPermissions,
-        },
+        data: result.data,
       });
     } else {
       res.status(HttpStatus.BAD_REQUEST).json({
@@ -233,6 +229,110 @@ const deleteDbUser = async (req, res) => {
   }
 }
 
+const getAllTrigger = async (req, res) => {
+  try {
+    const result = await adminRepository.getAllTriggers();
+
+    if (result.success) {
+      return res.status(HttpStatus.OK).json({
+        success: true,
+        data: result.data,
+      });
+    } else {
+      return res.status(HttpStatus.BAD_REQUEST).json({
+        success: false,
+        message: result.message,
+      });
+    }
+  } catch (error) {
+    console.log("Error getting all triggers:", error)
+    return res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
+      success: false,
+      message: "Error getting all triggers",
+    });
+  }
+}
+
+const getLogDetails = async (req, res) => {
+  try {
+    const trigger = req.body; // Assuming the trigger is passed as a query parameter
+    const affectedTables = getAffectedTables(trigger.triggerBody);
+    
+    if (affectedTables.length === 0) {
+      affectedTables.push(trigger.tableName);
+    }
+    const result = await adminRepository.getLogDetails(affectedTables[0]);
+    if (result.success) {
+      return res.status(HttpStatus.OK).json({
+        success: true,
+        rows: result.rows,
+        columns: result.columns,
+      });
+    } else {
+      return res.status(HttpStatus.BAD_REQUEST).json({
+        success: false,
+        message: result.message,
+      });
+    }
+  } catch (error) {
+    console.log("Error getting log details:", error)
+    return res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
+      success: false,
+      message: "Error getting log details",
+    });
+  }
+}
+
+const dropTrigger = async (req, res) => {
+  try {
+    const triggerName = req.params.triggerName;
+    const result = await adminRepository.dropTrigger(triggerName);
+
+    if (result.success) {
+      return res.status(HttpStatus.OK).json({
+        success: true,
+        message: result.message,
+      });
+    } else {
+      return res.status(HttpStatus.BAD_REQUEST).json({
+        success: false,
+        message: result.message,
+      });
+    }
+  } catch (error) {
+    console.log("Error dropping trigger:", error);
+    return res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
+      success: false,
+      message: "Error dropping trigger",
+    });
+  }
+};
+
+const changeTriggerStatus = async (req, res) => {
+  try {
+    const triggerName = req.params.triggerName;
+    const status = req.body.status; // Assuming the status is passed in the request body
+    const result = await adminRepository.changeTriggerStatus(triggerName, status);
+    if (result.success) {
+      return res.status(HttpStatus.OK).json({
+        success: true,
+        message: result.message,
+      });
+    } else {
+      return res.status(HttpStatus.BAD_REQUEST).json({
+        success: false,
+        message: result.message,
+      });
+    }
+  } catch (error) {
+    console.log("Error changing trigger status:", error);
+    return res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
+      success: false,
+      message: "Error changing trigger status",
+    });
+  }
+}
+
 export default {
   addOrcleUser,
   adminLogin,
@@ -241,5 +341,9 @@ export default {
   getAllDbUsers,
   getCurrentPermissions,
   updateDbUser,
-  deleteDbUser
+  deleteDbUser,
+  getAllTrigger,
+  getLogDetails,
+  dropTrigger,
+  changeTriggerStatus
 };

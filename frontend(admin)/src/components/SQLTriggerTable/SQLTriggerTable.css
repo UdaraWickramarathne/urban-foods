@@ -100,9 +100,11 @@
   display: inline-block;
 }
 
+/* Enhanced status colors */
 .status-active {
-  background-color: #ecfdf5;
-  color: #047857;
+  background-color: #e6f9e6;
+  color: #008000;
+  font-weight: 600;
 }
 
 .status-disabled {
@@ -115,6 +117,7 @@
   gap: 8px;
 }
 
+/* Enhanced action button colors */
 .btn-icon {
   background: none;
   border: 1px solid #e5e7eb;
@@ -128,15 +131,46 @@
   transition: all 0.2s;
 }
 
-.btn-icon:hover {
-  background-color: #f9fafb;
+/* Edit/View button styles */
+.btn-edit {
   color: #5f2eea;
+  border-color: #ddd3fc;
+}
+
+.btn-edit:hover {
+  background-color: #f5f0ff;
+  color: #4a1dc2;
+  border-color: #c4b5fd;
+}
+
+/* View details button styles */
+.btn-view {
+  color: #0284c7;
+  border-color: #bae6fd;
+}
+
+.btn-view:hover {
+  background-color: #f0f9ff;
+  color: #0369a1;
+  border-color: #7dd3fc;
+}
+
+/* Delete button styles - enhanced */
+.btn-delete {
+  color: #dc2626;
+  border-color: #fecaca;
 }
 
 .btn-delete:hover {
   background-color: #fef2f2;
-  color: #dc2626;
-  border-color: #fecaca;
+  color: #b91c1c;
+  border-color: #fca5a5;
+}
+
+/* Default hover for any other action buttons */
+.btn-icon:hover {
+  background-color: #f9fafb;
+  color: #5f2eea;
 }
 
 .pagination {
@@ -382,4 +416,116 @@
 .btn-disabled {
   opacity: 0.6;
   cursor: not-allowed;
+}
+
+/* Add this to your existing CSS file */
+
+.wide-modal {
+  width: 90% !important;
+  max-width: 1200px !important;
+}
+
+.log-table-container {
+  overflow-x: auto;
+  margin-bottom: 1rem;
+}
+
+.log-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.9rem;
+}
+
+.log-table th {
+  background-color: #f5f5f5;
+  padding: 10px;
+  text-align: left;
+  border-bottom: 2px solid #ddd;
+  font-weight: 600;
+}
+
+.log-table td {
+  padding: 8px 10px;
+  border-bottom: 1px solid #eee;
+}
+
+.log-table tr:hover {
+  background-color: #f9f9f9;
+}
+
+/* Add these new styles for the code textarea */
+
+.code-textarea {
+  font-family: 'Courier New', Courier, monospace;
+  font-size: 0.9rem;
+  tab-size: 4;
+  white-space: pre;
+  overflow-x: auto;
+  resize: vertical;
+  min-height: 200px;
+  line-height: 1.5;
+}
+
+/* Status toggle button styles */
+.btn-toggle-enable {
+  color: #008000;
+  border-color: #c7e6c7;
+  background-color: #f0fff0;
+}
+
+.btn-toggle-enable:hover {
+  background-color: #e6f9e6;
+  color: #006400;
+  border-color: #a3d9a3;
+}
+
+.btn-toggle-disable {
+  color: #dc2626;
+  border-color: #fecaca;
+  background-color: #fff5f5;
+}
+
+.btn-toggle-disable:hover {
+  background-color: #fef2f2;
+  color: #b91c1c;
+  border-color: #fca5a5;
+}
+
+/* Status toggle button styles - making more specific with !important for key properties */
+.btn-icon.btn-toggle-enable {
+  color: #008000 !important;
+  border-color: #c7e6c7 !important;
+  background-color: #f0fff0 !important;
+  padding: 6px 12px !important;
+  font-weight: 500;
+}
+
+.btn-icon.btn-toggle-enable:hover {
+  background-color: #e6f9e6 !important;
+  color: #006400 !important;
+  border-color: #a3d9a3 !important;
+}
+
+.btn-icon.btn-toggle-disable {
+  color: #dc2626 !important;
+  border-color: #fecaca !important;
+  background-color: #fff5f5 !important;
+  padding: 6px 12px !important;
+  font-weight: 500;
+}
+
+.btn-icon.btn-toggle-disable:hover {
+  background-color: #fef2f2 !important;
+  color: #b91c1c !important;
+  border-color: #fca5a5 !important;
+}
+
+/* Make sure text is visible */
+.btn-icon.btn-toggle-enable,
+.btn-icon.btn-toggle-disable {
+  display: inline-flex !important;
+  align-items: center;
+  justify-content: center;
+  min-width: 70px;
+  text-align: center;
 }

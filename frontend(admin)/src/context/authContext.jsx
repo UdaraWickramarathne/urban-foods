@@ -36,8 +36,8 @@ export const AuthProvider = ({ children }) => {
             const permissionResponse = await axios.get(
               `${GET_PERMISSIONS}/${response.data.userId}`
             );
-            setUserPermissions(permissionResponse.data.permissions);
-            
+            console.log(permissionResponse);
+            setUserPermissions(permissionResponse.data.data);
           } else {
             console.log("setting isAuthenticated to false");
             setIsAuthenticated(false);

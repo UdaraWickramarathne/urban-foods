@@ -28,16 +28,16 @@ app.use("/api/otp", otpRoutes);
 app.use("/api/orders", orderRoutes);
 app.use("/api/products", productRoutes);
 app.use("/api/customers", customerRoutes);
-
+app.use("/api/admin", adminRoutes);
 app.use("/api/category", categoryRoutes);
+app.use('/api/payment', paymentRoutes);
+app.use("/api/cart", cartRoutes);
+
+
 app.use("/api/images/products", express.static("uploads/products"));
 app.use("/api/images/suppliers", express.static("uploads/suppliers"));
 app.use("/api/images/customers", express.static("uploads/customers"));
 app.use("/api/images/default", express.static("uploads/defaults"));
-app.use("/api/admin", adminRoutes);
-app.use('/api/payment', paymentRoutes);
-app.use("/api/cart", cartRoutes);
-
 
 app.use('/api/suppliers', supplierRoutes);
 
