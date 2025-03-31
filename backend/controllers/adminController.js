@@ -12,7 +12,6 @@ const addOrcleUser = async (req, res) => {
         message: "Username and password are required",
       });
     }
-
     const result = await adminRepository.createOracleUser(userData);
 
     if (result.success) {
@@ -314,7 +313,6 @@ const changeTriggerStatus = async (req, res) => {
     const triggerName = req.params.triggerName;
     const status = req.body.status; // Assuming the status is passed in the request body
     const result = await adminRepository.changeTriggerStatus(triggerName, status);
-
     if (result.success) {
       return res.status(HttpStatus.OK).json({
         success: true,
@@ -334,7 +332,6 @@ const changeTriggerStatus = async (req, res) => {
     });
   }
 }
-
 
 export default {
   addOrcleUser,

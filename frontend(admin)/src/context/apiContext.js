@@ -286,7 +286,6 @@ export const apiContext = create((set, get) => ({
       return { success: false, message: "Failed to delete DB user" };
     }
   },
-
   // Get all triggers
   getAllTriggers: async () => {
     try {
@@ -332,6 +331,5 @@ export const apiContext = create((set, get) => ({
       return { success: false, message: "Failed to change trigger status" };
     }
   },
-
 
 }));

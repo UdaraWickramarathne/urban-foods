@@ -52,7 +52,6 @@ const createOracleUser = async (userData) => {
 
 const generateUserCreationSQL = (userData) => {
   console.log(userData);
-  
   const sqlStatements = [];
 
   // Create user
@@ -686,7 +685,6 @@ const deleteDbUser = async (username) => {
     }
   }
 }
-
 const getAllTriggers = async () => {
   let connection;
   try {
@@ -784,7 +782,6 @@ const changeTriggerStatus = async (triggerName, status) => {
     }
   }
 }
-
 export default {
   createOracleUser,
   listOracleUsers,
