@@ -1,7 +1,7 @@
 import axios from "axios";
 import { create } from "zustand";
 import HttpStatus from "../enums/httpsStatus";
-import { GET_CATEGORY, CUSTOMERS, SUPPLIERS, REQUEST_OTP, VALIDATE_OTP, USERS, PRODUCTS } from "./constants";
+import { GET_CATEGORY, CUSTOMERS, SUPPLIERS, REQUEST_OTP, VALIDATE_OTP, USERS, PRODUCTS, ADMIN } from "./constants";
 
 export const apiContext = create((set, get) => ({
   // Category API
@@ -92,6 +92,8 @@ export const apiContext = create((set, get) => ({
       }
     }
   },
+
+  // User API
   requestOtp: async (email) => {
     try {
       const response = await axios.post(REQUEST_OTP, { email });
@@ -179,6 +181,8 @@ export const apiContext = create((set, get) => ({
       }
     }
   },
+
+  // Product API
   addProduct: async (product) => {
     try {
       const response = await axios.post(`${PRODUCTS}`, product);
@@ -222,6 +226,109 @@ export const apiContext = create((set, get) => ({
         return error.response.data;
       }
       return { success: false, message: "Failed to delete product" };
+    }
+  },
+
+  // DB Users API
+  getAllDbUsers: async () => {
+    try {
+      const response = await axios.get(ADMIN);
+      return response.data;
+    } catch (error) {
+      if (error.response) {
+        return error.response.data;
+      }
+      return { success: false, message: "Failed to retrieve DB users" };
+    }
+  },
+  createOracleUser: async (userData) => {
+    try {
+      const response = await axios.post(`${ADMIN}/users`, userData);
+      return response.data;
+    } catch (error) {
+      if (error.response) {
+        return error.response.data;
+      }
+      console.log("Failed to create Oracle user:", error);
+    }
+    
+  },
+  getCurrentPermissions: async (username) => {
+    try {
+      const response = await axios.get(`${ADMIN}/current-privileges/${username}`);
+      return response.data;
+    } catch (error) {
+      if (error.response) {
+        return error.response.data;
+      }
+      return { success: false, message: "Failed to retrieve current permissions" };
+    }
+  },
+  updateDbUser: async (userData) => {
+    try {
+      const response = await axios.put(`${ADMIN}/users`, userData );
+      return response.data;
+    } catch (error) {
+      if (error.response) {
+        return error.response.data;
+      }
+      return { success: false, message: "Failed to update DB user" };
+    }
+  },
+  deleteDbUser: async (username) => {
+    try {
+      const response = await axios.delete(`${ADMIN}/users/${username}`);
+      return response.data;
+    } catch (error) {
+      if (error.response) {
+        return error.response.data;
+      }
+      return { success: false, message: "Failed to delete DB user" };
+    }
+  },
+  // Get all triggers
+  getAllTriggers: async () => {
+    try {
+      const response = await axios.get(`${ADMIN}/triggers`);
+      return response.data;
+    } catch (error) {
+      if (error.response) {
+        return error.response.data;
+      }
+      return { success: false, message: "Failed to retrieve triggers" };
+    }
+  },
+  getLogDetails: async (trigger) => {    
+    try {
+      const response = await axios.post(`${ADMIN}/log`, trigger);
+      return response.data;
+    } catch (error) {
+      if (error.response) {
+        return error.response.data;
+      }
+      return { success: false, message: "Failed to retrieve log details" };
+    }
+  },
+  dropTrigger: async (triggerName) => {
+    try {
+      const response = await axios.delete(`${ADMIN}/triggers/${triggerName}`);
+      return response.data;
+    } catch (error) {
+      if (error.response) {
+        return error.response.data;
+      }
+      return { success: false, message: "Failed to drop trigger" };
+    }
+  },
+  changeTriggerStatus: async (triggerName, status) => {
+    try {
+      const response = await axios.put(`${ADMIN}/triggers/${triggerName}`, { status });
+      return response.data;
+    } catch (error) {
+      if (error.response) {
+        return error.response.data;
+      }
+      return { success: false, message: "Failed to change trigger status" };
     }
   },
 

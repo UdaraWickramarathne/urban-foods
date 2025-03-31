@@ -6,7 +6,7 @@ const getAllProducts = async () => {
   let connection;
   try {
     connection = await getConnection();
-    const result = await connection.execute(`SELECT * FROM products`);
+    const result = await connection.execute(`SELECT p.*, c.name as category_name FROM products p INNER JOIN categories c ON p.category_id = c.category_id`);    
     const products = result.rows.map((row) => Product.fromDbRow(row, result.metaData));
     return {success: true, data: products};
   } catch (error) {
@@ -150,6 +150,5 @@ const searchProducts = async (keyword) => {
     }
   }
 }
-
 
 export default { getAllProducts,getProductById, insertProduct, deleteProduct, updateProduct, searchProducts };

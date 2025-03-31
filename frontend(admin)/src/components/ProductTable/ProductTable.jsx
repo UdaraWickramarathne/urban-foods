@@ -6,7 +6,6 @@ import React, { useState, useEffect } from "react";
 import { useAuth } from "../../context/authContext";
 import { hasPermission, PERMISSIONS } from "../../utils/permissions";
 
-
 const ProductTable = ({ currentPage, setCurrentPage }) => {
   // State for modal
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -34,7 +33,13 @@ const ProductTable = ({ currentPage, setCurrentPage }) => {
   const [isLoadingCategories, setIsLoadingCategories] = useState(false);
   const [categoryError, setCategoryError] = useState(null);
 
-  const { getAllCategories, addProduct, getAllProducts, updateProduct, deleteProduct } = apiContext();
+  const {
+    getAllCategories,
+    addProduct,
+    getAllProducts,
+    updateProduct,
+    deleteProduct,
+  } = apiContext();
   const { showNotification } = useNotification();
 
   const { userPermissions, handlePermissionCheck } = useAuth();
@@ -47,7 +52,6 @@ const ProductTable = ({ currentPage, setCurrentPage }) => {
       try {
         const response = await getAllCategories();
         if (response.success) {
-          console.log("Categories fetched successfully:", response.data);
           setCategories(response.data);
         }
       } catch (error) {
@@ -59,9 +63,39 @@ const ProductTable = ({ currentPage, setCurrentPage }) => {
     };
 
     if (isAddModalOpen || isModalOpen) {
-      fetchCategories();
+      // Use an IIFE to properly await the async function
+      (async () => {
+        try {
+          await fetchCategories();
+        } catch (error) {
+          console.error("Error in fetchCategories:", error);
+        }
+      })();
     }
   }, [isAddModalOpen, isModalOpen, getAllCategories]);
+
+  // Add a new useEffect to fetch categories on component mount
+  useEffect(() => {
+    const fetchCategories = async () => {
+      if (categories.length === 0 && !isLoadingCategories) {
+        setIsLoadingCategories(true);
+        setCategoryError(null);
+        try {
+          const response = await getAllCategories();
+          if (response.success) {
+            console.log("Categories pre-fetched:", response.data);
+            setCategories(response.data);
+          }
+        } catch (error) {
+          console.error("Error pre-fetching categories:", error);
+        } finally {
+          setIsLoadingCategories(false);
+        }
+      }
+    };
+
+    fetchCategories();
+  }, []);
 
   // Status Badge component
   const StatusBadge = ({ status }) => {
@@ -85,7 +119,14 @@ const ProductTable = ({ currentPage, setCurrentPage }) => {
   };
 
   useEffect(() => {
-    fetchAndUpdateProducts();
+    // Use an IIFE to properly await the async function
+    (async () => {
+      try {
+        await fetchAndUpdateProducts();
+      } catch (error) {
+        console.error("Error in fetchAndUpdateProducts:", error);
+      }
+    })();
   }, []); // Fetch products when component mounts
 
   // Icons
@@ -193,7 +234,7 @@ const ProductTable = ({ currentPage, setCurrentPage }) => {
       strokeLinejoin="round"
     >
       <polyline points="3 6 5 6 21 6"></polyline>
-      <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+      <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1-2 2v2"></path>
     </svg>
   );
 
@@ -202,11 +243,13 @@ const ProductTable = ({ currentPage, setCurrentPage }) => {
     // Make sure we're consistent with category property naming
     const productWithConsistentNames = {
       ...product,
-      categoryId: product.categoryId || product.category // Ensure categoryId exists
+      categoryId: product.categoryId || product.category, // Ensure categoryId exists
     };
     setSelectedProduct(productWithConsistentNames);
     setEditedProduct(productWithConsistentNames);
-    setEditedImagePreview(product.imageUrl ? `${PRODUCT_IMAGES}/${product.imageUrl}` : null);
+    setEditedImagePreview(
+      product.imageUrl ? `${PRODUCT_IMAGES}/${product.imageUrl}` : null
+    );
     setEditedImageFile(null);
     setIsModalOpen(true);
   };
@@ -216,17 +259,18 @@ const ProductTable = ({ currentPage, setCurrentPage }) => {
     if (!editedProduct) return;
 
     const { name, value } = e.target;
-    
+
     // If changing category, update categoryId
     if (name === "categoryId") {
       setEditedProduct({
         ...editedProduct,
-        categoryId: value
+        categoryId: value,
       });
     } else {
       setEditedProduct({
         ...editedProduct,
-        [name]: name === "price" || name === "stock" ? parseFloat(value) : value,
+        [name]:
+          name === "price" || name === "stock" ? parseFloat(value) : value,
       });
     }
   };
@@ -237,14 +281,14 @@ const ProductTable = ({ currentPage, setCurrentPage }) => {
 
     // Create FormData with consistent property naming
     const formData = new FormData();
-    formData.append('name', editedProduct.name);
-    formData.append('categoryId', editedProduct.categoryId); // Always use categoryId
-    formData.append('price', editedProduct.price);
-    formData.append('stock', editedProduct.stock);
-    
+    formData.append("name", editedProduct.name);
+    formData.append("categoryId", editedProduct.categoryId); // Always use categoryId
+    formData.append("price", editedProduct.price);
+    formData.append("stock", editedProduct.stock);
+
     // If a new image was selected, append it to the form data
     if (editedImageFile) {
-      formData.append('image', editedImageFile);
+      formData.append("image", editedImageFile);
     }
 
     const result = await updateProduct(selectedProduct.productId, formData);
@@ -255,11 +299,10 @@ const ProductTable = ({ currentPage, setCurrentPage }) => {
       setEditedProduct(null);
       setEditedImagePreview(null);
       setEditedImageFile(null);
-      
+
       // Fetch updated product list
       await fetchAndUpdateProducts();
-    }
-    else {
+    } else {
       showNotification(result.message, "error");
     }
   };
@@ -279,9 +322,9 @@ const ProductTable = ({ currentPage, setCurrentPage }) => {
         setEditedProduct(null);
         showNotification("Product deleted successfully!", "success");
         await fetchAndUpdateProducts();
-      }else{
+      } else {
         showNotification(result.message, "error");
-      }   
+      }
     }
   };
 
@@ -303,15 +346,62 @@ const ProductTable = ({ currentPage, setCurrentPage }) => {
 
   // Handle opening the add product modal
   const handleAddProductClick = () => {
-    setNewProduct({
-      name: "",
-      category: categories.length > 0 ? categories[0].id : "",
-      price: 0,
-      stock: 0,
-    });
-    setImagePreview(null);
-    setImageFile(null);
-    setIsAddModalOpen(true);
+    // First check if we have categories
+    if (categories.length > 0) {
+      setNewProduct({
+        name: "",
+        category: categories[0].id, // Use the first category if available
+        price: 0,
+        stock: 0,
+      });
+      setImagePreview(null);
+      setImageFile(null);
+      setIsAddModalOpen(true);
+
+      // Use setTimeout to log the updated state
+      setTimeout(() => {
+        console.log("New product after state update:", newProduct);
+      }, 0);
+    } else {
+      // If no categories are available yet, fetch them first
+      (async () => {
+        setIsLoadingCategories(true);
+        try {
+          const response = await getAllCategories();
+          if (response.success) {
+            const fetchedCategories = response.data;
+            setCategories(fetchedCategories);
+
+            // Now set the new product with a category if available
+            setNewProduct({
+              name: "",
+              category:
+                fetchedCategories.length > 0 ? fetchedCategories[0].id : "",
+              price: 0,
+              stock: 0,
+            });
+
+            console.log(
+              "Categories loaded, now setting category to:",
+              fetchedCategories.length > 0
+                ? fetchedCategories[0].id
+                : "none available"
+            );
+          }
+        } catch (error) {
+          console.error("Error fetching categories for new product:", error);
+          showNotification(
+            "Failed to load categories. Please try again.",
+            "error"
+          );
+        } finally {
+          setIsLoadingCategories(false);
+          setImagePreview(null);
+          setImageFile(null);
+          setIsAddModalOpen(true);
+        }
+      })();
+    }
   };
 
   // Handle input change for new product
@@ -326,6 +416,7 @@ const ProductTable = ({ currentPage, setCurrentPage }) => {
 
   // Handle save new product
   const handleSaveNewProduct = async () => {
+    console.log(newProduct);
     if (
       !newProduct.name ||
       !newProduct.category ||
@@ -362,7 +453,7 @@ const ProductTable = ({ currentPage, setCurrentPage }) => {
       });
       setImagePreview(null);
       setImageFile(null);
-      
+
       // Fetch updated product list
       await fetchAndUpdateProducts();
     } else {
@@ -400,9 +491,17 @@ const ProductTable = ({ currentPage, setCurrentPage }) => {
           <button className="btn btn-secondary">See All</button>
 
           <button
-            className={`btn btn-primary btn-with-icon ${!hasPermission(userPermissions, PERMISSIONS.CREATE_PRODUCTS) ? 'btn-disabled' : ''}`}
-            onClick={()=>{
-              handlePermissionCheck(PERMISSIONS.CREATE_PRODUCTS, handleAddProductClick, 'You do not have permission to add products.');
+            className={`btn btn-primary btn-with-icon ${
+              !hasPermission(userPermissions, PERMISSIONS.CREATE_PRODUCTS)
+                ? "btn-disabled"
+                : ""
+            }`}
+            onClick={() => {
+              handlePermissionCheck(
+                PERMISSIONS.CREATE_PRODUCTS,
+                handleAddProductClick,
+                "You do not have permission to add products."
+              );
             }}
           >
             <PlusIcon />
@@ -446,16 +545,19 @@ const ProductTable = ({ currentPage, setCurrentPage }) => {
 
           <tbody>
             {products.map((product) => (
-              <tr key={product.id}>
+              <tr key={product.productId}>
                 <td className="name-cell">
                   <div className="product-info">
                     <div className="product-image">
-                      <img src={`${PRODUCT_IMAGES}/${product.imageUrl}`} alt={product.name} />
+                      <img
+                        src={`${PRODUCT_IMAGES}/${product.imageUrl}`}
+                        alt={product.name}
+                      />
                     </div>
                     {product.name}
                   </div>
                 </td>
-                <td>{product.category}</td>
+                <td>{product.categoryName}</td>
                 <td>${product.price.toFixed(2)}</td>
                 <td>{product.stock}</td>
                 <td>
@@ -536,10 +638,14 @@ const ProductTable = ({ currentPage, setCurrentPage }) => {
                   </label>
                 </div>
                 {editedImagePreview && editedImageFile && (
-                  <button 
+                  <button
                     className="btn btn-text"
                     onClick={() => {
-                      setEditedImagePreview(selectedProduct.imageUrl ? `${PRODUCT_IMAGES}/${selectedProduct.imageUrl}` : null);
+                      setEditedImagePreview(
+                        selectedProduct.imageUrl
+                          ? `${PRODUCT_IMAGES}/${selectedProduct.imageUrl}`
+                          : null
+                      );
                       setEditedImageFile(null);
                     }}
                   >
@@ -620,25 +726,44 @@ const ProductTable = ({ currentPage, setCurrentPage }) => {
             </div>
 
             <div className="modal-footer">
-              <button
-                className={`btn btn-danger btn-with-icon ${!hasPermission(userPermissions, PERMISSIONS.DELETE_PRODUCTS) ? 'btn-disabled' : ''}`}
-                onClick={()=>{
-                  handlePermissionCheck(PERMISSIONS.DELETE_PRODUCTS, handleDeleteProduct, 'You do not have permission to delete products.');
-                }}
-              >
-                <TrashIcon />
-                Delete Product
-              </button>
               <div className="modal-actions">
+                <button
+                  className={`btn btn-danger btn-with-icon ${
+                    !hasPermission(userPermissions, PERMISSIONS.DELETE_PRODUCTS)
+                      ? "btn-disabled"
+                      : ""
+                  }`}
+                  onClick={() => {
+                    handlePermissionCheck(
+                      PERMISSIONS.DELETE_PRODUCTS,
+                      handleDeleteProduct,
+                      "You do not have permission to delete products."
+                    );
+                  }}
+                >
+                  <TrashIcon />
+                  Delete Product
+                </button>
                 <button
                   className="btn btn-secondary"
                   onClick={() => setIsModalOpen(false)}
                 >
                   Cancel
                 </button>
-                <button className={`btn btn-primary ${!hasPermission(userPermissions, PERMISSIONS.EDIT_PRODUCTS)}`} onClick={()=>{
-                  handlePermissionCheck(PERMISSIONS.EDIT_PRODUCTS, handleSaveChanges, 'You do not have permission to edit products.');
-                }}>
+                <button
+                  className={`btn btn-primary ${
+                    !hasPermission(userPermissions, PERMISSIONS.EDIT_PRODUCTS)
+                      ? "btn-disabled"
+                      : ""
+                  }`}
+                  onClick={() => {
+                    handlePermissionCheck(
+                      PERMISSIONS.EDIT_PRODUCTS,
+                      handleSaveChanges,
+                      "You do not have permission to edit products."
+                    );
+                  }}
+                >
                   Save Changes
                 </button>
               </div>
@@ -686,7 +811,7 @@ const ProductTable = ({ currentPage, setCurrentPage }) => {
                   </label>
                 </div>
                 {imagePreview && (
-                  <button 
+                  <button
                     className="btn btn-text"
                     onClick={() => {
                       setImagePreview(null);

@@ -63,6 +63,8 @@ const insertProduct = async (req, res) => {
 
     // !TODO: Remove this hardcoded value ////////////////////////////////////////////////////////////////////////////////////////////////////////
     productData.supplierId = "61";
+    console.log("productData.supplierId", productData.supplierId);
+    
 
     const result = await productRepository.insertProduct(productData);
     if (result.success) {
@@ -222,7 +224,7 @@ const updateProduct = async (req, res) => {
 
     // !TODO: Remove this hardcoded value ////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-    productData.supplierId = "8";
+    productData.supplierId = "61";
 
     // !TODO: Remove this hardcoded value ////////////////////////////////////////////////////////////////////////////////////////////////////////
 

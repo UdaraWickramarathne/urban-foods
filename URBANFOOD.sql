@@ -106,15 +106,39 @@ CREATE TABLE Deliveries (
 );
 
 
-SELECT * FROM DBA_TAB_PRIVS WHERE GRANTEE = 'ASIN';
+SELECT * FROM DBA_TAB_PRIVS WHERE GRANTEE = 'NIMAL';
 
-SELECT * FROM DBA_SYS_PRIVS WHERE GRANTEE = 'ASIN';
+SELECT * FROM DBA_SYS_PRIVS WHERE GRANTEE = 'SAMAN';
+
+DROP USER ASIN CASCADE;
+
+SELECT GRANTEE, PRIVILEGE FROM DBA_SYS_PRIVS
+WHERE GRANTEE = 'ASIN'
+SELECT * FROM DBA_TAB_PRIVS WHERE GRANTOR = 'URBANFOOD_USER';
 
 GRANT DBA TO URBANFOOD_USER;
 
 GRANT SELECT ON DBA_TAB_PRIVS TO URBANFOOD_USER;
 
+SELECT 
+    du.username, 
+    du.created, 
+    du.account_status, 
+    dsp.privilege AS system_privilege, 
+    dtp.table_name, 
+    dtp.privilege AS object_privilege
+FROM dba_users du
+LEFT JOIN dba_sys_privs dsp ON du.username = dsp.grantee
+LEFT JOIN dba_tab_privs dtp ON du.username = dtp.grantee
+WHERE du.username IN (SELECT UPPER(username) FROM users WHERE role = 'admin')
+ORDER BY du.created ASC;
+
+
+
 GRANT CONNECT, RESOURCE TO URBANFOOD_USER;
+
+SELECT * FROM dba_users 
+WHERE username IN (SELECT UPPER(username) FROM users WHERE role = 'admin');
 
 
 BEGIN

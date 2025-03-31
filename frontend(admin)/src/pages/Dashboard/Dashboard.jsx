@@ -550,23 +550,23 @@ const Dashboard = () => {
           </h1>
 
           <div className="header-actions">
-            <div className="search-container">
+            {/* <div className="search-container">
               <SearchIcon />
               <input
                 type="text"
                 placeholder="Search..."
                 className="search-input"
               />
-            </div>
+            </div> */}
 
-            <div className="notification-container">
+            {/* <div className="notification-container">
               <BellIcon />
               <span className="notification-badge">3</span>
-            </div>
+            </div> */}
 
             <div className="user-profile">
               <div className="avatar">
-                <img src="/avatar.jpg" alt="Profile" />
+                <img src="https://img.freepik.com/free-vector/blue-circle-with-white-user_78370-4707.jpg" alt="Profile" />
               </div>
             </div>
           </div>

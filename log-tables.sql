@@ -129,7 +129,9 @@ BEGIN
     END IF;
 END;
 /
+SELECT * FROM users;
 
+SELECT * FROM users_log;
 
 --Customers_log Trigger
 
@@ -149,7 +151,9 @@ BEGIN
     END IF;
 END;
 /
+SELECT * FROM customers;
 
+SELECT * FROM customers_log;
 
 --Suppliers_log Trigger
 
@@ -178,7 +182,10 @@ SELECT * FROM suppliers_log;
 CREATE OR REPLACE TRIGGER trg_categories_log
 AFTER INSERT OR UPDATE OR DELETE ON categories
 FOR EACH ROW
+DECLARE
+    product_count NUMBER;
 BEGIN
+SELECT COUNT(*) INTO product_count FROM categories WHERE category_id = NVL(:OLD.category_id, :NEW.category_id);
     IF INSERTING THEN
         INSERT INTO categories_log (category_id ,name,description,product_count, operation, changed_at, changed_by)
         VALUES (:NEW.category_id, :NEW.name,:NEW.description,:NEW.product_count, 'INSERT', SYSTIMESTAMP, USER);
@@ -210,7 +217,9 @@ BEGIN
     END IF;
 END;
 /
+SELECT * FROM products;
 
+SELECT * FROM products_log;
 
 --Cart_log Trigger
 
@@ -230,7 +239,9 @@ BEGIN
     END IF;
 END;
 /
+SELECT * FROM cart;
 
+SELECT * FROM cart_log;
 
 --Orders_log Trigger
 
@@ -250,7 +261,9 @@ BEGIN
     END IF;
 END;
 /
+SELECT * FROM orders;
 
+SELECT * FROM orders_log;
 
 --Orderitems_log Trigger
 
@@ -270,7 +283,9 @@ BEGIN
     END IF;
 END;
 /
+SELECT * FROM orderitems;
 
+SELECT * FROM orderitems_log;
 
 --payments_log Trigger
 
@@ -290,6 +305,9 @@ BEGIN
     END IF;
 END;
 /
+SELECT * FROM payments;
+
+SELECT * FROM payments_log;
 
 --Deliveries_log Trigger
 
@@ -309,22 +327,6 @@ BEGIN
     END IF;
 END;
 /
+SELECT * FROM deliveries;
 
--- Trigger for Category and Product Count Update
-CREATE OR REPLACE TRIGGER trg_update_product_count
-AFTER INSERT OR DELETE ON products
-FOR EACH ROW
-BEGIN
-    IF INSERTING THEN
-        UPDATE categories
-        SET PRODUCT_COUNT = PRODUCT_COUNT + 1
-        WHERE category_id = :new.category_id;
-    ELSIF DELETING THEN
-        UPDATE categories
-        SET PRODUCT_COUNT = PRODUCT_COUNT - 1
-        WHERE category_id = :old.category_id;
-    END IF;
-END;
-
-
-
+SELECT * FROM deliveries_log;
