@@ -557,7 +557,7 @@ const ProductTable = ({ currentPage, setCurrentPage }) => {
                     {product.name}
                   </div>
                 </td>
-                <td>{product.category}</td>
+                <td>{product.categoryName}</td>
                 <td>${product.price.toFixed(2)}</td>
                 <td>{product.stock}</td>
                 <td>
