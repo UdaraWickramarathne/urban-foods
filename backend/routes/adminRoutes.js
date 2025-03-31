@@ -18,5 +18,4 @@ router.post('/log', adminController.getLogDetails);
 router.delete('/triggers/:triggerName', adminController.dropTrigger);
 router.put('/triggers/:triggerName', adminController.changeTriggerStatus);
 
-
 export default router;
