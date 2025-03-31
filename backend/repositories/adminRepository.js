@@ -4,6 +4,7 @@ import User from "../models/user.js";
 import auth from "../middlewares/auth.js";
 import { ADMIN_PERMISSIONS, DB_PRIVILEGE_MAP } from "../enums/permissions.js";
 import DbUser from "../models/dbUser.js";
+import Trigger from "../models/trigger.js";
 
 const { generateToken } = auth;
 
@@ -50,6 +51,8 @@ const createOracleUser = async (userData) => {
 };
 
 const generateUserCreationSQL = (userData) => {
+  console.log(userData);
+  
   const sqlStatements = [];
 
   // Create user
@@ -59,7 +62,7 @@ const generateUserCreationSQL = (userData) => {
 
   // Set account accoutStatus
   const statusSql =
-    userData.accoutStatus === "Active"
+    userData.status === "Active"
       ? `ALTER USER ${userData.username} ACCOUNT UNLOCK`
       : `ALTER USER ${userData.username} ACCOUNT LOCK`;
   sqlStatements.push(statusSql);
@@ -684,6 +687,104 @@ const deleteDbUser = async (username) => {
   }
 }
 
+const getAllTriggers = async () => {
+  let connection;
+  try {
+    connection = await getConnection();
+    const result = await connection.execute(
+      `SELECT TRIGGER_NAME, TABLE_NAME, TRIGGER_TYPE, TRIGGERING_EVENT, STATUS, TRIGGER_BODY
+        FROM DBA_TRIGGERS WHERE OWNER = 'URBANFOOD_USER'`
+    );
+    const triggers = result.rows.map((row) => Trigger.fromDbRow(row, result.metaData));
+    return { success: true, data: triggers };
+  } catch (err) {
+    console.error("Error listing Oracle triggers:", err);
+    return { success: false, message: err.message };
+  } finally {
+    if (connection) {
+      try {
+        await connection.close();
+      } catch (err) {
+        console.error("Error closing connection:", err);
+      }
+    }
+  }
+
+}
+
+const getLogDetails = async (tableName) => {
+  let connection;
+  try {
+    connection = await getConnection();
+    const result = await connection.execute(
+      `SELECT * FROM ${tableName}`
+    );
+    // I want to return column names as well
+    const columns = result.metaData.map((col) => col.name);
+    return { success: true, rows: result.rows, columns: columns };
+  } catch (err) {
+    console.error("Error listing Oracle triggers:", err);
+    return { success: false, message: err.message };
+  } finally {
+    if (connection) {
+      try {
+        await connection.close();
+      } catch (err) {
+        console.error("Error closing connection:", err);
+      }
+    }
+  }
+}
+
+const dropTrigger = async (triggerName) => {
+  let connection;
+  try {
+    connection = await getConnection();
+    await connection.execute(`DROP TRIGGER ${triggerName}`);
+    await connection.commit();
+    return { success: true, message: `Trigger ${triggerName} deleted successfully` };
+  } catch (err) {
+    if (connection) {
+      await connection.rollback();
+    }
+    console.error("Error deleting Oracle trigger:", err);
+    return { success: false, message: err.message };
+  } finally {
+    if (connection) {
+      try {
+        await connection.close();
+      } catch (err) {
+        console.error("Error closing connection:", err);
+      }
+    }
+  }
+}
+
+const changeTriggerStatus = async (triggerName, status) => {
+  let connection;
+  try {
+    connection = await getConnection();
+    const sql = `ALTER TRIGGER ${triggerName} ${status}`;
+    await connection.execute(sql);
+    await connection.commit();
+    return { success: true, message: `Trigger ${triggerName} status changed to ${status}` };
+  } catch (err) {
+    if (connection) {
+      await connection.rollback();
+    }
+    console.error("Error changing trigger status:", err);
+    return { success: false, message: err.message };
+  } finally {
+    if (connection) {
+      try {
+        await connection.close();
+      } catch (err) {
+        console.error("Error closing connection:", err);
+      }
+    }
+  }
+}
+
 export default {
   createOracleUser,
   listOracleUsers,
@@ -693,5 +794,9 @@ export default {
   getAllDbUsers,
   updateDbUser,
   getCurrentUserPrivileges,
-  deleteDbUser
+  deleteDbUser,
+  getAllTriggers,
+  getLogDetails,
+  dropTrigger,
+  changeTriggerStatus
 };

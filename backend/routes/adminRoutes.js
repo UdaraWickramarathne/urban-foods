@@ -12,4 +12,11 @@ router.put('/users',adminController.updateDbUser);
 router.delete('/users/:username', adminController.deleteDbUser);
 
 
+// * Get all triggers
+router.get('/triggers', adminController.getAllTrigger);
+router.post('/log', adminController.getLogDetails);
+router.delete('/triggers/:triggerName', adminController.dropTrigger);
+router.put('/triggers/:triggerName', adminController.changeTriggerStatus);
+
+
 export default router;

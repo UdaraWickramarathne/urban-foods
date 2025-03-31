@@ -287,4 +287,51 @@ export const apiContext = create((set, get) => ({
     }
   },
 
+  // Get all triggers
+  getAllTriggers: async () => {
+    try {
+      const response = await axios.get(`${ADMIN}/triggers`);
+      return response.data;
+    } catch (error) {
+      if (error.response) {
+        return error.response.data;
+      }
+      return { success: false, message: "Failed to retrieve triggers" };
+    }
+  },
+  getLogDetails: async (trigger) => {    
+    try {
+      const response = await axios.post(`${ADMIN}/log`, trigger);
+      return response.data;
+    } catch (error) {
+      if (error.response) {
+        return error.response.data;
+      }
+      return { success: false, message: "Failed to retrieve log details" };
+    }
+  },
+  dropTrigger: async (triggerName) => {
+    try {
+      const response = await axios.delete(`${ADMIN}/triggers/${triggerName}`);
+      return response.data;
+    } catch (error) {
+      if (error.response) {
+        return error.response.data;
+      }
+      return { success: false, message: "Failed to drop trigger" };
+    }
+  },
+  changeTriggerStatus: async (triggerName, status) => {
+    try {
+      const response = await axios.put(`${ADMIN}/triggers/${triggerName}`, { status });
+      return response.data;
+    } catch (error) {
+      if (error.response) {
+        return error.response.data;
+      }
+      return { success: false, message: "Failed to change trigger status" };
+    }
+  },
+
+
 }));
