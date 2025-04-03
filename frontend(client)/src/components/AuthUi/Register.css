@@ -1,145 +1,237 @@
-  .register-container {
+.register-container {
   display: flex;
   justify-content: center;
   align-items: center;
-  height: 100vh;
+  height: 100%;
+  width: 100%;
   background-color: transparent;
-  }
+}
   
-  .register-box {
+.register-box {
   display: flex;
   width: 750px;
-  
-  border-radius: 8px;
+  border-radius: 12px;
   overflow: hidden;
   height: 500px;
-  }
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+}
 
-  .register-left {
-    width: 50%;
-    background-color: #2e8b4d;
-    color: white;
-    padding: 20px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    background-image: url('src/images/windows-5EQkyNai6L0-unsplash.jpg');
-    background-size: cover;
-    background-position: center;
-  }
+.register-left {
+  width: 50%;
+  background-color: #2e8b4d;
+  color: white;
+  padding: 40px 30px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background-image: url('src/images/home-image.png');
+  background-size: cover;
+  background-position: center;
+}
   
-  .register-left h2 {
-  font-size: 24px;
+.register-left h2 {
+  font-size: 28px;
   font-weight: bold;
-  margin-bottom: 10px;
-  color: #2e8b4d;
-  }
+  margin-bottom: 20px;
+  color: white;
+}
   
-  .register-left ul {
+.register-left ul {
   list-style: none;
   padding: 0;
-  color: #2e8b4d;
+  color: rgb(231, 231, 231);
   font-size: 18px;
-  }
+  width: 100%;
+  margin-top: 20px;
+}
   
-  .register-left ul li {
-    margin-bottom: 8px;
-  }
+.register-left ul li {
+  margin-bottom: 15px;
+  padding-left: 5px;
+}
 
-  .register-right {
+.register-right {
   width: 50%;
   background-color: white;
-  padding: 20px;
+  padding: 40px 30px;
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  }
+}
   
-  .register-right h2 {
-    font-size: 20px;
-    font-weight: bold;
-  }
+.register-right h2 {
+  font-size: 22px;
+  font-weight: bold;
+  margin-bottom: 15px;
+}
   
-  .register-right p {
+.register-right p {
   color: gray;
   font-size: 14px;
-  margin-bottom: 10px;
-  }
+  margin-bottom: 20px;
+  text-align: center;
+}
   
-  .register-right a {
-    color: #007bff;
+.register-right a {
+  color: #007bff;
   text-decoration: none;
-  }
+  font-weight: 500;
+  transition: color 0.2s;
+}
+
+.register-right a:hover {
+  color: #0056b3;
+}
   
-  .input-field {
-    width: 100%;
-    padding: 10px;
-    margin-top: 10px;
-    border: 1px solid lightgray;
-    border-radius: 4px;
-  }
+.input-field {
+  width: 100%;
+  padding: 12px 15px;
+  margin-bottom: 15px;
+  border: 1px solid #e0e0e0;
+  border-radius: 6px;
+  font-size: 14px;
+  transition: border-color 0.2s;
+}
+
+.input-field:focus {
+  border-color: #2e8b4d;
+  outline: none;
+}
   
-  .continue-btn {
-    width: 100%;
-    background-color: rgb(15, 149, 33);
-    color: white;
-    padding: 10px;
-    margin-top: 10px;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-  }
+.continue-btn {
+  width: 100%;
+  background-color: rgb(15, 149, 33);
+  color: white;
+  padding: 12px;
+  margin-top: 5px;
+  margin-bottom: 15px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: background-color 0.2s;
+}
+
+.continue-btn:hover {
+  background-color: rgb(12, 130, 28);
+}
+
+.google-btn, .email-btn {
+  width: 100%;
+  padding: 12px;
+  margin-bottom: 15px;
+  border: 1px solid #e0e0e0;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 500;
+  transition: background-color 0.2s;
+}
+
+.google-btn {
+  background-color: #f8f9fa;
+  color: #333;
+}
+
+.email-btn {
+  background-color: #e9f7fd;
+  color: #0078d7;
+}
+
+.google-btn:hover, .email-btn:hover {
+  background-color: #f0f0f0;
+}
   
-  .or-text {
-    text-align: center;
-    margin-top: 10px;
-    font-size: 14px;
-    color: gray;
-  }
-  
-  .social-buttons {
-    display: flex;
-    justify-content: space-between;
-    margin-top: 10px;
-  }
-  
-  .apple-btn,
-  .facebook-btn {
-    width: 48%;
-    padding: 10px;
-    color: white;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-  }
-  
-  .verify-btn {
-    width: 100%;
-    background-color: green;
-    color: white;
-    padding: 10px;
-    margin-top: 10px;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-  }
-  .back-btn {
-    cursor: pointer;
-  }
-  .resend-btn {
-    cursor: pointer;
-    color: cadetblue;
-  }
-  .loading-overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(0, 0, 0, 0.5);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    z-index: 1000;
-  }
+.verify-btn {
+  width: 100%;
+  background-color: green;
+  color: white;
+  padding: 12px;
+  margin-top: 5px;
+  margin-bottom: 15px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: background-color 0.2s;
+}
+
+.verify-btn:hover {
+  background-color: #006400;
+}
+
+.back-btn {
+  cursor: pointer;
+  color: #666;
+  background: none;
+  border: none;
+  margin-top: 10px;
+  padding: 5px 10px;
+  font-size: 14px;
+  transition: color 0.2s;
+}
+
+.back-btn:hover {
+  color: #333;
+}
+
+.resend-btn {
+  cursor: pointer;
+  color: #3d8da9;
+  background: none;
+  border: none;
+  margin: 10px 0;
+  padding: 5px 10px;
+  font-size: 14px;
+  transition: color 0.2s;
+}
+
+.resend-btn:hover {
+  color: #2c6a80;
+}
+
+.loading-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+/* Error message styling */
+.error-message {
+  color: #e53935;
+  font-size: 14px;
+  margin-top: 5px;
+  margin-bottom: 10px;
+}
+
+/* Modal overlay improvements */
+.modal-overlay {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.6);
+  z-index: 1001;
+}
+
+.modal-content {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  height: 100%;
+  max-height: 100vh;
+  padding: 20px;
+  box-sizing: border-box;
+}

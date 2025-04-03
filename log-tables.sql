@@ -109,7 +109,7 @@ CREATE TABLE deliveries_log (
     changed_at      TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     changed_by      VARCHAR2(50)
 );
-
+SELECT p.*, c.name as category_name  FROM products p INNER JOIN categories c ON p.category_id = c.category_id
 
 --User_log Trigger
 
