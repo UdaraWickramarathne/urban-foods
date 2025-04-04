@@ -27,9 +27,11 @@ const addToCart = async (req, res) => {
 
 const updateCartItem = async (req, res) => {
   try {
-    const result = await cartRepository.updateCartItem(req.params.cartId, req.body.quantity);
+    const { userId, quantity } = req.body;
+    const result = await cartRepository.updateCartItem(userId, req.params.product_id, quantity);
     res.status(HttpStatus.OK).json(result);
   } catch (error) {
+    console.error("Error updating cart item:", error.message);
     res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
       success: false,
       message: "Error updating cart item",
@@ -39,9 +41,11 @@ const updateCartItem = async (req, res) => {
 
 const removeFromCart = async (req, res) => {
   try {
-    const result = await cartRepository.removeFromCart(req.params.cartId);
+    const { userId } = req.body;
+    const result = await cartRepository.removeFromCart(userId, req.params.product_id);
     res.status(HttpStatus.OK).json(result);
   } catch (error) {
+    console.error("Error removing item from cart:", error.message);
     res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
       success: false,
       message: "Error removing item from cart",
