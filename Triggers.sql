@@ -239,14 +239,14 @@ AFTER INSERT OR UPDATE OR DELETE ON orders
 FOR EACH ROW
 BEGIN
     IF INSERTING THEN
-        INSERT INTO orders_log (order_id,customer_id,status,order_date,total_amount, operation, changed_at, changed_by)
-        VALUES (:NEW.order_id,:NEW.customer_id,:NEW.status, :NEW.order_date,:NEW.total_amount, 'INSERT', SYSTIMESTAMP, USER);
+        INSERT INTO orders_log (order_id,customer_id,status,order_date,total_amount, address, operation, changed_at, changed_by)
+        VALUES (:NEW.order_id,:NEW.customer_id,:NEW.status, :NEW.order_date,:NEW.total_amount, :NEW.address, 'INSERT', SYSTIMESTAMP, USER);
     ELSIF UPDATING THEN
-         INSERT INTO orders_log (order_id,customer_id,status,order_date,total_amount, operation, changed_at, changed_by)
-        VALUES (:NEW.order_id,:NEW.customer_id,:NEW.status, :NEW.order_date,:NEW.total_amount, 'UPDATE', SYSTIMESTAMP, USER);
+         INSERT INTO orders_log (order_id,customer_id,status,order_date,total_amount, address, operation, changed_at, changed_by)
+        VALUES (:NEW.order_id,:NEW.customer_id,:NEW.status, :NEW.order_date,:NEW.total_amount, :NEW.address, 'UPDATE', SYSTIMESTAMP, USER);
     ELSIF DELETING THEN
-         INSERT INTO orders_log (order_id,customer_id,status,order_date,total_amount, operation, changed_at, changed_by)
-        VALUES (:OLD.order_id,:OLD.customer_id,:OLD.status, :OLD.order_date,:OLD.total_amount, 'DELETE', SYSTIMESTAMP, USER);
+         INSERT INTO orders_log (order_id,customer_id,status,order_date,total_amount,address, operation, changed_at, changed_by)
+        VALUES (:OLD.order_id,:OLD.customer_id,:OLD.status, :OLD.order_date,:OLD.total_amount, :NEW.address, 'DELETE', SYSTIMESTAMP, USER);
     END IF;
 END;
 /

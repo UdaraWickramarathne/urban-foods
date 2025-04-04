@@ -14,3 +14,6 @@ export const SUPPLIER_IMAGES = `${BASE_URL}/images/suppliers`;
 export const PRODUCT_IMAGES = `${BASE_URL}/images/products`;
 export const DEFAULT_IMAGE = `${BASE_URL}/images/default/default-image.jpg`;
 export const PRODUCTS = `${BASE_URL}/products`;
+export const CART = `${BASE_URL}/cart`;
+export const ORDERS = `${BASE_URL}/orders`;
+export const PAYMENT = `${BASE_URL}/payment`;

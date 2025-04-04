@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import "./Navbar.css";
 import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
@@ -9,15 +9,17 @@ import PersonOutlineIcon from "@mui/icons-material/PersonOutline";
 import ShoppingBagOutlinedIcon from "@mui/icons-material/ShoppingBagOutlined";
 import storeContext from "../../context/storeContext";
 import { PRODUCT_IMAGES } from "../../context/constants";
+import { CartContext } from "../../context/CartContext";
 
 const Navbar = ({ onUserIconClick }) => {
   const [menu, setMenu] = useState("home");
   const [dropdownVisible, setDropdownVisible] = useState(false);
   const [cartDropdownVisible, setCartDropdownVisible] = useState(false);
-  const [cartItems, setCartItems] = useState([]); // State to store cart items
   const { token, setToken, setRole, setUserId, role } = storeContext();
   const navigate = useNavigate();
   const [searchQuery, setSearchQuery] = useState("");
+
+  const {cartItems, removeFromCart, updateQuantity} = useContext(CartContext);
 
   useEffect(() => {
     const savedToken = localStorage.getItem("token");
@@ -29,29 +31,9 @@ const Navbar = ({ onUserIconClick }) => {
       setRole(savedRole);
     }
 
-    // Fetch cart items if the user is logged in
-    if (savedToken) {
-      fetchCartItems();
-    }
   }, []);
 
-  const fetchCartItems = async () => {
-    try {
-      const userId = localStorage.getItem("userId");
-      if (!userId) {
-        console.error("No userId found in localStorage.");
-        return;
-      }
-      console.log("Fetching cart items for userId:", userId);
-      const response = await axios.get(`http://localhost:5000/api/cart/${userId}`);
-      if (response.data) {
-        setCartItems(response.data); // Update cart items state
-        console.log("Cart items fetched successfully:", response.data);
-      }
-    } catch (error) {
-      console.error("Error fetching cart items:", error.response?.data || error.message);
-    }
-  };
+  
 
   const handleUserIconClick = () => {
     setDropdownVisible(!dropdownVisible);
@@ -63,6 +45,8 @@ const Navbar = ({ onUserIconClick }) => {
     const action = e.target.getAttribute("data-action");
 
     if (action === "view-cart") {
+      setCartDropdownVisible(!cartDropdownVisible);
+      if (dropdownVisible) setDropdownVisible(false);
       navigate("/cart");
     } else {
       setCartDropdownVisible(!cartDropdownVisible);
@@ -79,8 +63,15 @@ const Navbar = ({ onUserIconClick }) => {
   };
 
   const handleProfileClick = () => {
+    setDropdownVisible(!dropdownVisible);
     navigate("/profile");
   };
+
+
+  const handleOrdersClick = () => {
+    setDropdownVisible(!dropdownVisible);
+    navigate("/orders");
+  }
 
   const handleSearchSubmit = (e) => {
     e.preventDefault();
@@ -89,35 +80,28 @@ const Navbar = ({ onUserIconClick }) => {
     }
   };
 
-  const handleQuantityChange = async (productId, change) => {
-    try {
-      const updatedCartItems = cartItems.map((item) =>
-        item.productId === productId
-          ? { ...item, quantity: item.quantity + change }
-          : item
-      );
-      setCartItems(updatedCartItems);
-
-      await axios.put(`http://localhost:5000/api/cart/${productId}`, {
-        userId: localStorage.getItem("userId"),
-        quantity: updatedCartItems.find((item) => item.productId === productId)
-          .quantity,
-      });
-    } catch (error) {
-      console.error("Error updating quantity:", error);
+  const handleQuantityChange = async (product, change) => {
+    if(change === 'increase') {
+      await updateQuantity(product.productId, product.quantity + 1);
+    }else if(change === 'decrease') {
+      if(product.quantity > 1) {
+        await updateQuantity(product.productId, product.quantity - 1);
+      }else {
+        await removeFromCart(product.productId);
+      }
     }
   };
 
   const handleRemoveItem = async (productId) => {
-    try {
-      setCartItems(cartItems.filter((item) => item.productId !== productId));
-      await axios.delete(`http://localhost:5000/api/cart/${productId}`, {
-        data: { userId: localStorage.getItem("userId") },
-      });
-    } catch (error) {
-      console.error("Error removing item:", error);
-    }
+    await removeFromCart(productId);
   };
+  const showTotalPrice = () => {
+    return cartItems.reduce((total, item) => total + item.price * item.quantity, 0).toFixed(2);
+  }
+
+  const itemPrice = (item) => {
+    return item.price * item.quantity;
+  }
 
   return (
     <nav className="navbar">
@@ -194,7 +178,7 @@ const Navbar = ({ onUserIconClick }) => {
                       <span className="dropdown-icon">📊</span> Dashboard
                     </Link>
                   )}
-                  <Link to="/orders" className="dropdown-item">
+                  <Link to="/orders" className="dropdown-item" onClick={handleOrdersClick}>
                     <span className="dropdown-icon">📦</span> My Orders
                   </Link>
                   <button className="dropdown-item logout" onClick={handleLogout}>
@@ -272,21 +256,20 @@ const Navbar = ({ onUserIconClick }) => {
                                 <div className="quantity-selector">
                                   <button
                                     className="qty-btn dec"
-                                    onClick={() => handleQuantityChange(item.productId, -1)}
+                                    onClick={() => handleQuantityChange(item, 'decrease')}
                                   >
                                     -
                                   </button>
                                   <span className="qty-value">{item.quantity}</span>
                                   <button
                                     className="qty-btn inc"
-                                    onClick={() => handleQuantityChange(item.productId, 1)}
+                                    onClick={() => handleQuantityChange(item, 'increase')}
                                   >
                                     +
                                   </button>
                                 </div>
                                 <div className="cart-item-price">
-                                  ${item.price.toFixed(2)} x {item.quantity} = $
-                                  {(item.price * item.quantity).toFixed(2)}
+                                  ${itemPrice(item).toFixed(2)}
                                 </div>
                               </div>
                             </div>
@@ -299,9 +282,7 @@ const Navbar = ({ onUserIconClick }) => {
                           <span>Subtotal</span>
                           <span>
                             $
-                            {cartItems
-                              .reduce((total, item) => total + item.price * item.quantity, 0)
-                              .toFixed(2)}
+                            {showTotalPrice()}
                           </span>
                         </div>
                         <div className="cart-summary-row">
