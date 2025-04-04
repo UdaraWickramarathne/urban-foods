@@ -1,5 +1,6 @@
 import {create} from 'zustand';
-import { VALIDATE_TOKEN } from './constants';
+import { PRODUCTS, VALIDATE_TOKEN } from './constants';
+import axios from 'axios';
 
 const storeContext = create((set, get) =>({
     token: localStorage.getItem('token') || '',
@@ -38,7 +39,19 @@ const storeContext = create((set, get) =>({
             localStorage.removeItem("userId");
             set({ token: "", userId: "" });
         }
-    }
+    },
+    // get products
+    getAllProducts: async () => {
+        try {
+          const response = await axios.get(PRODUCTS);
+          return response.data;
+        } catch (error) {
+          if (error.response) {
+            return error.response.data;
+          }
+          return { success: false, message: error.message };
+        }
+    },
 }))
 
 export default storeContext;

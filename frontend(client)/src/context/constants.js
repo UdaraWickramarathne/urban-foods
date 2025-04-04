@@ -11,5 +11,6 @@ export const CUSTOMERS = `${BASE_URL}/customers`;
 export const SUPPLIERS = `${BASE_URL}/suppliers`;
 export const CUSTOMER_IMAGES = `${BASE_URL}/images/customers`;
 export const SUPPLIER_IMAGES = `${BASE_URL}/images/suppliers`;
+export const PRODUCT_IMAGES = `${BASE_URL}/images/products`;
 export const DEFAULT_IMAGE = `${BASE_URL}/images/default/default-image.jpg`;
 export const PRODUCTS = `${BASE_URL}/products`;
