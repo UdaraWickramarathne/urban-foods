@@ -17,7 +17,7 @@ export const CartProvider = ({ children }) => {
 
   const {showNotification} = useNotification();
 
-  const { getCartItems, handleAddToCart, updateCartItem, handleRemoveFromCart } = storeContext();
+  const { getCartItems, handleAddToCart, updateCartItem, handleRemoveFromCart, userId  } = storeContext();
 
   const fetchCartItems = async () => {
       const result = await getCartItems();
@@ -28,7 +28,9 @@ export const CartProvider = ({ children }) => {
 
   // Load cart from localStorage on initial render
   useEffect(() => {
-    fetchCartItems();
+    if (userId) {
+      fetchCartItems();
+    }
   }, []);
 
   // Add product to cart
