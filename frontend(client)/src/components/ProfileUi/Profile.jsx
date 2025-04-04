@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import axios from 'axios';
 import './Profile.css';
 import storeContext from "../../context/storeContext";
-import { CUSTOMERS, SUPPLIERS, CUSTOMER_IMAGES, SUPPLIER_IMAGES, } from '../../context/constants';
+import { CUSTOMERS, SUPPLIERS, CUSTOMER_IMAGES, SUPPLIER_IMAGES, GET_USER, } from '../../context/constants';
 import { FaPencilAlt } from 'react-icons/fa';
 
 const Profile = () => {
@@ -119,11 +119,7 @@ const Profile = () => {
   const handleDeleteClick = async () => {
     if (window.confirm("Are you sure you want to delete your profile? This action cannot be undone.")) {
       try {
-        const endpoint =
-          role === 'supplier'
-            ? `${SUPPLIERS}/deleteSupplier/${userId}`
-            : `${CUSTOMERS}/delete/${userId}`;
-        const response = await axios.delete(endpoint);
+        const response = await axios.delete(`${GET_USER}/${userId}`);
         if (response.data.success) {
           alert("Profile deleted successfully!");
           handleLogout();
@@ -154,7 +150,7 @@ const Profile = () => {
             <div className="pro">
               <div className="profile-pic-container">
                 <img
-                  src={userData.imageUrl ? userData.imageUrl : 'assets/egg.png'}
+                  src={userData.imageUrl && userData.imageUrl.trim() !== '' ? userData.imageUrl : 'default-image.jpg'}
                   alt="Profile"
                   className="profile-pic"
                 />
