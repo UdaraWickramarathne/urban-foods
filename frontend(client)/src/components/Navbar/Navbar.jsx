@@ -9,7 +9,11 @@ import PersonOutlineIcon from "@mui/icons-material/PersonOutline";
 import ShoppingBagOutlinedIcon from "@mui/icons-material/ShoppingBagOutlined";
 import storeContext from "../../context/storeContext";
 import { PRODUCT_IMAGES } from "../../context/constants";
+
+import ReviewPopup from "../CustomerFeedback/CustomerFeedbackAdd";
+
 import { CartContext } from "../../context/CartContext";
+
 
 const Navbar = ({ onUserIconClick }) => {
   const [menu, setMenu] = useState("home");
@@ -19,7 +23,19 @@ const Navbar = ({ onUserIconClick }) => {
   const navigate = useNavigate();
   const [searchQuery, setSearchQuery] = useState("");
 
+  const [feedbackPopupVisible, setFeedbackPopupVisible] = useState(false);
+
+  const handleAddFeedbackClick = () => {
+    setFeedbackPopupVisible(true);
+    setDropdownVisible(false);
+  };
+
+  const handleFeedbackSubmit = (review) => {
+    console.log("Feedback submitted:", review);
+  };
+
   const {cartItems, removeFromCart, updateQuantity} = useContext(CartContext);
+
 
   useEffect(() => {
     const savedToken = localStorage.getItem("token");
@@ -30,7 +46,6 @@ const Navbar = ({ onUserIconClick }) => {
     if (savedRole) {
       setRole(savedRole);
     }
-
   }, []);
 
   
@@ -180,6 +195,12 @@ const Navbar = ({ onUserIconClick }) => {
                   )}
                   <Link to="/orders" className="dropdown-item" onClick={handleOrdersClick}>
                     <span className="dropdown-icon">📦</span> My Orders
+                  </Link>
+                  <Link
+                    className="dropdown-item"
+                    onClick={handleAddFeedbackClick}
+                  >
+                    <span className="dropdown-icon">📝</span> Add Feedback
                   </Link>
                   <button className="dropdown-item logout" onClick={handleLogout}>
                     <span className="dropdown-icon">🚪</span> Logout
@@ -334,6 +355,13 @@ const Navbar = ({ onUserIconClick }) => {
           </div>
         </div>
       </div>
+      {feedbackPopupVisible && (
+        <ReviewPopup
+          isOpen={feedbackPopupVisible}
+          onClose={() => setFeedbackPopupVisible(false)}
+          onSubmit={handleFeedbackSubmit}
+        />
+      )}
     </nav>
   );
 };

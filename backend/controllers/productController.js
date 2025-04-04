@@ -1,3 +1,4 @@
+import { log } from "console";
 import HttpStatus from "../enums/httpsStatus.js";
 import imageUpload from "../middlewares/imageUpload.js";
 import productRepository from "../repositories/productRepository.js";
@@ -60,10 +61,12 @@ const insertProduct = async (req, res) => {
       );
     }
     productData.imageUrl = imageUrl;
+    console.log(productData);
+    
 
-    // !TODO: Remove this hardcoded value ////////////////////////////////////////////////////////////////////////////////////////////////////////
-    productData.supplierId = "61";
-    console.log("productData.supplierId", productData.supplierId);
+    // // !TODO: Remove this hardcoded value ////////////////////////////////////////////////////////////////////////////////////////////////////////
+    // productData.supplierId = "63";
+    // console.log("productData.supplierId", productData.supplierId);
     
 
     const result = await productRepository.insertProduct(productData);
@@ -224,7 +227,7 @@ const updateProduct = async (req, res) => {
 
     // !TODO: Remove this hardcoded value ////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-    productData.supplierId = "61";
+    // productData.supplierId = "63";
 
     // !TODO: Remove this hardcoded value ////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -265,6 +268,27 @@ const searchProducts = async (req, res) => {
   }
 };
 
+const getProductsBySupplierId = async (req, res) => {
+  try {
+    const supplierId = req.params.supplierId;
+    const products = await productRepository.getProductsBySupplierId(supplierId);
+    if (products.length > 0) {
+      res.status(HttpStatus.OK).json(products);
+    } else {
+      res.status(HttpStatus.NOT_FOUND).json({
+        success: false,
+        message: "No products found for this supplier",
+      });
+    }
+  } catch (error) {
+    console.error("Error in getProductsBySupplierId controller:", error.message);
+    res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
+      success: false,
+      message: "Error retrieving products",
+    });
+  }
+};
+
 export default {
   getAllProducts,
   getProductById,
@@ -272,4 +296,5 @@ export default {
   deleteProduct,
   updateProduct,
   searchProducts,
+  getProductsBySupplierId,
 };

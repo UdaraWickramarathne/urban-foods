@@ -8,8 +8,13 @@ import customerRoutes from './routes/customerRoutes.js';
 import categoryRoutes from './routes/categoryRoutes.js';
 import adminRoutes from './routes/adminRoutes.js';
 import supplierRoutes from './routes/supplierRoutes.js';
+
+import feedbackRoutes from './routes/feedbackRoutes.js';
+
 import paymentRoutes from './routes/paymentRoutes.js';
 import cartRoutes from './routes/cartRoutes.js';
+import bodyParser from "body-parser";
+import { connectToDatabase } from "./db/mongodbConnection.js";
 
 
 const app = express();
@@ -17,6 +22,11 @@ const app = express();
 app.use(cors());
 
 app.use(express.json());
+
+app.use(bodyParser.json());
+
+// Connect to MongoDB
+connectToDatabase();
 
 app.get('/', (req, res) => {
     res.send('API is running...');
@@ -39,8 +49,7 @@ app.use("/api/images/customers", express.static("uploads/customers"));
 app.use("/api/images/default", express.static("uploads/defaults"));
 
 app.use('/api/suppliers', supplierRoutes);
-
-
+app.use('/api/feedback', feedbackRoutes);
 app.listen(5000, () => {
     console.log('Server started on http://localhost:5000');
 });
