@@ -172,3 +172,4 @@ const getProductsBySupplierId = async (supplierId) => {
 }
 
 export default { getAllProducts,getProductById, insertProduct, deleteProduct, updateProduct, searchProducts, getProductsBySupplierId };
+
