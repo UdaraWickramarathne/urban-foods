@@ -1,26 +1,48 @@
 import React from "react";
-import "./CustomerFeedback.css";
+import axios from "axios";
+import "./CustomerFeedbackAdd.css";
+import { useNotification } from '../../context/notificationContext';
 
 const ReviewPopup = ({ isOpen, onClose, onSubmit }) => {
+
+  const  {showNotification} = useNotification()
+
   if (!isOpen) return null;
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
+    const userId = localStorage.getItem("userId");
+    if (!userId) {
+      alert("User not logged in. Please log in to submit feedback.");
+      return;
+    }
+  
     const review = {
+      userId : userId,
       reviewer: e.target.reviewer.value.trim(),
       rating: parseInt(e.target.rating.value),
       text: e.target.text.value.trim(),
       date: new Date().toLocaleDateString(),
     };
-
-    // Ensure all fields are filled before submitting
+  
     if (!review.reviewer || !review.rating || !review.text) {
       alert("Please fill out all fields before submitting.");
       return;
     }
-
-    onSubmit(review); // Pass the review data to the parent component
-    onClose(); // Close the popup after submission
+  
+    try {
+      const response = await axios.post("http://localhost:5000/api/feedback", review);
+      if (response.data.success) {
+        showNotification("Feedback submitted successfully!", "success");
+        onSubmit(review);
+        onClose();
+      } else {
+        showNotification("Failed to submit feedback. Please try again.", "error");
+      }
+    } catch (error) {
+      console.error("Error submitting feedback:", error);
+      alert("An error occurred while submitting feedback.");
+    }
   };
 
   return (
@@ -47,7 +69,7 @@ const ReviewPopup = ({ isOpen, onClose, onSubmit }) => {
           </select>
           <textarea
             name="text"
-            placeholder="Write your review..."
+            placeholder="Write your Feedback..."
             required
           ></textarea>
           <button type="submit">Submit</button>
