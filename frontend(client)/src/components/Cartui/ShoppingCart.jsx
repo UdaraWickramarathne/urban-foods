@@ -47,7 +47,7 @@ export default function ShoppingCart() {
 
       const data = await response.json();
       if (data.url) {
-        window.location.href = data.url; // Redirect to Stripe Checkout
+        window.location.href = data.url;
       }
     } catch (error) {
       console.error("Error during checkout:", error);

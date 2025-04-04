@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import './ProductCard.css';
 import { useNavigate } from 'react-router-dom';
 import { PRODUCT_IMAGES } from '../../context/constants';
+import axios from 'axios';
 
 const ProductCard = ({ product }) => {
   const [isInCart, setIsInCart] = useState(false);
@@ -9,19 +10,81 @@ const ProductCard = ({ product }) => {
 
   const navigate = useNavigate();
 
-  const handleAddToCart = () => {
+  const handleAddToCart = async() => {
     setIsInCart(true);
+    try {
+      const response = await axios.post('http://localhost:5000/api/cart', {
+        userId: localStorage.getItem('userId'),
+        productId: product.productId,
+        quantity: quantity,
+      });
+      if (response.data.success) {
+        setIsInCart(true);
+        alert('Product added to cart successfully!');
+      } else {
+        alert('Failed to add product to cart.');
+      }
+    } catch (error) {
+      console.error('Error adding product to cart:', error);
+      alert('An error occurred while adding the product to the cart.');
+    }
   };
 
-  const increaseQuantity = () => {
-    setQuantity(quantity + 1);
+  const increaseQuantity = async () => {
+    try {
+      const response = await axios.put(`http://localhost:5000/api/cart/${product.productId}`, {
+        userId: localStorage.getItem('userId'),
+        quantity: quantity + 1,
+      });
+  
+      if (response.data.success) {
+        setQuantity(quantity + 1);
+        alert('Quantity increased successfully!');
+      } else {
+        alert('Failed to increase quantity.');
+      }
+    } catch (error) {
+      console.error('Error increasing quantity:', error);
+      alert('An error occurred while increasing the quantity.');
+    }
   };
-
-  const decreaseQuantity = () => {
+  
+  const decreaseQuantity = async () => {
     if (quantity > 1) {
-      setQuantity(quantity - 1);
+      try {
+        const response = await axios.put(`http://localhost:5000/api/cart/${product.productId}`, {
+          userId: localStorage.getItem('userId'),
+          quantity: quantity - 1,
+        });
+  
+        if (response.data.success) {
+          setQuantity(quantity - 1);
+          alert('Quantity decreased successfully!');
+        } else {
+          alert('Failed to decrease quantity.');
+        }
+      } catch (error) {
+        console.error('Error decreasing quantity:', error);
+        alert('An error occurred while decreasing the quantity.');
+      }
     } else {
-      setIsInCart(false);
+      try {
+        const response = await axios.delete(`http://localhost:5000/api/cart/${product.productId}`, {
+          data: {
+            userId: localStorage.getItem('userId'),
+          },
+        });
+  
+        if (response.data.success) {
+          setIsInCart(false);
+          alert('Product removed from cart successfully!');
+        } else {
+          alert('Failed to remove product from cart.');
+        }
+      } catch (error) {
+        console.error('Error removing product from cart:', error);
+        alert('An error occurred while removing the product from the cart.');
+      }
     }
   };
 
