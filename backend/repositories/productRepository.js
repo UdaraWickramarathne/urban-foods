@@ -151,4 +151,5 @@ const searchProducts = async (keyword) => {
   }
 }
 
+
 export default { getAllProducts,getProductById, insertProduct, deleteProduct, updateProduct, searchProducts };

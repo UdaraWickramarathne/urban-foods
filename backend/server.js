@@ -8,7 +8,6 @@ import customerRoutes from './routes/customerRoutes.js';
 import categoryRoutes from './routes/categoryRoutes.js';
 import adminRoutes from './routes/adminRoutes.js';
 import supplierRoutes from './routes/supplierRoutes.js';
-
 import paymentRoutes from './routes/paymentRoutes.js';
 import cartRoutes from './routes/cartRoutes.js';
 
