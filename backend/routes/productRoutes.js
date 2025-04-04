@@ -4,7 +4,7 @@ import imageUpload from "../middlewares/imageUpload.js";
 
 const { memoryUpload } = imageUpload;
 
-const { getAllProducts, getProductById, insertProduct, deleteProduct, updateProduct,searchProducts} = productController;
+const { getAllProducts, getProductById, insertProduct, deleteProduct, updateProduct,searchProducts, getProductsBySupplierId} = productController;
 
 const router = express.Router();
 
@@ -24,6 +24,9 @@ router.delete('/:productId', deleteProduct);
 
 // Route to update a product by ID
 router.put('/:productId', memoryUpload.single("image"), updateProduct);
+
+// Route to get products by supplier ID
+router.get('/supplier/:supplierId', getProductsBySupplierId);
 
 
 export default router;

@@ -151,4 +151,24 @@ const searchProducts = async (keyword) => {
   }
 }
 
-export default { getAllProducts,getProductById, insertProduct, deleteProduct, updateProduct, searchProducts };
+const getProductsBySupplierId = async (supplierId) => {
+  let connection;
+  try {
+    connection = await getConnection();
+    const result = await connection.execute(
+      `SELECT * FROM products WHERE supplier_id = :supplierId`,
+      { supplierId }
+    );
+    const products = result.rows.map((row) => Product.fromDbRow(row, result.metaData));
+    return products;
+  } catch (error) {
+    console.error("Error retrieving products by supplier ID:", error.message);
+    return [];
+  } finally {
+    if (connection) {
+      await connection.close();
+    }
+  }
+}
+
+export default { getAllProducts,getProductById, insertProduct, deleteProduct, updateProduct, searchProducts, getProductsBySupplierId };
