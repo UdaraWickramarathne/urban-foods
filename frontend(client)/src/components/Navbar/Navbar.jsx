@@ -67,7 +67,7 @@ const Navbar = ({ onUserIconClick }) => {
             sentence="Urban Foods"
             manualMode={false}
             blurAmount={5}
-            borderColor="green"
+            borderColor="white"
             animationDuration={2}
             pauseBetweenAnimations={1}
           />
@@ -147,8 +147,8 @@ const Navbar = ({ onUserIconClick }) => {
             <Button
               onClick={onUserIconClick}
               sx={{
-                backgroundColor: "#4CAF50",
-                color: "white",
+                backgroundColor: "white",
+                color: "#16a34a",
                 borderRadius: "25px",
                 padding: "8px 20px",
                 textTransform: "none",
@@ -157,7 +157,7 @@ const Navbar = ({ onUserIconClick }) => {
                 boxShadow: "0 2px 10px rgba(76, 175, 80, 0.2)",
                 transition: "all 0.3s ease",
                 "&:hover": {
-                  backgroundColor: "#43a047",
+                  backgroundColor: "#f0f1f2",
                   boxShadow: "0 4px 15px rgba(76, 175, 80, 0.3)",
                   transform: "translateY(-2px)"
                 },

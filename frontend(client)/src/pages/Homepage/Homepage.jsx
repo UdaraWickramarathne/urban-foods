@@ -6,7 +6,7 @@ import ProductSection from '../../components/ProductSection/ProductSection'
 import CusromerReview from '../../components/CustomerReviewsSection/CustomerReviews.jsx'
 import Footer from '../../components/FooterSection/Footer.jsx'
 import Profile from '../../components/ProfileUi/Profile.jsx'
-import Dashboard from '../../components/Dashboard/Dashboard.jsx'
+import Dashboard from '../Dashboard/Dashboard.jsx'
 
 function Homepage() {
   return (

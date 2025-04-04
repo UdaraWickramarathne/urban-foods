@@ -10,6 +10,12 @@ const LoginPage = ({ onClose, onSwitchToRegister }) => {
 
   const {setToken,setUserId,setRole} = storeContext();
 
+  const handleClose = (e) => {
+    if (e.target.classList.contains("container")) {
+      onClose();
+    }
+  }
+
   const handleLogin = async (e) => {
     e.preventDefault();
     try {
@@ -33,7 +39,7 @@ const LoginPage = ({ onClose, onSwitchToRegister }) => {
     }
   };
   return (
-    <div className="modal-overlay" onClick={(e) => e.target === e.currentTarget && onClose()}>
+    <div className="modal-overlay" onClick={handleClose}>
       <div className="modal-content">
         <div className="container">
           <div className="card">

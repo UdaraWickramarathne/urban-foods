@@ -10,7 +10,7 @@ import ShoppingCart from "./components/Cartui/ShoppingCart";
 import PaymentSuccess from "./pages/PaymentSuccess/PaymentSuccess";
 import Profile from './components/ProfileUi/Profile.jsx';
 import About from './components/About/About.jsx';
-import Dashboard from './components/Dashboard/Dashboard.jsx';
+import Dashboard from './pages/Dashboard/Dashboard.jsx';
 import { ContextWrapper } from './context/contextWrapper';
 import ProductDisplay from './pages/ProductDisplay/ProductDisplay.jsx';
 import ProductDetailPage from './pages/ProductDetails/ProductDetailPage.jsx';

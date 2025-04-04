@@ -677,30 +677,30 @@
 
 /* Login button - alternative custom styling if MUI styling isn't enough */
 .custom-login-btn {
-  background-color: #ffffff; /* White button */
-  color: #16a34a; /* Green text */
+  background-color: #16a34a; /* Changed from white to green to match navbar */
+  color: #ffffff; /* Changed from green to white to match navbar text */
   border: none;
   border-radius: 25px;
   padding: 10px 22px;
-  font-size: 16px; /* Increased from 14px */
+  font-size: 16px;
   font-weight: 600;
   cursor: pointer;
   display: flex;
   align-items: center;
   gap: 8px;
-  box-shadow: 0 2px 10px rgba(255, 255, 255, 0.2);
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1); /* Updated shadow for better visibility */
   transition: all 0.3s ease;
 }
 
 .custom-login-btn:hover {
-  background-color: #e2f7e2; /* Light green on hover */
-  box-shadow: 0 4px 15px rgba(255, 255, 255, 0.3);
+  background-color: #138a3f; /* Darker green on hover, matching checkout button hover */
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
   transform: translateY(-2px);
 }
 
 .custom-login-btn:active {
   transform: translateY(0);
-  box-shadow: 0 2px 5px rgba(255, 255, 255, 0.2);
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.15);
 }
 
 .custom-login-btn svg {

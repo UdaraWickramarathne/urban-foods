@@ -68,7 +68,7 @@ const Register = ({ onClose, onSwitchToLogin }) => {
   };
 
   const handleOverlayClick = (e) => {
-    if (e.target === e.currentTarget) {
+    if (e.target.classList.contains("register-container")) {
       onClose();
     }
   };
