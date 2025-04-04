@@ -1,18 +1,20 @@
 import React, { useState, useEffect } from "react";
 import "./Navbar.css";
 import { Link, useNavigate } from "react-router-dom";
+import axios from "axios";
 import TrueFocus from "../TrueFocus/TrueFocus";
 import Button from "@mui/material/Button";
 import LoginIcon from "@mui/icons-material/Login";
-import SearchIcon from "@mui/icons-material/Search";
 import PersonOutlineIcon from "@mui/icons-material/PersonOutline";
 import ShoppingBagOutlinedIcon from "@mui/icons-material/ShoppingBagOutlined";
 import storeContext from "../../context/storeContext";
+import { PRODUCT_IMAGES } from "../../context/constants";
 
 const Navbar = ({ onUserIconClick }) => {
   const [menu, setMenu] = useState("home");
   const [dropdownVisible, setDropdownVisible] = useState(false);
   const [cartDropdownVisible, setCartDropdownVisible] = useState(false);
+  const [cartItems, setCartItems] = useState([]); // State to store cart items
   const { token, setToken, setRole, setUserId, role } = storeContext();
   const navigate = useNavigate();
   const [searchQuery, setSearchQuery] = useState("");
@@ -26,7 +28,30 @@ const Navbar = ({ onUserIconClick }) => {
     if (savedRole) {
       setRole(savedRole);
     }
+
+    // Fetch cart items if the user is logged in
+    if (savedToken) {
+      fetchCartItems();
+    }
   }, []);
+
+  const fetchCartItems = async () => {
+    try {
+      const userId = localStorage.getItem("userId");
+      if (!userId) {
+        console.error("No userId found in localStorage.");
+        return;
+      }
+      console.log("Fetching cart items for userId:", userId);
+      const response = await axios.get(`http://localhost:5000/api/cart/${userId}`);
+      if (response.data) {
+        setCartItems(response.data); // Update cart items state
+        console.log("Cart items fetched successfully:", response.data);
+      }
+    } catch (error) {
+      console.error("Error fetching cart items:", error.response?.data || error.message);
+    }
+  };
 
   const handleUserIconClick = () => {
     setDropdownVisible(!dropdownVisible);
@@ -35,8 +60,14 @@ const Navbar = ({ onUserIconClick }) => {
 
   const handleCartIconClick = (e) => {
     e.preventDefault();
-    setCartDropdownVisible(!cartDropdownVisible);
-    if (dropdownVisible) setDropdownVisible(false);
+    const action = e.target.getAttribute("data-action");
+
+    if (action === "view-cart") {
+      navigate("/cart");
+    } else {
+      setCartDropdownVisible(!cartDropdownVisible);
+      if (dropdownVisible) setDropdownVisible(false);
+    }
   };
 
   const handleLogout = () => {
@@ -58,6 +89,36 @@ const Navbar = ({ onUserIconClick }) => {
     }
   };
 
+  const handleQuantityChange = async (productId, change) => {
+    try {
+      const updatedCartItems = cartItems.map((item) =>
+        item.productId === productId
+          ? { ...item, quantity: item.quantity + change }
+          : item
+      );
+      setCartItems(updatedCartItems);
+
+      await axios.put(`http://localhost:5000/api/cart/${productId}`, {
+        userId: localStorage.getItem("userId"),
+        quantity: updatedCartItems.find((item) => item.productId === productId)
+          .quantity,
+      });
+    } catch (error) {
+      console.error("Error updating quantity:", error);
+    }
+  };
+
+  const handleRemoveItem = async (productId) => {
+    try {
+      setCartItems(cartItems.filter((item) => item.productId !== productId));
+      await axios.delete(`http://localhost:5000/api/cart/${productId}`, {
+        data: { userId: localStorage.getItem("userId") },
+      });
+    } catch (error) {
+      console.error("Error removing item:", error);
+    }
+  };
+
   return (
     <nav className="navbar">
       <div className="navbar-container">
@@ -72,7 +133,7 @@ const Navbar = ({ onUserIconClick }) => {
             pauseBetweenAnimations={1}
           />
         </div>
-        
+
         {/* Navigation Links */}
         <div className="navbar-links">
           <ul>
@@ -116,7 +177,6 @@ const Navbar = ({ onUserIconClick }) => {
 
         {/* Search, User and Cart Icons */}
         <div className="navbar-icons">
-
           {token ? (
             <div className="user-icon-container">
               <div className="icon-user" onClick={handleUserIconClick}>
@@ -177,66 +237,72 @@ const Navbar = ({ onUserIconClick }) => {
             <button className="cart-button" onClick={handleCartIconClick}>
               <div className="cart-button-content">
                 <ShoppingBagOutlinedIcon />
-                <span className="cart-count">2</span>
+                <span className="cart-count">{cartItems.length}</span>
                 <span className="icon-label">Cart</span>
               </div>
             </button>
             {cartDropdownVisible && (
               <div className="cart-dropdown">
                 <div className="cart-dropdown-header">
-                  <h3>Shopping Cart <span className="cart-count-badge">2</span></h3>
+                  <h3>Shopping Cart <span className="cart-count-badge">{cartItems.length}</span></h3>
                   <button className="close-cart-btn" onClick={handleCartIconClick}>×</button>
                 </div>
-                
+
                 <div className="cart-items-wrapper">
-                  {true ? (
+                  {cartItems.length > 0 ? (
                     <>
                       <div className="cart-item-list">
-                        <div className="cart-item">
-                          <div className="cart-item-img">
-                            <img src="https://images.unsplash.com/photo-1568702846914-96b305d2aaeb?ixlib=rb-1.2.1&auto=format&fit=crop&w=150&q=80" alt="Organic Apples" />
-                          </div>
-                          <div className="cart-item-content">
-                            <div className="cart-item-top">
-                              <h4 className="cart-item-title">Organic Apples</h4>
-                              <button className="remove-item-btn" title="Remove item">×</button>
+                        {cartItems.map((item) => (
+                          <div className="cart-item" key={item.productId}>
+                            <div className="cart-item-img">
+                              <img src={`${PRODUCT_IMAGES}/${item.imageUrl}`} alt={item.name} />
                             </div>
-                            <div className="cart-item-bottom">
-                              <div className="quantity-selector">
-                                <button className="qty-btn dec">-</button>
-                                <span className="qty-value">1</span>
-                                <button className="qty-btn inc">+</button>
+                            <div className="cart-item-content">
+                              <div className="cart-item-top">
+                                <h4 className="cart-item-title">{item.name}</h4>
+                                <button
+                                  className="remove-item-btn"
+                                  title="Remove item"
+                                  onClick={() => handleRemoveItem(item.productId)}
+                                >
+                                  ×
+                                </button>
                               </div>
-                              <div className="cart-item-price">$4.99</div>
-                            </div>
-                          </div>
-                        </div>
-                        
-                        <div className="cart-item">
-                          <div className="cart-item-img">
-                            <img src="https://images.unsplash.com/photo-1509440159596-0249088772ff?ixlib=rb-1.2.1&auto=format&fit=crop&w=150&q=80" alt="Fresh Bread" />
-                          </div>
-                          <div className="cart-item-content">
-                            <div className="cart-item-top">
-                              <h4 className="cart-item-title">Fresh Bread</h4>
-                              <button className="remove-item-btn" title="Remove item">×</button>
-                            </div>
-                            <div className="cart-item-bottom">
-                              <div className="quantity-selector">
-                                <button className="qty-btn dec">-</button>
-                                <span className="qty-value">1</span>
-                                <button className="qty-btn inc">+</button>
+                              <div className="cart-item-bottom">
+                                <div className="quantity-selector">
+                                  <button
+                                    className="qty-btn dec"
+                                    onClick={() => handleQuantityChange(item.productId, -1)}
+                                  >
+                                    -
+                                  </button>
+                                  <span className="qty-value">{item.quantity}</span>
+                                  <button
+                                    className="qty-btn inc"
+                                    onClick={() => handleQuantityChange(item.productId, 1)}
+                                  >
+                                    +
+                                  </button>
+                                </div>
+                                <div className="cart-item-price">
+                                  ${item.price.toFixed(2)} x {item.quantity} = $
+                                  {(item.price * item.quantity).toFixed(2)}
+                                </div>
                               </div>
-                              <div className="cart-item-price">$3.49</div>
                             </div>
                           </div>
-                        </div>
+                        ))}
                       </div>
-                      
+
                       <div className="cart-summary">
                         <div className="cart-summary-row">
                           <span>Subtotal</span>
-                          <span>$8.48</span>
+                          <span>
+                            $
+                            {cartItems
+                              .reduce((total, item) => total + item.price * item.quantity, 0)
+                              .toFixed(2)}
+                          </span>
                         </div>
                         <div className="cart-summary-row">
                           <span>Shipping</span>
@@ -244,7 +310,12 @@ const Navbar = ({ onUserIconClick }) => {
                         </div>
                         <div className="cart-summary-total">
                           <span>Total</span>
-                          <span>$8.48</span>
+                          <span>
+                            $
+                            {cartItems
+                              .reduce((total, item) => total + item.price * item.quantity, 0)
+                              .toFixed(2)}
+                          </span>
                         </div>
                       </div>
                     </>
@@ -252,7 +323,10 @@ const Navbar = ({ onUserIconClick }) => {
                     <div className="empty-cart-state">
                       <div className="empty-cart-icon">
                         <svg width="64" height="64" viewBox="0 0 24 24">
-                          <path fill="currentColor" d="M19 7h-3V6a4 4 0 0 0-8 0v1H5a1 1 0 0 0-1 1v11a3 3 0 0 0 3 3h10a3 3 0 0 0 3-3V8a1 1 0 0 0-1-1zm-9-1a2 2 0 0 1 4 0v1h-4V6zm8 13a1 1 0 0 1-1 1H7a1 1 0 0 1-1-1V9h2v1a1 1 0 0 0 2 0V9h4v1a1 1 0 0 0 2 0V9h2v10z"/>
+                          <path
+                            fill="currentColor"
+                            d="M19 7h-3V6a4 4 0 0 0-8 0v1H5a1 1 0 0 0-1 1v11a3 3 0 0 0 3 3h10a3 3 0 0 0 3-3V8a1 1 0 0 0-1-1zm-9-1a2 2 0 0 1 4 0v1h-4V6zm8 13a1 1 0 0 1-1 1H7a1 1 0 0 1-1-1V9h2v1a1 1 0 0 0 2 0V9h4v1a1 1 0 0 0 2 0V9h2v10z"
+                          />
                         </svg>
                       </div>
                       <h3>Your cart is empty</h3>
@@ -263,13 +337,13 @@ const Navbar = ({ onUserIconClick }) => {
                     </div>
                   )}
                 </div>
-                
-                {true && (
+
+                {cartItems.length > 0 && (
                   <div className="cart-actions">
-                    <Link to="/cart" className="view-cart-btn" onClick={handleCartIconClick}>
+                    <Link to="#" className="view-cart-btn" data-action="view-cart" onClick={handleCartIconClick}>
                       View Cart
                     </Link>
-                    <Link to="/checkout" className="checkout-btn" onClick={handleCartIconClick}>
+                    <Link to="#" className="checkout-btn" data-action="view-cart" onClick={handleCartIconClick}>
                       Checkout
                     </Link>
                   </div>

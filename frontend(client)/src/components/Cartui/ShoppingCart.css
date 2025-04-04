@@ -29,6 +29,7 @@
     background-color: #fff;
     padding: 20px;
     border-radius: 8px;
+    min-height: 800px;
   }
   
   .cart-summary {
@@ -89,6 +90,7 @@
   
   .cart-total {
     text-align: center;
+    display: block;
   }
 
   .cart-total h1 {
@@ -145,6 +147,7 @@
   
   .payment-method label {
     display: block;
+    text-align: center;
     margin-bottom: 8px;
     font-size: 1rem;
     cursor: pointer;
