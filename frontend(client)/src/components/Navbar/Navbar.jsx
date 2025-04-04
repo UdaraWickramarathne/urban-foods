@@ -9,15 +9,27 @@ import PersonOutlineIcon from "@mui/icons-material/PersonOutline";
 import ShoppingBagOutlinedIcon from "@mui/icons-material/ShoppingBagOutlined";
 import storeContext from "../../context/storeContext";
 import { PRODUCT_IMAGES } from "../../context/constants";
+import ReviewPopup from "../CustomerFeedback/CustomerFeedbackAdd";
 
 const Navbar = ({ onUserIconClick }) => {
   const [menu, setMenu] = useState("home");
   const [dropdownVisible, setDropdownVisible] = useState(false);
   const [cartDropdownVisible, setCartDropdownVisible] = useState(false);
-  const [cartItems, setCartItems] = useState([]); // State to store cart items
+  const [cartItems, setCartItems] = useState([]);
   const { token, setToken, setRole, setUserId, role } = storeContext();
   const navigate = useNavigate();
   const [searchQuery, setSearchQuery] = useState("");
+
+  const [feedbackPopupVisible, setFeedbackPopupVisible] = useState(false);
+
+  const handleAddFeedbackClick = () => {
+    setFeedbackPopupVisible(true);
+    setDropdownVisible(false);
+  };
+
+  const handleFeedbackSubmit = (review) => {
+    console.log("Feedback submitted:", review);
+  };
 
   useEffect(() => {
     const savedToken = localStorage.getItem("token");
@@ -29,7 +41,6 @@ const Navbar = ({ onUserIconClick }) => {
       setRole(savedRole);
     }
 
-    // Fetch cart items if the user is logged in
     if (savedToken) {
       fetchCartItems();
     }
@@ -197,6 +208,12 @@ const Navbar = ({ onUserIconClick }) => {
                   <Link to="/orders" className="dropdown-item">
                     <span className="dropdown-icon">📦</span> My Orders
                   </Link>
+                  <Link
+                    className="dropdown-item"
+                    onClick={handleAddFeedbackClick}
+                  >
+                    <span className="dropdown-icon">📝</span> Add Feedback
+                  </Link>
                   <button className="dropdown-item logout" onClick={handleLogout}>
                     <span className="dropdown-icon">🚪</span> Logout
                   </button>
@@ -353,6 +370,13 @@ const Navbar = ({ onUserIconClick }) => {
           </div>
         </div>
       </div>
+      {feedbackPopupVisible && (
+        <ReviewPopup
+          isOpen={feedbackPopupVisible}
+          onClose={() => setFeedbackPopupVisible(false)}
+          onSubmit={handleFeedbackSubmit}
+        />
+      )}
     </nav>
   );
 };

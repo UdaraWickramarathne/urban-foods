@@ -40,7 +40,7 @@ const SupplierProducts = () => {
 
   const fetchProducts = async () => {
     try {
-      const supplierId = localStorage.getItem('userId'); // Get the logged-in user's ID
+      const supplierId = localStorage.getItem('userId');
       if (!supplierId) {
         console.error('Supplier ID is missing. Please log in again.');
         return;
