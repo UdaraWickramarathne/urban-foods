@@ -116,17 +116,7 @@
   transform: scale(1.1);
 }
 
-.product-tag {
-  position: absolute;
-  top: 15px;
-  left: 15px;
-  background-color: #ff4545;
-  color: white;
-  padding: 6px 12px;
-  border-radius: 20px;
-  font-size: 12px;
-  font-weight: 600;
-  z-index: 1;
+
 .product-tag {
   position: absolute;
   top: 15px;
@@ -273,14 +263,8 @@
 .product-actions {
   display: flex;
   gap: 10px;
-.product-actions {
-  display: flex;
-  gap: 10px;
 }
 
-.add-to-cart {
-  width: 100%;
-  background-color: #16a34a;
 .add-to-cart {
   width: 100%;
   background-color: #16a34a;
