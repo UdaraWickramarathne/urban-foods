@@ -72,6 +72,7 @@ CREATE TABLE orders_log (
     status       VARCHAR2(20),
     order_date   DATE,
     total_amount NUMBER(10,2),
+    address      VARCHAR(255),
     operation    VARCHAR2(10) CHECK (operation IN ('INSERT', 'UPDATE', 'DELETE')),
     changed_at   TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     changed_by   VARCHAR2(50)

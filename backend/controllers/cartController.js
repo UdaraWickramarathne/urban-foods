@@ -53,4 +53,18 @@ const removeFromCart = async (req, res) => {
   }
 };
 
-export default { getCartItems, addToCart, updateCartItem, removeFromCart };
+const clearCart = async (req, res) => {
+  try {
+    const result = await cartRepository.clearCart(req.params.userId);
+    return res.status(HttpStatus.OK).json(result);
+  } catch (error) {
+    console.error("Error clearing cart:", error.message);
+    return res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
+      success: false,
+      message: "Error clearing cart",
+    });
+  }
+}
+
+
+export default { getCartItems, addToCart, updateCartItem, removeFromCart, clearCart };

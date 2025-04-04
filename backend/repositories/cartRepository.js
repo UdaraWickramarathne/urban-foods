@@ -7,19 +7,22 @@ const getCartItems = async (userId) => {
   try {
     connection = await getConnection();
     const result = await connection.execute(
-      `SELECT c.product_id, c.quantity, p.name, p.image_url, p.price
+      `SELECT c.product_id, c.quantity, p.name, p.image_url, p.price, ctg.name
        FROM cart c
-       JOIN products p ON c.product_id = p.product_id
+       INNER JOIN products p ON c.product_id = p.product_id
+       INNER JOIN categories ctg ON p.category_id = ctg.category_id
        WHERE c.user_id = :userId`,
       { userId }
     );
-    return result.rows.map((row) => ({
+    const cartItems = result.rows.map((row) => ({
       productId: row[0],
       quantity: row[1],
       name: row[2],
       imageUrl: row[3],
       price: row[4],
+      category: row[5],
     }));
+    return cartItems;
   } catch (error) {
     console.error("Error retrieving cart items:", error.message);
     return [];
@@ -34,33 +37,17 @@ const addToCart = async (cartData) => {
   let connection;
   try {
     connection = await getConnection();
-    const existingItem = await connection.execute(
-      `SELECT * FROM cart WHERE product_id = :productId AND user_id = :userId`,
-      { productId: cartData.productId, userId: cartData.userId }
+
+    await connection.execute(
+      `INSERT INTO cart (user_id, product_id, quantity) VALUES (:userId, :productId, :quantity)`,
+      {
+        userId: cartData.userId,
+        productId: cartData.productId,
+        quantity: cartData.quantity,
+      },
+      { autoCommit: true }
     );
-    if (existingItem.rows.length > 0) {
-      await connection.execute(
-        `UPDATE cart SET quantity = :quantity WHERE product_id = :productId AND user_id = :userId`,
-        {
-          quantity: cartData.quantity,
-          productId: cartData.productId,
-          userId: cartData.userId,
-        }
-      );
-      await connection.commit();
-      return { success: true, message: "Cart item updated successfully" };
-    } else {
-      await connection.execute(
-        `INSERT INTO cart (user_id, product_id, quantity) VALUES (:userId, :productId, :quantity)`,
-        {
-          userId: cartData.userId,
-          productId: cartData.productId,
-          quantity: cartData.quantity,
-        },
-        { autoCommit: true }
-      );
-      return { success: true, message: "Item added to cart successfully" };
-    }
+    return { success: true, message: "Item added to cart successfully" };
   } catch (error) {
     console.error("Error adding item to cart:", error.message);
     return { success: false, message: "Error adding item to cart" };
@@ -111,4 +98,23 @@ const updateCartItem = async (userId, productId, quantity) => {
   }
 };
 
-export default { getCartItems, addToCart, removeFromCart, updateCartItem };
+const clearCart = async (userId) => {
+  let connection;
+  try {
+    connection = await getConnection();
+    await connection.execute(`DELETE FROM cart WHERE user_id = :userId`, {
+      userId,
+    });
+    await connection.commit();
+    return { success: true, message: "Cart cleared successfully" };
+  } catch (error) {
+    console.error("Error clearing cart:", error.message);
+    return { success: false, message: "Error clearing cart" };
+  } finally {
+    if (connection) {
+      await connection.close();
+    }
+  }
+}
+
+export default { getCartItems, addToCart, removeFromCart, updateCartItem, clearCart };

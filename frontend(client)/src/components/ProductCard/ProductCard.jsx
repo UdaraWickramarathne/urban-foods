@@ -1,90 +1,36 @@
-import React, { useState } from 'react';
+import React, { use, useContext, useEffect } from 'react';
 import './ProductCard.css';
 import { useNavigate } from 'react-router-dom';
 import { PRODUCT_IMAGES } from '../../context/constants';
-import axios from 'axios';
+import { CartContext } from '../../context/CartContext';
 
 const ProductCard = ({ product }) => {
-  const [isInCart, setIsInCart] = useState(false);
-  const [quantity, setQuantity] = useState(1);
-
   const navigate = useNavigate();
+  const { addToCart, removeFromCart, updateQuantity, getQuantity, cartItems } = useContext(CartContext);
+  
+  // Get current quantity from cart context
+  let quantity = getQuantity(product.productId);
+  let isInCart = quantity > 0;
 
-  const handleAddToCart = async() => {
-    setIsInCart(true);
-    try {
-      const response = await axios.post('http://localhost:5000/api/cart', {
-        userId: localStorage.getItem('userId'),
-        productId: product.productId,
-        quantity: quantity,
-      });
-      if (response.data.success) {
-        setIsInCart(true);
-        alert('Product added to cart successfully!');
-      } else {
-        alert('Failed to add product to cart.');
-      }
-    } catch (error) {
-      console.error('Error adding product to cart:', error);
-      alert('An error occurred while adding the product to the cart.');
-    }
+  useEffect(() => {
+    quantity = getQuantity(product.productId);
+    isInCart = quantity > 0;    
+  },[cartItems]);
+  
+
+  const handleAddToCart = () => {
+    addToCart(product);
   };
 
-  const increaseQuantity = async () => {
-    try {
-      const response = await axios.put(`http://localhost:5000/api/cart/${product.productId}`, {
-        userId: localStorage.getItem('userId'),
-        quantity: quantity + 1,
-      });
-  
-      if (response.data.success) {
-        setQuantity(quantity + 1);
-        alert('Quantity increased successfully!');
-      } else {
-        alert('Failed to increase quantity.');
-      }
-    } catch (error) {
-      console.error('Error increasing quantity:', error);
-      alert('An error occurred while increasing the quantity.');
-    }
+  const increaseQuantity = () => {
+    updateQuantity(product.productId, quantity + 1);
   };
-  
-  const decreaseQuantity = async () => {
+
+  const decreaseQuantity = () => {
     if (quantity > 1) {
-      try {
-        const response = await axios.put(`http://localhost:5000/api/cart/${product.productId}`, {
-          userId: localStorage.getItem('userId'),
-          quantity: quantity - 1,
-        });
-  
-        if (response.data.success) {
-          setQuantity(quantity - 1);
-          alert('Quantity decreased successfully!');
-        } else {
-          alert('Failed to decrease quantity.');
-        }
-      } catch (error) {
-        console.error('Error decreasing quantity:', error);
-        alert('An error occurred while decreasing the quantity.');
-      }
+      updateQuantity(product.productId, quantity - 1);
     } else {
-      try {
-        const response = await axios.delete(`http://localhost:5000/api/cart/${product.productId}`, {
-          data: {
-            userId: localStorage.getItem('userId'),
-          },
-        });
-  
-        if (response.data.success) {
-          setIsInCart(false);
-          alert('Product removed from cart successfully!');
-        } else {
-          alert('Failed to remove product from cart.');
-        }
-      } catch (error) {
-        console.error('Error removing product from cart:', error);
-        alert('An error occurred while removing the product from the cart.');
-      }
+      removeFromCart(product.productId);
     }
   };
 
