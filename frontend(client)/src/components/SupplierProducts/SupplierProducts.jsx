@@ -1,63 +1,100 @@
 import React, { useState, useEffect } from 'react';
+import axios from 'axios';
 import './SupplierProducts.css';
+import { PRODUCT_IMAGES } from '../../context/constants';
+import { useNotification } from '../../context/notificationContext';
 
 const SupplierProducts = () => {
-  // Sample product data (replace with API call)
-  const [products, setProducts] = useState([
-    { id: 1, name: 'Organic Tomatoes', category: 'Vegetables', price: 2.99, stock: 150, image: 'https://images.unsplash.com/photo-1546470427-f5e2c6ad26e8?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80' },
-    { id: 2, name: 'Fresh Apples', category: 'Fruits', price: 1.49, stock: 200, image: 'https://images.unsplash.com/photo-1568702846914-96b305d2aaeb?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80' },
-    { id: 3, name: 'Whole Grain Bread', category: 'Bakery', price: 3.25, stock: 75, image: 'https://images.unsplash.com/photo-1549931319-a545dcf3bc7c?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80' },
-    { id: 4, name: 'Chicken Breast', category: 'Meat', price: 5.99, stock: 50, image: 'https://images.unsplash.com/photo-1604503468506-a8da13d82791?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80' },
-  ]);
-  
+  const [products, setProducts] = useState([]);
+  const [categories, setCategories] = useState([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [showModal, setShowModal] = useState(false);
   const [modalType, setModalType] = useState('add');
   const [currentProduct, setCurrentProduct] = useState({
     name: '',
-    category: '',
+    categoryId: '',
     price: '',
     stock: '',
     image: ''
   });
   const [imagePreview, setImagePreview] = useState(null);
-  
-  // Filter products based on search term
-  const filteredProducts = products.filter(product => 
+  const  {showNotification} = useNotification()
+
+  const API_URL = 'http://localhost:5000/api/products';
+  const CATEGORY_API_URL = 'http://localhost:5000/api/category';
+
+  useEffect(() => {
+    
+    const fetchCategories = async () => {
+      try {
+        const response = await axios.get(CATEGORY_API_URL);
+        setCategories(response.data.data);
+      } catch (error) {
+        console.error('Error fetching categories:', error);
+      }
+    };
+
+    fetchProducts();
+    fetchCategories();
+  }, []);
+
+  const fetchProducts = async () => {
+    try {
+      const supplierId = localStorage.getItem('userId'); // Get the logged-in user's ID
+      if (!supplierId) {
+        console.error('Supplier ID is missing. Please log in again.');
+        return;
+      }
+
+      const response = await axios.get(`${API_URL}/supplier/${supplierId}`);
+      console.log('Fetched products:', response.data);
+      setProducts(response.data);
+    } catch (error) {
+      console.error('Error fetching products:', error);
+    }
+  };
+
+  const filteredProducts = products.filter(product =>
     product.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    product.category.toLowerCase().includes(searchTerm.toLowerCase())
+    product.category_name.toLowerCase().includes(searchTerm.toLowerCase())
   );
-  
-  // Handle edit product
+
   const handleEdit = (product) => {
     setCurrentProduct(product);
     setModalType('edit');
     setShowModal(true);
-    setImagePreview(product.image); // Set the image preview when editing
+    setImagePreview(product.image_url);
   };
-  
-  // Handle delete product
-  const handleDelete = (id) => {
+
+  const handleDelete = async (productId) => {
+    console.log(productId);
     if (window.confirm('Are you sure you want to delete this product?')) {
-      setProducts(products.filter(product => product.id !== id));
+      try {
+        await axios.delete(`${API_URL}/${productId}`);
+        setProducts(products.filter(product => product.product_id !== productId));
+        showNotification('Product deleted successfully', 'success');
+        fetchProducts();
+      } catch (error) {
+        console.error('Error deleting product:', error.response?.data || error.message);
+        alert('Failed to delete the product. Please try again.');
+      }
     }
   };
+
   
-  // Handle add new product
   const handleAdd = () => {
     setCurrentProduct({
       name: '',
-      category: '',
+      categoryId: '',
       price: '',
       stock: '',
       image: ''
     });
     setModalType('add');
     setShowModal(true);
-    setImagePreview(null); // Reset the image preview
+    setImagePreview(null);
   };
-  
-  // Handle form input changes
+
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setCurrentProduct({
@@ -65,8 +102,7 @@ const SupplierProducts = () => {
       [name]: value
     });
   };
-  
-  // Handle image upload
+
   const handleImageUpload = (e) => {
     const file = e.target.files[0];
     if (file) {
@@ -75,39 +111,67 @@ const SupplierProducts = () => {
         setImagePreview(reader.result);
         setCurrentProduct({
           ...currentProduct,
-          image: reader.result
+          image: file
         });
       };
       reader.readAsDataURL(file);
     }
   };
-  
-  // Handle form submission
-  const handleSubmit = (e) => {
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    if (modalType === 'add') {
-      const newProduct = {
-        ...currentProduct,
-        id: products.length + 1
-      };
-      setProducts([...products, newProduct]);
-    } else {
-      setProducts(products.map(product => 
-        product.id === currentProduct.id ? currentProduct : product
-      ));
-    }
-    setShowModal(false);
-  };
   
+    if (!currentProduct.name || !currentProduct.categoryId || !currentProduct.price || !currentProduct.stock) {
+      alert("Please fill out all required fields.");
+      return;
+    }
+  
+    const supplierId = localStorage.getItem('userId');
+  
+    if (!supplierId) {
+      alert("Supplier ID is missing. Please log in again.");
+      return;
+    }
+  
+    const formData = new FormData();
+    formData.append('name', currentProduct.name);
+    formData.append('categoryId', currentProduct.categoryId);
+    formData.append('price', currentProduct.price);
+    formData.append('stock', currentProduct.stock);
+    formData.append('supplierId', supplierId);
+  
+    if (currentProduct.image instanceof File) {
+      formData.append('image', currentProduct.image);
+    }
+  
+    try {
+      if (modalType === 'add') {
+        const response = await axios.post(API_URL, formData);
+        setProducts([...products, { ...currentProduct, product_id: response.data.productId }]);
+        showNotification('Product added successfully', 'success');
+      } else {
+        await axios.put(`${API_URL}/${currentProduct.productId}`, formData);
+        setProducts(products.map(product =>
+          product.product_id === currentProduct.product_id ? currentProduct : product
+        ));
+        showNotification('Update successfully', 'success');
+      }
+      setShowModal(false);
+      fetchProducts();
+    } catch (error) {
+      console.error('Error saving product:', error.response?.data || error.message);
+    }
+  };
+
   return (
     <div className="supplier-products-container">
       <div className="products-header">
         <h1>Manage Products</h1>
         <div className="actions-container">
           <div className="search-box">
-            <input 
-              type="text" 
-              placeholder="Search products..." 
+            <input
+              type="text"
+              placeholder="Search products..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
             />
@@ -117,17 +181,17 @@ const SupplierProducts = () => {
           </button>
         </div>
       </div>
-      
+
       <div className="products-grid">
         {filteredProducts.length > 0 ? (
           filteredProducts.map(product => (
-            <div className="product-card" key={product.id}>
+            <div className="product-card" key={product.product_id}>
               <div className="product-image">
-                <img src={product.image} alt={product.name} />
+                <img src={`${PRODUCT_IMAGES}/${product.imageUrl}`} alt={product.name} />
               </div>
               <div className="product-details">
                 <h3>{product.name}</h3>
-                <span className="product-category">{product.category}</span>
+                <span className="product-category">{product.category_name}</span>
                 <div className="product-info">
                   <p><strong>Price:</strong> ${product.price}</p>
                   <p><strong>Stock:</strong> {product.stock} units</p>
@@ -136,7 +200,7 @@ const SupplierProducts = () => {
                   <button className="edit-btn" onClick={() => handleEdit(product)}>
                     Edit
                   </button>
-                  <button className="delete-btn" onClick={() => handleDelete(product.id)}>
+                  <button className="delete-btn" onClick={() => handleDelete(product.productId)}>
                     Delete
                   </button>
                 </div>
@@ -149,7 +213,7 @@ const SupplierProducts = () => {
           </div>
         )}
       </div>
-      
+
       {showModal && (
         <div className="modal-backdrop">
           <div className="product-modal">
@@ -160,31 +224,37 @@ const SupplierProducts = () => {
             <form onSubmit={handleSubmit}>
               <div className="form-group">
                 <label>Product Name</label>
-                <input 
-                  type="text" 
-                  name="name" 
-                  value={currentProduct.name} 
+                <input
+                  type="text"
+                  name="name"
+                  value={currentProduct.name}
                   onChange={handleInputChange}
                   required
                 />
               </div>
               <div className="form-group">
                 <label>Category</label>
-                <input 
-                  type="text" 
-                  name="category" 
-                  value={currentProduct.category} 
+                <select
+                  name="categoryId"
+                  value={currentProduct.categoryId}
                   onChange={handleInputChange}
                   required
-                />
+                >
+                  <option value="">Select a category</option>
+                  {categories.map(category => (
+                    <option key={category.id} value={category.id}>
+                      {category.name}
+                    </option>
+                  ))}
+                </select>
               </div>
               <div className="form-row">
                 <div className="form-group">
                   <label>Price ($)</label>
-                  <input 
-                    type="number" 
-                    name="price" 
-                    value={currentProduct.price} 
+                  <input
+                    type="number"
+                    name="price"
+                    value={currentProduct.price}
                     onChange={handleInputChange}
                     min="0"
                     step="0.01"
@@ -193,10 +263,10 @@ const SupplierProducts = () => {
                 </div>
                 <div className="form-group">
                   <label>Stock</label>
-                  <input 
-                    type="number" 
-                    name="stock" 
-                    value={currentProduct.stock} 
+                  <input
+                    type="number"
+                    name="stock"
+                    value={currentProduct.stock}
                     onChange={handleInputChange}
                     min="0"
                     required
@@ -209,9 +279,9 @@ const SupplierProducts = () => {
                   {imagePreview ? (
                     <div className="image-preview">
                       <img src={imagePreview} alt="Product preview" />
-                      <button 
-                        type="button" 
-                        className="change-image-btn" 
+                      <button
+                        type="button"
+                        className="change-image-btn"
                         onClick={() => document.getElementById('image-upload').click()}
                       >
                         Change Image
@@ -223,8 +293,8 @@ const SupplierProducts = () => {
                       <p>Click to upload image</p>
                     </div>
                   )}
-                  <input 
-                    type="file" 
+                  <input
+                    type="file"
                     id="image-upload"
                     accept="image/*"
                     onChange={handleImageUpload}

@@ -271,7 +271,7 @@ const Register = ({ onClose, onSwitchToLogin }) => {
                       <h2>Register as Supplier</h2>
                       <input
                         type="text"
-                        placeholder="Enter your name"
+                        placeholder="Enter your business name"
                         value={businessName}
                         onChange={(e) => setbusinessName(e.target.value)}
                         className="input-field"
