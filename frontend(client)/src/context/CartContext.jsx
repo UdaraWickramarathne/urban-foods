@@ -17,7 +17,7 @@ export const CartProvider = ({ children }) => {
 
   const {showNotification} = useNotification();
 
-  const { getCartItems, handleAddToCart, updateCartItem, handleRemoveFromCart } = storeContext();
+  const { getCartItems, handleAddToCart, updateCartItem, handleRemoveFromCart, userId  } = storeContext();
 
   const fetchCartItems = async () => {
       const result = await getCartItems();
@@ -28,8 +28,10 @@ export const CartProvider = ({ children }) => {
 
   // Load cart from localStorage on initial render
   useEffect(() => {
-    fetchCartItems();
-  }, []);
+    if (userId) {
+      fetchCartItems();
+    }
+  }, [userId]);
 
   // Add product to cart
   const addToCart = async (product) => {
@@ -121,6 +123,7 @@ export const CartProvider = ({ children }) => {
     getCartTotal,
     getCartTotalPrice,
     fetchCartItems,
+    setCartItems
   };
 
   return (

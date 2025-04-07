@@ -1,7 +1,7 @@
 import axios from "axios";
 import { create } from "zustand";
 import HttpStatus from "../enums/httpsStatus";
-import { GET_CATEGORY, CUSTOMERS, SUPPLIERS, REQUEST_OTP, VALIDATE_OTP, USERS, PRODUCTS, ADMIN } from "./constants";
+import { GET_CATEGORY, CUSTOMERS, SUPPLIERS, REQUEST_OTP, VALIDATE_OTP, USERS, PRODUCTS, ADMIN, ORDERS } from "./constants";
 
 export const apiContext = create((set, get) => ({
   // Category API
@@ -331,5 +331,38 @@ export const apiContext = create((set, get) => ({
       return { success: false, message: "Failed to change trigger status" };
     }
   },
+  getOrders: async () => {
+    try {
+      const response = await axios.get(ORDERS);
+      return response.data;
+    } catch (error) {
+      if (error.response) {
+        return error.response.data;
+      }
+      return { success: false, message: "Failed to retrieve orders" };
+    }
+  },
+  updateOrderStatus: async (orderId, status) => {
+    try {
+      const response = await axios.patch(`${ORDERS}/${orderId}`, { status });
+      return response.data;
+    } catch (error) {
+      if (error.response) {
+        return error.response.data;
+      }
+      return { success: false, message: "Failed to update order status" };
+    }
+  },
+  getTotalSales: async () => {
+    try {
+      const response = await axios.get(`${ORDERS}/totalSales`);
+      return response.data;
+    } catch (error) {
+      if (error.response) {
+        return error.response.data;
+      }
+      return { success: false, message: "Failed to retrieve total sales" };
+    }
+  }
 
 }));
