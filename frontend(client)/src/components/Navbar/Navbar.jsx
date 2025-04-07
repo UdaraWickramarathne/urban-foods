@@ -34,7 +34,9 @@ const Navbar = ({ onUserIconClick }) => {
     console.log("Feedback submitted:", review);
   };
 
+
   const { cartItems, removeFromCart, updateQuantity, setCartItems} = useContext(CartContext);
+
 
 
   useEffect(() => {
