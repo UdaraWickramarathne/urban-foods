@@ -151,6 +151,7 @@ const searchProducts = async (keyword) => {
   }
 }
 
+
 const getProductsBySupplierId = async (supplierId) => {
   let connection;
   try {
