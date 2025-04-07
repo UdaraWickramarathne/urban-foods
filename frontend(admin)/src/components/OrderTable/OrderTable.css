@@ -1,0 +1,265 @@
+/* Order Table Styles */
+.status-dropdown {
+  padding: 8px 12px;
+  border-radius: 6px;
+  border: 1px solid #ddd;
+  font-size: 0.95rem;
+  width: 100%;
+  max-width: 180px;
+  cursor: pointer;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 12px center;
+  background-size: 12px;
+  padding-right: 30px;
+  outline: none;
+}
+
+.status-dropdown:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+.status-pending {
+  background-color: #fff8e6;
+  color: #e6a700;
+  border-color: #ffe0a3;
+}
+
+.status-complete {
+  background-color: #e6f7ee;
+  color: #0d8a59;
+  border-color: #b7e6d0;
+}
+
+.status-canceled {
+  background-color: #fbe9e9;
+  color: #d32f2f;
+  border-color: #f5c1c1;
+}
+
+/* Order Details Modal */
+.order-details-section,
+.order-items-section,
+.shipping-section {
+  margin-bottom: 20px;
+}
+
+.detail-row {
+  display: flex;
+  margin-bottom: 8px;
+}
+
+.detail-label {
+  font-weight: 500;
+  width: 120px;
+  color: #666;
+}
+
+.detail-value {
+  flex: 1;
+}
+
+.items-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 10px;
+}
+
+.items-table th,
+.items-table td {
+  padding: 10px;
+  text-align: left;
+  border-bottom: 1px solid #eee;
+}
+
+.items-table th {
+  font-weight: 500;
+  color: #666;
+}
+
+.items-table tfoot {
+  font-weight: 500;
+}
+
+.items-table .total-label {
+  text-align: right;
+  padding-right: 20px;
+}
+
+.items-table .grand-total {
+  font-weight: 700;
+  font-size: 1.1rem;
+}
+
+.grand-total td {
+  border-top: 2px solid #ddd;
+  padding-top: 12px;
+}
+
+.no-orders {
+  text-align: center;
+  color: #666;
+  padding: 30px 0;
+}
+
+/* Modern Modal Styles */
+.modern-modal {
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+  max-width: 650px;
+  width: 90%;
+}
+
+.modern-modal .modal-header {
+  background-color: #f9fafb;
+  padding: 18px 24px;
+  border-bottom: 1px solid #eaecef;
+}
+
+.modern-modal .modal-title-section {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.modern-modal .modal-title-section h3 {
+  margin: 0;
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #333;
+}
+
+.status-badge {
+  padding: 4px 10px;
+  border-radius: 50px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+.status-badge.status-pending {
+  background-color: #fff8e6;
+  color: #e6a700;
+}
+
+.status-badge.status-complete {
+  background-color: #e6f7ee;
+  color: #0d8a59;
+}
+
+.status-badge.status-canceled {
+  background-color: #fbe9e9;
+  color: #d32f2f;
+}
+
+.modern-modal .modal-body {
+  padding: 24px;
+}
+
+.order-summary-card {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.card-section {
+  padding: 20px;
+  background-color: #f9fafb;
+  border-radius: 8px;
+  border: 1px solid #eaecef;
+}
+
+.section-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 15px;
+}
+
+.section-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  background-color: #f0f0f0;
+  border-radius: 50%;
+  color: #555;
+}
+
+.section-header h4 {
+  margin: 0;
+  font-size: 1.1rem;
+  font-weight: 500;
+  color: #333;
+}
+
+.info-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 16px;
+}
+
+.info-item {
+  display: flex;
+  flex-direction: column;
+}
+
+.info-label {
+  font-size: 0.85rem;
+  color: #666;
+  margin-bottom: 4px;
+}
+
+.info-value {
+  font-size: 1rem;
+  color: #333;
+  font-weight: 500;
+}
+
+.info-value.highlight {
+  color: #0d8a59;
+  font-weight: 600;
+  font-size: 1.1rem;
+}
+
+.address-text {
+  margin: 0;
+  line-height: 1.5;
+  color: #333;
+}
+
+.status-update-container {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.status-label {
+  font-size: 0.9rem;
+  color: #666;
+}
+
+.status-hint {
+  margin-top: 4px;
+  font-size: 0.8rem;
+}
+
+.permission-hint {
+  color: #d32f2f;
+}
+
+.update-hint {
+  color: #666;
+}
+
+.modal-footer {
+  padding: 16px 24px;
+  background-color: #f9fafb;
+  border-top: 1px solid #eaecef;
+  display: flex;
+  justify-content: flex-end;
+}

@@ -289,6 +289,30 @@ const getProductsBySupplierId = async (req, res) => {
   }
 };
 
+const getTop10Products = async (req, res) => {
+  try {
+    const products = await productRepository.getTop10Products();
+  
+    if (products.length > 0) {
+      res.status(HttpStatus.OK).json({
+        success: true,
+        data: products,
+      });
+    } else {
+      res.status(HttpStatus.NOT_FOUND).json({
+        success: false,
+        message: "No products found",
+      });
+    }
+  } catch (error) {
+    console.error("Error in getTop10Products controller:", error.message);
+    res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
+      success: false,
+      message: "Error retrieving products",
+    });
+  }
+}
+
 export default {
   getAllProducts,
   getProductById,
@@ -297,4 +321,5 @@ export default {
   updateProduct,
   searchProducts,
   getProductsBySupplierId,
+  getTop10Products
 };

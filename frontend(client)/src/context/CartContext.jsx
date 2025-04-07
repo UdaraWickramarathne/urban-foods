@@ -31,7 +31,7 @@ export const CartProvider = ({ children }) => {
     if (userId) {
       fetchCartItems();
     }
-  }, []);
+  }, [userId]);
 
   // Add product to cart
   const addToCart = async (product) => {
@@ -123,6 +123,7 @@ export const CartProvider = ({ children }) => {
     getCartTotal,
     getCartTotalPrice,
     fetchCartItems,
+    setCartItems
   };
 
   return (

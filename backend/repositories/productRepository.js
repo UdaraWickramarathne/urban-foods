@@ -172,5 +172,51 @@ const getProductsBySupplierId = async (supplierId) => {
   }
 }
 
-export default { getAllProducts,getProductById, insertProduct, deleteProduct, updateProduct, searchProducts, getProductsBySupplierId };
+const getTop10Products = async () => {
+  let connection;
+  try {
+    connection = await getConnection();
+    const sql = `
+      DECLARE
+        top_products SYS_REFCURSOR;
+      BEGIN
+        top_products := get_top_10_products();
+        DBMS_SQL.RETURN_RESULT(top_products);
+      END;
+    `;
+
+    const result = await connection.execute(sql, [], { outFormat: oracledb.OUT_FORMAT_OBJECT });
+
+    const resultSet = result.implicitResults[0];
+    
+    if (!resultSet) {
+      return [];
+    }
+    
+    const products = resultSet.map(row => {
+      return {
+        productId: row.PRODUCT_ID,
+        name: row.NAME,
+        price: row.PRICE,
+        stock: row.STOCK,
+        imageUrl: row.IMAGE_URL,
+        supplierId: row.SUPPLIER_ID,
+        categoryId: row.CATEGORY_ID,
+        categoryName: row.CATEGORY_NAME
+      };
+    });
+    
+    return products;
+
+  } catch (error) {
+    console.error('Error fetching top 10 products:', error);
+    throw error;
+  } finally {
+    if (connection) {
+      await connection.close();
+    }
+  }
+}
+
+export default { getAllProducts,getProductById, insertProduct, deleteProduct, updateProduct, searchProducts, getProductsBySupplierId, getTop10Products };
 
