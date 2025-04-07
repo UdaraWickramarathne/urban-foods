@@ -1,7 +1,6 @@
 import React, { useState, useEffect, useContext } from "react";
 import "./Navbar.css";
 import { Link, useNavigate } from "react-router-dom";
-import axios from "axios";
 import TrueFocus from "../TrueFocus/TrueFocus";
 import Button from "@mui/material/Button";
 import LoginIcon from "@mui/icons-material/Login";
@@ -9,7 +8,6 @@ import PersonOutlineIcon from "@mui/icons-material/PersonOutline";
 import ShoppingBagOutlinedIcon from "@mui/icons-material/ShoppingBagOutlined";
 import storeContext from "../../context/storeContext";
 import { PRODUCT_IMAGES } from "../../context/constants";
-import ReviewPopup from "../CustomerFeedback/CustomerFeedbackAdd";
 import { CartContext } from "../../context/CartContext";
 
 
