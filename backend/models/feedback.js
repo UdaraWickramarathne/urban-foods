@@ -3,9 +3,9 @@ import mongoose from "mongoose";
 const feedbackSchema = new mongoose.Schema({
   using: { type: String },
   userId: { type: String, required: true },
-  reviewer: { type: String, required: true },
+  title: { type: String, required: true },
   rating: { type: Number, required: true, min: 1, max: 5 },
-  text: { type: String, required: true },
+  comment: { type: String, required: true },
   date: { type: String, required: true },
 });
 

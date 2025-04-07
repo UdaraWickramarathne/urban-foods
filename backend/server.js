@@ -9,9 +9,6 @@ import categoryRoutes from './routes/categoryRoutes.js';
 import adminRoutes from './routes/adminRoutes.js';
 import supplierRoutes from './routes/supplierRoutes.js';
 import feedbackRoutes from './routes/feedbackRoutes.js';
-
-import feedbackRoutes from './routes/feedbackRoutes.js';
-
 import paymentRoutes from './routes/paymentRoutes.js';
 import cartRoutes from './routes/cartRoutes.js';
 import bodyParser from "body-parser";
