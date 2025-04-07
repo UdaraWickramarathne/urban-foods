@@ -163,6 +163,12 @@ DROP TRIGGER trg_update_product_count
 
 DELETE FROM users WHERE user_id = 21
 
-SELECT 
+SELECT o.order_id, o.customer_id, o.status, o.order_date, o.total_amount, o.address,
+       (SELECT COUNT(DISTINCT oi.product_id) 
+        FROM OrderItems oi 
+        WHERE oi.order_id = o.order_id) AS product_type_count
+FROM Orders o
+WHERE o.customer_id = 89 ORDER BY o.order_date
 
-
+SELECT o.order_id, c.first_name || ' ' || c.last_name as customer_name, o.status, o.order_date, o.total_amount, o.address 
+FROM Orders o INNER JOIN Customers c ON o.customer_id = c.customer_id ORDER BY o.order_date DESC

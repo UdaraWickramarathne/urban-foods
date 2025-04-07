@@ -170,6 +170,28 @@ const storeContext = create((set, get) => ({
       }
       return { success: false, message: error.message };
     }
+  },
+  getOrderItems: async (orderId) => {
+    try {
+      const response = await axios.get(`${ORDERS}/${orderId}/items`);
+      return response.data;
+    } catch (error) {
+      if (error.response) {
+        return error.response.data;
+      }
+      return { success: false, message: error.message };
+    }
+  },
+  getTop10Products: async () => {
+    try {
+      const response = await axios.get(`${PRODUCTS}/top10`);
+      return response.data;
+    } catch (error) {
+      if (error.response) {
+        return error.response.data;
+      }
+      return { success: false, message: error.message };
+    }
   }
 }));
 

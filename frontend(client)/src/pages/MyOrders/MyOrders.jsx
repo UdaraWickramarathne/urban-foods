@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import './MyOrders.css';
 import storeContext from '../../context/storeContext';
 import { useNotification } from '../../context/notificationContext';
+import { PRODUCT_IMAGES } from '../../context/constants';
 
 const MyOrders = () => {
   const [orders, setOrders] = useState([]);
@@ -9,7 +10,7 @@ const MyOrders = () => {
   const [showModal, setShowModal] = useState(false);
   const [loading, setLoading] = useState(true);
 
-  const {getOrderByUserId} = storeContext();
+  const { getOrderByUserId, getOrderItems} = storeContext();
 
   const {showNotification} = useNotification();
 
@@ -35,8 +36,22 @@ const MyOrders = () => {
     fetchOrders();
   }, []);
 
-  const handleOrderClick = (order) => {
-    setSelectedOrder(order);
+  const  fetchOrderItems = async (orderId) => {
+    try {
+      const response = await getOrderItems(orderId); // Replace with your API endpoint
+      if(response.success){
+        setSelectedOrder(response.data);
+      }
+      else{
+        showNotification(response.message, "error");
+      }
+    } catch (error) {
+      showNotification("An error occurred while fetching order items", "error");
+    }
+  }
+
+  const handleOrderClick = async (order) => {
+    await fetchOrderItems(order.orderId);
     setShowModal(true);
   };
 
@@ -110,16 +125,16 @@ const MyOrders = () => {
             <div className="order-info">
               <div className="order-info-item">
                 <span className="info-label">Order ID:</span>
-                <span className="info-value">#{selectedOrder.id}</span>
+                <span className="info-value">#{selectedOrder.order.orderId}</span>
               </div>
               <div className="order-info-item">
                 <span className="info-label">Date:</span>
-                <span className="info-value">{formatDate(selectedOrder.date)}</span>
+                <span className="info-value">{formatDate(selectedOrder.order.orderDate)}</span>
               </div>
               <div className="order-info-item">
                 <span className="info-label">Status:</span>
-                <span className={`status-badge ${selectedOrder.status.toLowerCase()}`}>
-                  {selectedOrder.status}
+                <span className={`status-badge ${selectedOrder.order.status.toLowerCase()}`}>
+                  {selectedOrder.order.status}
                 </span>
               </div>
             </div>
@@ -127,19 +142,19 @@ const MyOrders = () => {
             <div className="order-items-list">
               <h3>Items</h3>
               {selectedOrder.items.map((item) => (
-                <div key={item.id} className="order-item">
+                <div key={item.orderItemId} className="order-item">
                   <div className="item-image">
-                    <img src={item.image} alt={item.name} />
+                    <img src={`${PRODUCT_IMAGES}/${item.productImage}`} alt={item.productName} />
                   </div>
                   <div className="item-details">
-                    <h4>{item.name}</h4>
+                    <h4>{item.productName}</h4>
                     <div className="item-meta">
                       <span>Qty: {item.quantity}</span>
-                      <span>${item.price.toFixed(2)}</span>
+                      <span>${item.unitPrice.toFixed(2)}</span>
                     </div>
                   </div>
                   <div className="item-total">
-                    ${(item.quantity * item.price).toFixed(2)}
+                    ${(item.quantity * item.unitPrice).toFixed(2)}
                   </div>
                 </div>
               ))}
@@ -148,30 +163,25 @@ const MyOrders = () => {
             <div className="order-summary">
               <div className="summary-row">
                 <span>Subtotal:</span>
-                <span>${selectedOrder.subtotal.toFixed(2)}</span>
+                <span>${selectedOrder.order.totalAmount.toFixed(2)}</span>
               </div>
               <div className="summary-row">
                 <span>Shipping:</span>
-                <span>${selectedOrder.shipping.toFixed(2)}</span>
+                <span>$0.00</span>
               </div>
               <div className="summary-row">
                 <span>Tax:</span>
-                <span>${selectedOrder.tax.toFixed(2)}</span>
+                <span>$0.00</span>
               </div>
               <div className="summary-row total">
                 <span>Total:</span>
-                <span>${selectedOrder.total.toFixed(2)}</span>
+                <span>${selectedOrder.order.totalAmount.toFixed(2)}</span>
               </div>
             </div>
             
             <div className="shipping-address">
               <h3>Shipping Address</h3>
-              <p>{selectedOrder.shippingAddress.name}</p>
-              <p>{selectedOrder.shippingAddress.street}</p>
-              <p>
-                {selectedOrder.shippingAddress.city}, {selectedOrder.shippingAddress.state} {selectedOrder.shippingAddress.zip}
-              </p>
-              <p>{selectedOrder.shippingAddress.country}</p>
+              <p>{selectedOrder.order.address}</p>
             </div>
             
             <div className="modal-actions">
