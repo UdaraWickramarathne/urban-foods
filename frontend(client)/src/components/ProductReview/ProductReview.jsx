@@ -1,8 +1,7 @@
 import React, { useState } from 'react';
-import axios from 'axios'; // Import axios for API calls
 import './ProductReview.css';
 
-const FeedbackPopup = ({ onClose, productId, onReviewAdded }) => {
+const FeedbackPopup = ({ onClose }) => {
   const [rating, setRating] = useState(0);
   const [title, setTitle] = useState('');
   const [comment, setComment] = useState('');
@@ -11,36 +10,10 @@ const FeedbackPopup = ({ onClose, productId, onReviewAdded }) => {
     setRating(value);
   };
 
-  const handleSubmit = async () => {
-    const userId = localStorage.getItem('userId'); // Get user ID from localStorage
-
-    if (!userId) {
-      console.error('User ID not found in localStorage');
-      return;
-    }
-
-    try {
-      const reviewData = {
-        productId,
-        userId,
-        title,
-        comment,
-        rating,
-        date: new Date().toISOString(), // Add the current date
-      };
-
-      const response = await axios.post('http://localhost:5000/api/review', reviewData);
-
-      if (response.data.success) {
-        console.log('Review added successfully:', response.data.Review);
-        onReviewAdded(response.data.Review); // Notify parent component about the new review
-        onClose(); // Close the popup
-      } else {
-        console.error('Failed to add review:', response.data.message);
-      }
-    } catch (error) {
-      console.error('Error submitting review:', error);
-    }
+  const handleSubmit = () => {
+    // You can send this data to your backend
+    console.log({ rating, title, comment });
+    onClose();
   };
 
   return (
