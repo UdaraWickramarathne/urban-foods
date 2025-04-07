@@ -11,7 +11,6 @@ const FeedbackPopup = ({ onClose }) => {
   };
 
   const handleSubmit = () => {
-    // You can send this data to your backend
     console.log({ rating, title, comment });
     onClose();
   };
