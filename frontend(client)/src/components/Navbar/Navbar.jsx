@@ -27,7 +27,7 @@ const Navbar = ({ onUserIconClick }) => {
     navigate("/feedback");
   };
 
-  const {cartItems, removeFromCart, updateQuantity} = useContext(CartContext);
+  const { cartItems, removeFromCart, updateQuantity, setCartItems} = useContext(CartContext);
 
 
   useEffect(() => {
@@ -67,7 +67,9 @@ const Navbar = ({ onUserIconClick }) => {
     setUserId("");
     setRole("");
     navigate("/");
+    setCartItems([]);
     setDropdownVisible(!dropdownVisible);
+    
   };
 
   const handleProfileClick = () => {

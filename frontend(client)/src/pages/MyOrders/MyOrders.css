@@ -132,12 +132,12 @@
   color: #3498db;
 }
 
-.order-status.complete {
+.order-status.completed {
   background-color: #e6ffe6;
   color: #27ae60;
 }
 
-.order-status.cancelled {
+.order-status.canceled {
   background-color: #ffe6e6;
   color: #e74c3c;
 }

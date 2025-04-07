@@ -1,10 +1,29 @@
-import React, { useState } from 'react';
+import React, { use, useEffect, useState } from 'react';
 import './DashboardContent.css';
+import { apiContext } from '../../context/apiContext';
 
 const DashboardContent = () => {
   const [products, setProducts] = useState([]);
   const [sales, setSales] = useState([]);
   const [customers, setCustomers] = useState([]);
+  const [totalSales, setTotalSales] = useState(0);
+
+  const { getTotalSales } = apiContext();
+
+  const fetchTotalSales = async () => {
+    try {
+      const response = await getTotalSales();
+      if (response.success) {
+        setTotalSales(response.totalSales);
+      }
+    } catch (error) {
+      console.error("Error fetching total sales:", error);
+    }
+  }
+
+  useEffect(() => {
+    fetchTotalSales();
+  },[])
 
   return (
     <div className="dashboard-content">
@@ -18,7 +37,7 @@ const DashboardContent = () => {
           </div>
           <div className="stat-content">
             <h3>Total Sales</h3>
-            <p className="stat-value">$24,780.50</p>
+            <p className="stat-value">${totalSales.toFixed(2)}</p>
             <p className="stat-change positive">+12.5% <span>vs last month</span></p>
           </div>
         </div>
