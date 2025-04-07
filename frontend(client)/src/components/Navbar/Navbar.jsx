@@ -9,6 +9,7 @@ import PersonOutlineIcon from "@mui/icons-material/PersonOutline";
 import ShoppingBagOutlinedIcon from "@mui/icons-material/ShoppingBagOutlined";
 import storeContext from "../../context/storeContext";
 import { PRODUCT_IMAGES } from "../../context/constants";
+import ReviewPopup from "../CustomerFeedback/CustomerFeedbackAdd";
 import { CartContext } from "../../context/CartContext";
 
 
@@ -27,7 +28,7 @@ const Navbar = ({ onUserIconClick }) => {
     navigate("/feedback");
   };
 
-  const { cartItems, removeFromCart, updateQuantity, setCartItems} = useContext(CartContext);
+  const {cartItems, removeFromCart, updateQuantity} = useContext(CartContext);
 
 
   useEffect(() => {
