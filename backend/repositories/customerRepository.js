@@ -1,5 +1,7 @@
 import { getConnection } from "../db/dbConnection.js";
 import Customer from "../models/customer.js";
+import oracledb from "oracledb";
+
 
 const getCustomerById = async (customerId) => {
   let connection;
@@ -14,6 +16,7 @@ const getCustomerById = async (customerId) => {
     if (result.rows.length === 0) {
       return null;
     }
+    
     return Customer.fromDbRow(result.rows[0], result.metaData);
   } catch (error) {
     console.error("Error getting customer by ID:", error);
@@ -65,7 +68,7 @@ const getAllCustomers = async () => {
     return result.rows.map((row) => Customer.fromDbRow(row, result.metaData));
   } catch (error) {
     console.error("Error getting all customers:", error);
-    return [];
+    return null;
   } finally {
     if (connection) {
       try {
@@ -129,15 +132,15 @@ const editCustomer = async (customerId, customerData) => {
   }
 };
 
-const deleteCustomer = async (customerId) => {
+const deleteCustomer = async (userId) => {
   let connection;
   try {
       connection = await getConnection();
       
       const result = await connection.execute(
-          `DELETE FROM customers WHERE customer_id = :customerId`,
+          `DELETE FROM users WHERE user_id = :userId`,
           {
-              customerId: customerId
+              userId: userId
           }
       );
 
@@ -170,4 +173,77 @@ const deleteCustomer = async (customerId) => {
   }
 };
 
-export default { getCustomerById, getCustomerByEmail, getAllCustomers,deleteCustomer,editCustomer };
+const getCustomersWithTotalSpends = async () => {
+  let connection;
+  try {
+    connection = await getConnection();
+    
+    await connection.execute(`BEGIN DBMS_OUTPUT.ENABLE(NULL); END;`);
+    
+    await connection.execute(`BEGIN GetAllCustomersWithTotalSpends; END;`);
+    
+    const outputResult = await connection.execute(`
+      DECLARE
+        v_line VARCHAR2(32767);
+        v_status INTEGER := 0;
+        v_output CLOB := '';
+      BEGIN
+        LOOP
+          DBMS_OUTPUT.GET_LINE(v_line, v_status);
+          EXIT WHEN v_status != 0;
+          v_output := v_output || v_line || CHR(10);
+        END LOOP;
+        :output := v_output;
+      END;
+    `, {
+      output: { dir: oracledb.BIND_OUT, type: oracledb.STRING, maxSize: 100000 }
+    });
+    
+    // Parse the output text into an array of customer objects
+    const outputText = outputResult.outBinds.output || '';
+    const customerLines = outputText.split('\n').filter(line => line.trim() !== '');
+    
+    const customers = customerLines.map(line => {
+      // Parse each line into components
+      const customerId = line.match(/Customer ID: (\d+)/)?.[1]?.trim() || '';
+      const firstName = line.match(/First Name: ([^,]+)/)?.[1]?.trim() || '';
+      const lastName = line.match(/Last Name: ([^,]+)/)?.[1]?.trim() || '';
+      const email = line.match(/Email: ([^,]+)/)?.[1]?.trim() || '';
+      const address = line.match(/Address: ([^,]+)/)?.[1]?.trim() || '';
+      const imageUrl = line.match(/Image Url: ([^,]+)/)?.[1]?.trim() || '';
+      const totalSpends = parseFloat(line.match(/Total Spends: ([^ ]+)/)?.[1] || '0');
+      
+      return {
+        customerId,
+        firstName,
+        lastName,
+        email,
+        address,
+        imageUrl,
+        totalSpends
+      };
+    });
+    
+    return {success: true, data: customers};
+  } catch (error) {
+    console.error("Error executing GetAllCustomersWithTotalSpends procedure:", error);
+    return {success: false, message: "Error executing procedure" };
+  } finally {
+    if (connection) {
+      try {
+        await connection.close();
+      } catch (err) {
+        console.error("Error closing connection:", err.message);
+      }
+    }
+  }
+};
+
+export default { 
+  getCustomerById, 
+  getCustomerByEmail, 
+  getAllCustomers, 
+  deleteCustomer, 
+  editCustomer,
+  getCustomersWithTotalSpends 
+};

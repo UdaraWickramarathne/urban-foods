@@ -6,12 +6,12 @@ const getAllProducts = async () => {
   let connection;
   try {
     connection = await getConnection();
-    const result = await connection.execute(`SELECT * FROM products`);
+    const result = await connection.execute(`SELECT p.*, c.name as category_name FROM products p INNER JOIN categories c ON p.category_id = c.category_id`);    
     const products = result.rows.map((row) => Product.fromDbRow(row, result.metaData));
-    return products;
+    return {success: true, data: products};
   } catch (error) {
     console.error("Error retrieving products:", error.message);
-    return [];
+    return {success: false, message: "Error retrieving products"};
   } finally {
     if (connection) {
       await connection.close();
@@ -77,9 +77,12 @@ const deleteProduct = async (productId) => {
   let connection;
   try {
     connection = await getConnection();
-    await connection.execute("DELETE FROM products WHERE product_id = :productId", {
+    const  result = await connection.execute("DELETE FROM products WHERE product_id = :productId", {
       productId,
     });
+    if (result.rowsAffected === 0) {
+      return { success: false, message: "Product not found" };
+    }
     await connection.commit();
     return { success: true, message: "Product deleted successfully" };
   } catch (error) {
@@ -149,4 +152,71 @@ const searchProducts = async (keyword) => {
 }
 
 
-export default { getAllProducts,getProductById, insertProduct, deleteProduct, updateProduct, searchProducts };
+const getProductsBySupplierId = async (supplierId) => {
+  let connection;
+  try {
+    connection = await getConnection();
+    const result = await connection.execute(
+      `SELECT * FROM products WHERE supplier_id = :supplierId`,
+      { supplierId }
+    );
+    const products = result.rows.map((row) => Product.fromDbRow(row, result.metaData));
+    return products;
+  } catch (error) {
+    console.error("Error retrieving products by supplier ID:", error.message);
+    return [];
+  } finally {
+    if (connection) {
+      await connection.close();
+    }
+  }
+}
+
+const getTop10Products = async () => {
+  let connection;
+  try {
+    connection = await getConnection();
+    const sql = `
+      DECLARE
+        top_products SYS_REFCURSOR;
+      BEGIN
+        top_products := get_top_10_products();
+        DBMS_SQL.RETURN_RESULT(top_products);
+      END;
+    `;
+
+    const result = await connection.execute(sql, [], { outFormat: oracledb.OUT_FORMAT_OBJECT });
+
+    const resultSet = result.implicitResults[0];
+    
+    if (!resultSet) {
+      return [];
+    }
+    
+    const products = resultSet.map(row => {
+      return {
+        productId: row.PRODUCT_ID,
+        name: row.NAME,
+        price: row.PRICE,
+        stock: row.STOCK,
+        imageUrl: row.IMAGE_URL,
+        supplierId: row.SUPPLIER_ID,
+        categoryId: row.CATEGORY_ID,
+        categoryName: row.CATEGORY_NAME
+      };
+    });
+    
+    return products;
+
+  } catch (error) {
+    console.error('Error fetching top 10 products:', error);
+    throw error;
+  } finally {
+    if (connection) {
+      await connection.close();
+    }
+  }
+}
+
+export default { getAllProducts,getProductById, insertProduct, deleteProduct, updateProduct, searchProducts, getProductsBySupplierId, getTop10Products };
+

@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from "react";
 import "./CategoryTable.css";
 import Button from "@mui/material/Button";
-import Snackbar from "@mui/material/Snackbar";
-import Alert from "@mui/material/Alert";
-import { adminContext } from "../../context/adminContext.js";
+import { apiContext } from "../../context/apiContext.js";
+import { hasPermission, PERMISSIONS } from "../../utils/permissions.js";
+import { useAuth } from "../../context/authContext.jsx";
+import { useNotification } from "../../context/notificationContext.jsx";
 
 const CategoryTable = ({ currentPage, setCurrentPage }) => {
   // State for modals
@@ -23,39 +24,14 @@ const CategoryTable = ({ currentPage, setCurrentPage }) => {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
   
-  // Snackbar state
-  const [snackbar, setSnackbar] = useState({
-    open: false,
-    message: "",
-    severity: "success", // 'success', 'error', 'warning', 'info'
-  });
-
   // Pagination settings
   const categoriesPerPage = 10;
   const [paginatedCategories, setPaginatedCategories] = useState([]);
   const totalPages = Math.ceil(categories.length / categoriesPerPage);
 
-  const { addCategory, getAllCategories, deleteCategory, updateCategory } = adminContext();
-
-  // Show notification function
-  const showNotification = (message, severity = "success") => {
-    setSnackbar({
-      open: true,
-      message,
-      severity,
-    });
-  };
-
-  // Handle snackbar close
-  const handleSnackbarClose = (event, reason) => {
-    if (reason === "clickaway") {
-      return;
-    }
-    setSnackbar({
-      ...snackbar,
-      open: false,
-    });
-  };
+  const { addCategory, getAllCategories, deleteCategory, updateCategory } = apiContext();
+  const { userPermissions, handlePermissionCheck } = useAuth();
+  const { showNotification } = useNotification();
 
   // Extract getCategories function outside useEffect so it can be reused
   const getCategories = async () => {
@@ -77,7 +53,7 @@ const CategoryTable = ({ currentPage, setCurrentPage }) => {
   // Fetch categories when component mounts
   useEffect(() => {
     getCategories();
-  }, [getAllCategories]);
+  }, []);
 
   // Update paginated categories when currentPage or categories change
   useEffect(() => {
@@ -281,7 +257,6 @@ const CategoryTable = ({ currentPage, setCurrentPage }) => {
     </svg>
   );
 
-  // Handle opening the modal with category details
   const handleDetailsClick = (category) => {
     setSelectedCategory(category);
     setEditedCategory({ ...category });
@@ -305,14 +280,14 @@ const CategoryTable = ({ currentPage, setCurrentPage }) => {
     if (!editedCategory) return;
 
     const result = await updateCategory(selectedCategory.id, editedCategory);
-    if (result) {
+    if (result.success) {
       setIsModalOpen(false);
       setSelectedCategory(null);
       setEditedCategory(null);
       showNotification(`Category "${editedCategory.name}" updated successfully`);
       await getCategories();
     }else{
-      showNotification(`Error deleting category: ${error.message || "Unknown error"}`, "error");
+      showNotification(`Error deleting category: ${result.message || "Unknown error"}`, "error");
     }
   };
 
@@ -365,15 +340,28 @@ const CategoryTable = ({ currentPage, setCurrentPage }) => {
   // Handle add new category
   const handleAddCategory = async () => {
     setIsAddingCategory(true);
+    if (!newCategory.name) {
+      showNotification("Category name is required", "error");
+      setIsAddingCategory(false);
+      return;
+    }
+    if (!newCategory.description) {
+      showNotification("Category description is required", "error");
+      setIsAddingCategory(false);
+      return;
+    }
 
     try {
+      // Validate new category data
+      
       const response = await addCategory(newCategory);
-      console.log(response);
-      // Refresh categories list after successful addition
-      await getCategories();
-      showNotification(`Category "${newCategory.name}" added successfully`);
+      if(response.success){
+        await getCategories();
+        showNotification(`Category "${newCategory.name}" added successfully`);
+      }else{
+        showNotification(`Failed to add category: ${response.message || "Unknown error"}`, "error");
+      }
     } catch (error) {
-      console.log("Failed to add category:", error);
       showNotification(`Failed to add category: ${error.message || "Unknown error"}`, "error");
     } finally {
       // Reset loading state and close modal
@@ -399,8 +387,8 @@ const CategoryTable = ({ currentPage, setCurrentPage }) => {
           <button className="btn btn-secondary">See all</button>
 
           <button
-            className="btn btn-primary btn-with-icon"
-            onClick={handleAddCategoryClick}
+            className={`btn btn-primary btn-with-icon ${!hasPermission(userPermissions, PERMISSIONS.CREATE_CATEGORIES) ? 'btn-disabled' : ''}`}
+            onClick={() => handlePermissionCheck(PERMISSIONS.CREATE_CATEGORIES, handleAddCategoryClick, "You don't have permission to add categories")}
           >
             <PlusIcon />
             Add category
@@ -579,8 +567,8 @@ const CategoryTable = ({ currentPage, setCurrentPage }) => {
             <div className="modal-footer">
               <div className="modal-actions">
                 <button
-                  className="btn btn-danger btn-with-icon"
-                  onClick={handleDeleteCategory}
+                  className={`btn btn-danger btn-with-icon ${!hasPermission(userPermissions, PERMISSIONS.DELETE_CATEGORIES) ? 'btn-disabled' : ''}`}
+                  onClick={()=> handlePermissionCheck(PERMISSIONS.DELETE_CATEGORIES, handleDeleteCategory, "You don't have permission to delete categories")}
                 >
                   <TrashIcon />
                   Delete Category
@@ -591,7 +579,14 @@ const CategoryTable = ({ currentPage, setCurrentPage }) => {
                 >
                   Cancel
                 </button>
-                <button className="btn btn-primary" onClick={handleSaveChanges}>
+                <button 
+                  className={`btn btn-primary ${!hasPermission(userPermissions, PERMISSIONS.EDIT_CATEGORIES) ? 'btn-disabled' : ''}`}
+                  onClick={() => handlePermissionCheck(
+                    PERMISSIONS.EDIT_CATEGORIES, 
+                    handleSaveChanges, 
+                    "You don't have permission to edit categories"
+                  )}
+                >
                   Save Changes
                 </button>
               </div>
@@ -682,23 +677,6 @@ const CategoryTable = ({ currentPage, setCurrentPage }) => {
           </div>
         </div>
       )}
-
-      {/* Snackbar for notifications */}
-      <Snackbar
-        open={snackbar.open}
-        autoHideDuration={6000}
-        onClose={handleSnackbarClose}
-        anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
-      >
-        <Alert 
-          onClose={handleSnackbarClose} 
-          severity={snackbar.severity}
-          variant="filled" 
-          sx={{ width: '100%' }}
-        >
-          {snackbar.message}
-        </Alert>
-      </Snackbar>
     </div>
   );
 };

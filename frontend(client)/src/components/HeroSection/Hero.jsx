@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import "./Hero.css"; // Make sure to create this CSS file
+import "./Hero.css";
 import milkImg from "../../assets/milk.png";
 import vegetablesImg from "../../assets/vegetables.png";
 import eggImg from "../../assets/egg.png";
@@ -7,6 +7,7 @@ import breadImg from "../../assets/bread.png";
 import tomato from "../../assets/tomato.png";
 import fruits from "../../assets/fruits.png";
 import TrueFocus from "../TrueFocus/TrueFocus";
+import { FaShoppingCart, FaSearch, FaArrowRight } from 'react-icons/fa';
 
 const Hero = () => {
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
@@ -45,23 +46,54 @@ const Hero = () => {
   }, [sliderImages.length]);
 
   return (
-    <div className="hero-container">
+    <section className="hero-container">
+      {/* Promotional banner */}
+      <div className="promo-banner">
+        <span>🎉 FREE delivery on orders over $50! Limited time offer</span>
+      </div>
+      
       {/* Left section with text */}
       <div className="hero-text-section">
-        <h2 className="hero-title">
-        Urban Bites: Fresh Flavors, Fast Delivery
-        </h2>
+        <div className="hero-badge">Premium Quality</div>
+        <h1 className="hero-title">
+          Fresh Local Produce <span className="highlight">Delivered Daily</span>
+        </h1>
         <p className="hero-description">
           Connect directly with local farmers and artisans. Experience the
           freshest produce, dairy, and handcrafted goods delivered straight to
           your doorstep.
         </p>
-        <button className="hero-button">Explore Products</button>
+        
+        <div className="hero-cta-group">
+          <button className="hero-button primary">
+            <FaShoppingCart className="button-icon" /> Shop Now
+          </button>
+          <button className="hero-button secondary">
+            Browse Categories <FaArrowRight className="button-icon" />
+          </button>
+        </div>
+        
+        <div className="hero-search">
+          <input type="text" placeholder="Search for fresh products..." />
+          <button className="search-button"><FaSearch /></button>
+        </div>
+        
+        <div className="trust-badges">
+          <span>✓ Fresh Guarantee</span>
+          <span>✓ Local Sourcing</span>
+          <span>✓ Same-Day Delivery</span>
+        </div>
       </div>
 
       {/* Right section with image slider */}
       <div className="hero-image-section">
         <div className="image-slider-container">
+          {/* Sale badge */}
+          <div className="sale-badge">
+            <span>30% OFF</span>
+            <span className="small">Selected Items</span>
+          </div>
+          
           {/* Circle background that changes color */}
           <div
             className="circle-background"
@@ -99,7 +131,13 @@ const Hero = () => {
           </div>
         </div>
       </div>
-    </div>
+      
+      {/* Scroll indicator */}
+      <div className="scroll-indicator">
+        <span>Scroll for more</span>
+        <div className="scroll-arrow"></div>
+      </div>
+    </section>
   );
 };
 

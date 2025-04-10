@@ -1,12 +1,11 @@
 .profile-container {
     width: 100%;
     height: calc(100vh - 60px); 
-    background: #fff;
+    background: transparent;
     padding: 30px;
     display: flex;
     flex-direction: column;
     justify-content: center;
-    margin-top: 60px; 
     box-shadow: 0px 5px 15px rgba(0, 0, 0, 0.1);
     border-radius: 15px;
   }
@@ -22,15 +21,38 @@
   .profile-info {
     display: flex;
     align-items: center;
+    gap: 20px;
+  }
+  
+  .profile-pic-container {
+    position: relative;
+    display: inline-block;
+    border-radius: 50%;
+    border: 5px solid #0c6510;
+    overflow: hidden;
+    box-shadow: 0px 5px 15px rgba(0, 0, 0, 0.1);
   }
   
   .profile-pic {
-    width: 120px;
-    height: 120px;
+    width: 180px;
+    height: 180px;
     border-radius: 50%;
-    margin-right: 20px;
-    border: 3px solid #007bff;
-    object-fit: cover; 
+    object-fit: cover;
+  }
+  
+  .edit-icon {
+    position: absolute;
+    bottom: 20px;
+    right: 40px;
+    background-color: #fff;
+    border-radius: 50%;
+    padding: 5px;
+    cursor: pointer;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  }
+  
+  .edit-icon:hover {
+    background-color: #f0f0f0;
   }
   
   .email {
@@ -39,7 +61,7 @@
   }
   
   .edit-btn {
-    background-color: #007bff;
+    background-color: #28a745;
     color: white;
     border: none;
     padding: 12px 20px;
@@ -50,7 +72,7 @@
   }
   
   .edit-btn:hover {
-    background-color: #0056b3;
+    background-color: #28a745;
   }
   
   .profile-form {
@@ -190,7 +212,7 @@
       width: 100%;
       max-width: 600px;
       display: flex;
-      justify-content: space-between;
+
       align-items: center;
       padding-bottom: 20px;
     }
@@ -212,21 +234,6 @@
     .email {
       color: gray;
       font-size: 16px;
-    }
-    
-    .edit-btn {
-      background-color: #007bff;
-      color: white;
-      border: none;
-      padding: 12px 20px;
-      font-size: 16px;
-      border-radius: 8px;
-      cursor: pointer;
-      transition: 0.3s;
-    }
-    
-    .edit-btn:hover {
-      background-color: #0056b3;
     }
     
     .profile-form {
@@ -327,3 +334,26 @@
     background-color: #218838;
   }
   
+  .button-group {
+    display: flex;
+    gap: 10px; 
+  }
+  
+  .edit-btn:hover {
+    background-color: #0fd316;
+  }
+  
+  .delete-btn {
+    background-color: #e53e3e;
+    color: white;
+    border: none;
+    padding: 12px 20px;
+    font-size: 16px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: 0.3s;
+  }
+  
+  .delete-btn:hover {
+    background-color: #c53030;
+  }

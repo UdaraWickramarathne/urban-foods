@@ -72,7 +72,7 @@
     padding: 25px;
     border-radius: 8px;
     width: 500px;
-    max-width: 90%;
+    max-width: 100%;
   }
   
   .form-group {
@@ -248,8 +248,36 @@
     padding: 16px 20px;
     border-top: 1px solid #e2e8f0;
     display: flex;
-    justify-content: flex-end;
     gap: 12px;
+    justify-content: flex-end;
+  }
+  
+  /* Delete modal footer specific styles */
+  .delete-modal .modal-footer {
+    justify-content: flex-end;
+    margin-top: 16px;
+  }
+
+  /* Delete modal footer specific styles - with stronger specificity */
+  .delete-modal .modal-footer,
+  .delete-modal .modal-actions,
+  .modal-container .delete-warning + .modal-footer,
+  .modal-content .delete-warning + .modal-actions {
+    display: flex !important;
+    flex-direction: row !important;
+    justify-content: flex-end !important;
+    width: 100% !important;
+    text-align: right !important;
+    margin-top: 16px !important;
+  }
+
+  /* Make sure buttons within the delete modal footer have appropriate spacing */
+  .delete-modal .modal-footer button,
+  .delete-modal .modal-actions button,
+  .modal-container .delete-warning + .modal-footer button,
+  .modal-content .delete-warning + .modal-actions button {
+    margin-left: 10px !important;
+    margin-right: 0 !important;
   }
   
   /* Form styles */
@@ -514,4 +542,8 @@
 
 .modal-content::-webkit-scrollbar-thumb:hover {
   background: #a0a0a0;
+}
+.btn-disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
 }

@@ -3,7 +3,7 @@ import "./OfferSection.css";
 
 const OfferSection = () => {
   const calculateTimeLeft = () => {
-    const difference = new Date("2025-03-31T23:59:59") - new Date();
+    const difference = new Date("2025-04-31T23:59:59") - new Date();
     let timeLeft = {};
 
     if (difference > 0) {

@@ -6,7 +6,8 @@ class Product {
     name,
     price,
     stock,
-    imageUrl
+    imageUrl,
+    categoryName
   ) {
     this.productId = productId;
     this.supplierId = supplierId;
@@ -15,6 +16,7 @@ class Product {
     this.price = price;
     this.stock = stock;
     this.imageUrl = imageUrl;
+    this.categoryName = categoryName;
   }
 
   static fromDbRow(row, metadata) {
@@ -28,6 +30,7 @@ class Product {
     let price = null;
     let stock = null;
     let imageUrl = null;
+    let categoryName = null;
 
     metadata.forEach((meta, index) => {
       switch (meta.name) {
@@ -52,6 +55,9 @@ class Product {
         case "IMAGE_URL":
           imageUrl = row[index];
           break;
+        case "CATEGORY_NAME":
+          categoryName = row[index];
+          break;
       }
     });
 
@@ -62,7 +68,8 @@ class Product {
       name,
       price,
       stock,
-      imageUrl
+      imageUrl,
+      categoryName
     );
   }
 }

@@ -6,10 +6,15 @@ import Homepage from './pages/Homepage/Homepage';
 import LoginPage from './components/AuthUi/Login';
 import Register from './components/AuthUi/Register';
 import ExplorePage from "./components/ExploreMenu/ExploreMenu.jsx";
-import ShoppingCart from "./components/Cartui/ShoppingCart";
+import ShoppingCart from "./components/Cart/ShoppingCart.jsx";
 import PaymentSuccess from "./pages/PaymentSuccess/PaymentSuccess";
-import ProductDetails from "./pages/ProductDtails/ProductDtails";
-
+import Profile from './components/ProfileUi/Profile.jsx';
+import About from './components/About/About.jsx';
+import Dashboard from './pages/Dashboard/Dashboard.jsx';
+import { ContextWrapper } from './context/contextWrapper';
+import ProductDisplay from './pages/ProductDisplay/ProductDisplay.jsx';
+import ProductDetailPage from './pages/ProductDetails/ProductDetailPage.jsx';
+import MyOrders from './pages/MyOrders/MyOrders.jsx';
 
 function App() {
   const [showLogin, setShowLogin] = useState(false);
@@ -39,7 +44,7 @@ function App() {
   };
 
   return (
-    <>
+    <ContextWrapper>
       <Navbar onUserIconClick={handleUserIconClick} />
       {showLogin && (
         <LoginPage onClose={handleCloseLogin} onSwitchToRegister={handleSwitchToRegister} />
@@ -49,12 +54,16 @@ function App() {
       )}
       <Routes>
         <Route path="/" element={<Homepage />} />
-        <Route path="/explore" element={<ExplorePage />} />
+        <Route path="/shop" element={<ProductDisplay />} />
         <Route path="/cart" element={<ShoppingCart />} />
         <Route path="/payment-success" element={<PaymentSuccess />} />
-        <Route path="/product/:id" element={<ProductDetails />} />
+        <Route path="/product/:id" element={<ProductDetailPage />} />
+        <Route path="/profile"  element={<Profile />} />
+        <Route path="/about"  element={<About />} />
+        <Route path='/dashboard' element={<Dashboard/>}/>
+        <Route path="/orders" element={<MyOrders />} />
       </Routes>
-    </>
+    </ContextWrapper>
   );
 }
 

@@ -1,91 +1,11 @@
-import React, { useState } from "react";
+import React, { use, useEffect, useState } from "react";
 import "./SQLTriggerTable.css";
+import { apiContext } from "../../context/apiContext";
+import { useNotification } from "../../context/notificationContext";
 
 const SQLTriggerTable = () => {
-  // Sample trigger data
-  const [triggers, setTriggers] = useState([
-    {
-      id: 1,
-      name: "tr_ProductUpdate",
-      table: "Products",
-      event: "UPDATE",
-      timing: "AFTER",
-      description: "Updates product modification date when a product is updated",
-      status: "Active",
-      createdDate: "2023-09-15",
-    },
-    {
-      id: 2,
-      name: "tr_OrderInsert",
-      table: "Orders",
-      event: "INSERT",
-      timing: "AFTER",
-      description: "Updates inventory when a new order is placed",
-      status: "Active",
-      createdDate: "2023-09-10",
-    },
-    {
-      id: 3,
-      name: "tr_CustomerDelete",
-      table: "Customers",
-      event: "DELETE",
-      timing: "BEFORE",
-      description: "Archives customer data before deletion",
-      status: "Disabled",
-      createdDate: "2023-08-22",
-    },
-    {
-      id: 4,
-      name: "tr_InventoryCheck",
-      table: "Inventory",
-      event: "UPDATE",
-      timing: "BEFORE",
-      description: "Validates inventory changes before applying updates",
-      status: "Active",
-      createdDate: "2023-10-05",
-    },
-    {
-      id: 5,
-      name: "tr_SalesReport",
-      table: "Sales",
-      event: "INSERT",
-      timing: "AFTER",
-      description: "Updates sales analytics after new sales record",
-      status: "Active",
-      createdDate: "2023-09-30",
-    },
-    {
-      id: 6,
-      name: "tr_UserAudit",
-      table: "Users",
-      event: "INSERT,UPDATE,DELETE",
-      timing: "AFTER",
-      description: "Records all changes to user accounts in audit log",
-      status: "Active",
-      createdDate: "2023-08-15",
-    },
-    {
-      id: 7,
-      name: "tr_CategoryValidate",
-      table: "Categories",
-      event: "INSERT,UPDATE",
-      timing: "BEFORE",
-      description: "Validates category data before saving",
-      status: "Disabled",
-      createdDate: "2023-10-12",
-    },
-    {
-      id: 8,
-      name: "tr_PaymentProcess",
-      table: "Payments",
-      event: "INSERT",
-      timing: "AFTER",
-      description: "Processes payment confirmations and updates order status",
-      status: "Active",
-      createdDate: "2023-09-18",
-    },
-  ]);
-
+  // Sample trigger data with updated structure
+  const [triggers, setTriggers] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [searchTerm, setSearchTerm] = useState("");
   const [filterStatus, setFilterStatus] = useState("All");
@@ -94,32 +14,44 @@ const SQLTriggerTable = () => {
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [isLogModalOpen, setIsLogModalOpen] = useState(false);
+  const [logData, setLogData] = useState({ columns: [], rows: [] });
   const [newTrigger, setNewTrigger] = useState({
-    name: "",
-    table: "",
-    event: "INSERT",
-    timing: "AFTER",
-    description: "",
+    triggerName: "",
+    tableName: "",
+    triggeringEvent: "INSERT",
+    triggerType: "AFTER",
     status: "Active",
-    createdDate: new Date().toISOString().split('T')[0]
+    triggerBody: "",
   });
   const [editedTrigger, setEditedTrigger] = useState(null);
 
+  const { getAllTriggers, getLogDetails, dropTrigger, changeTriggerStatus } =
+    apiContext();
+  const { showNotification } = useNotification();
+
   // Pagination logic
-  const itemsPerPage = 5;
+  const itemsPerPage = 10;
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+
+  useEffect(() => {
+    fetchTriggers();
+  }, []);
 
   // Filter triggers based on search and status filter
   const filteredTriggers = triggers.filter(
     (trigger) =>
-      (trigger.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        trigger.table.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        trigger.description.toLowerCase().includes(searchTerm.toLowerCase())) &&
+      (trigger.triggerName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        trigger.tableName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        trigger.triggerBody.toLowerCase().includes(searchTerm.toLowerCase())) &&
       (filterStatus === "All" || trigger.status === filterStatus)
   );
 
-  const currentTriggers = filteredTriggers.slice(indexOfFirstItem, indexOfLastItem);
+  const currentTriggers = filteredTriggers.slice(
+    indexOfFirstItem,
+    indexOfLastItem
+  );
   const totalPages = Math.ceil(filteredTriggers.length / itemsPerPage);
 
   // Event handlers
@@ -144,7 +76,7 @@ const SQLTriggerTable = () => {
 
   const handleEditTrigger = (trigger) => {
     setSelectedTrigger(trigger);
-    setEditedTrigger({...trigger});
+    setEditedTrigger({ ...trigger });
     setIsEditModalOpen(true);
   };
 
@@ -157,17 +89,27 @@ const SQLTriggerTable = () => {
     setIsDeleteModalOpen(true);
   };
 
-  const handleStatusToggle = (triggerId) => {
-    setTriggers(
-      triggers.map((trigger) =>
-        trigger.id === triggerId
-          ? {
-              ...trigger,
-              status: trigger.status === "Active" ? "Disabled" : "Active",
-            }
-          : trigger
-      )
+  const fetchTriggers = async () => {
+    const result = await getAllTriggers();
+    if (result.success) {
+      setTriggers(result.data);
+    } else {
+      alert("Failed to fetch triggers.");
+    }
+  };
+
+  const handleStatusToggle = async (trigger) => {
+    const updatedStatus = trigger.status === "ENABLED" ? "DISABLE" : "ENABLE";
+    const result = await changeTriggerStatus(
+      trigger.triggerName,
+      updatedStatus
     );
+    if (result.success) {
+      showNotification(result.message, "success");
+      await fetchTriggers();
+    } else {
+      showNotification(result.message, "error");
+    }
   };
 
   const closeModal = () => {
@@ -175,74 +117,148 @@ const SQLTriggerTable = () => {
     setIsEditModalOpen(false);
     setIsAddModalOpen(false);
     setIsDeleteModalOpen(false);
+    setIsLogModalOpen(false);
     setSelectedTrigger(null);
     setEditedTrigger(null);
   };
 
   const handleInputChange = (e, formType) => {
     const { name, value } = e.target;
-    if (formType === 'add') {
+    if (formType === "add") {
       setNewTrigger({ ...newTrigger, [name]: value });
-    } else if (formType === 'edit') {
+    } else if (formType === "edit") {
       setEditedTrigger({ ...editedTrigger, [name]: value });
     }
   };
 
   const submitNewTrigger = () => {
     // Validate form data
-    if (!newTrigger.name || !newTrigger.table || !newTrigger.description) {
+    if (
+      !newTrigger.triggerName ||
+      !newTrigger.tableName ||
+      !newTrigger.triggerBody
+    ) {
       alert("Please fill all required fields");
       return;
     }
 
     // Create new trigger with unique ID
-    const newId = Math.max(...triggers.map(trigger => trigger.id)) + 1;
+    const newId =
+      triggers.length > 0
+        ? Math.max(...triggers.map((trigger) => trigger.id)) + 1
+        : 1;
     const triggerToAdd = {
       ...newTrigger,
-      id: newId
+      id: newId,
     };
 
     // Add to triggers list
     setTriggers([...triggers, triggerToAdd]);
     closeModal();
-    
+
     // Reset form
     setNewTrigger({
-      name: "",
-      table: "",
-      event: "INSERT",
-      timing: "AFTER",
-      description: "",
+      triggerName: "",
+      tableName: "",
+      triggeringEvent: "INSERT",
+      triggerType: "AFTER",
       status: "Active",
-      createdDate: new Date().toISOString().split('T')[0]
+      triggerBody: "",
     });
   };
 
   const submitEditTrigger = () => {
     // Validate form data
-    if (!editedTrigger.name || !editedTrigger.table || !editedTrigger.description) {
+    if (
+      !editedTrigger.triggerName ||
+      !editedTrigger.tableName ||
+      !editedTrigger.triggerBody
+    ) {
       alert("Please fill all required fields");
       return;
     }
 
     // Update trigger in the list
     setTriggers(
-      triggers.map(trigger => 
+      triggers.map((trigger) =>
         trigger.id === editedTrigger.id ? editedTrigger : trigger
       )
     );
     closeModal();
   };
 
-  const confirmDeleteTrigger = () => {
+  const confirmDeleteTrigger = async () => {
     // Remove trigger from list
     if (selectedTrigger) {
-      setTriggers(triggers.filter(trigger => trigger.id !== selectedTrigger.id));
-      closeModal();
+      const result = await dropTrigger(selectedTrigger.triggerName);
+      if (result.success) {
+        showNotification(result.message, "success");
+        await fetchTriggers();
+        closeModal();
+      } else {
+        showNotification(result.message, "error");
+        closeModal();
+      }
     }
   };
 
-  // Icons
+  const handleViewLogs = async (trigger) => {
+    setSelectedTrigger(trigger);
+    setIsLogModalOpen(true);
+    await fetchLogData(trigger);
+  };
+
+  const fetchLogData = async (trigger) => {
+    try {
+      // Set default empty data while loading
+      setLogData({ columns: [], rows: [] });
+
+      // Call the API to get real log data
+      const result = await getLogDetails(trigger);
+
+      if (result.success) {
+        setLogData({
+          columns: result.columns,
+          rows: result.rows,
+        });
+      } else {
+        alert("Failed to fetch log data.");
+        setLogData({
+          columns: ["No Data Available"],
+          rows: [],
+        });
+      }
+    } catch (error) {
+      console.error("Error fetching log data:", error);
+      setLogData({
+        columns: ["Error"],
+        rows: [],
+      });
+    }
+  };
+
+  const generateSQLCode = (trigger) => {
+    if (trigger.triggerBody && trigger.triggerBody.trim()) {
+      return trigger.triggerBody;
+    }
+
+    let code = `CREATE TRIGGER [${trigger.triggerName}]\nON [dbo].[${trigger.tableName}]\n${trigger.triggerType} ${trigger.triggeringEvent}\nAS\nBEGIN\n    SET NOCOUNT ON;\n    \n    -- Trigger logic here\n`;
+
+    if (trigger.triggeringEvent.includes("UPDATE")) {
+      code +=
+        "    -- For example, when data is updated\n    UPDATE dbo.AuditLog SET LastModified = GETDATE() WHERE ID IN (SELECT ID FROM inserted);";
+    } else if (trigger.triggeringEvent.includes("INSERT")) {
+      code +=
+        "    -- For example, when new data is inserted\n    INSERT INTO dbo.AuditLog (TableName, RecordID, Action, ChangedBy)\n    SELECT '${trigger.tableName}', i.ID, 'INSERT', CURRENT_USER\n    FROM inserted i;";
+    } else if (trigger.triggeringEvent.includes("DELETE")) {
+      code +=
+        "    -- For example, when data is deleted\n    INSERT INTO dbo.Archived_Data (ID, TableName, Data, DeletedOn)\n    SELECT d.ID, '${trigger.tableName}', (SELECT * FROM deleted FOR XML AUTO), GETDATE()\n    FROM deleted d;";
+    }
+
+    code += "\nEND";
+    return code;
+  };
+
   const EditIcon = () => (
     <svg
       width="18"
@@ -281,7 +297,7 @@ const SQLTriggerTable = () => {
       height="18"
       viewBox="0 0 24 24"
       fill="none"
-      stroke="currentColor"
+      stroke="#bd343e"
       strokeWidth="2"
       strokeLinecap="round"
       strokeLinejoin="round"
@@ -307,27 +323,28 @@ const SQLTriggerTable = () => {
     </svg>
   );
 
-  const StatusBadge = ({ status }) => {
-    const className = `status-badge status-${status.toLowerCase()}`;
-    return <span className={className}>{status}</span>;
-  };
+  const LogIcon = () => (
+    <svg
+      width="18"
+      height="18"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
+      <path d="M14 3v4a1 1 0 0 0 1 1h4"></path>
+      <path d="M17 21H7a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h7l5 5v11a2 2 0 0 1-2 2z"></path>
+      <line x1="9" y1="9" x2="10" y2="9"></line>
+      <line x1="9" y1="13" x2="15" y2="13"></line>
+      <line x1="9" y1="17" x2="15" y2="17"></line>
+    </svg>
+  );
 
-  // New function to generate sample SQL code
-  const generateSQLCode = (trigger) => {
-    let code = `CREATE TRIGGER [${trigger.name}]\nON [dbo].[${trigger.table}]\n${trigger.timing} ${trigger.event}\nAS\nBEGIN\n    SET NOCOUNT ON;\n    \n    -- `;
-    
-    if (trigger.description.includes("modification date")) {
-      code += "Update last modified date\n    UPDATE dbo.Products SET LastModified = GETDATE() WHERE ID IN (SELECT ID FROM inserted);";
-    } else if (trigger.description.includes("inventory")) {
-      code += "Update inventory stock\n    UPDATE dbo.Inventory SET Stock = Stock - i.Quantity FROM inserted i JOIN dbo.Inventory inv ON i.ProductID = inv.ProductID;";
-    } else if (trigger.event.includes("DELETE")) {
-      code += "Archive data before deletion\n    INSERT INTO dbo.Archived_Data (ID, TableName, Data, DeletedOn)\n    SELECT d.ID, '${trigger.table}', (SELECT * FROM deleted FOR XML AUTO), GETDATE()\n    FROM deleted d;";
-    } else {
-      code += "Custom trigger logic would be here";
-    }
-    
-    code += "\nEND";
-    return code;
+  const StatusBadge = ({ status }) => {
+    const effect = status === "ENABLED" ? "active" : "disabled";
+    return <span className={`status-badge status-${effect}`}>{status}</span>;
   };
 
   return (
@@ -355,7 +372,9 @@ const SQLTriggerTable = () => {
               <option value="Disabled">Disabled</option>
             </select>
           </div>
-          <button className="btn-add" onClick={handleAddTrigger}>+ New Trigger</button>
+          <button className="btn-add" onClick={handleAddTrigger}>
+            + New Trigger
+          </button>
         </div>
       </div>
 
@@ -366,29 +385,21 @@ const SQLTriggerTable = () => {
               <th>Trigger Name</th>
               <th>Table</th>
               <th>Event</th>
-              <th>Timing</th>
-              <th>Description</th>
+              <th>Type</th>
               <th>Status</th>
-              <th>Created Date</th>
               <th>Actions</th>
             </tr>
           </thead>
           <tbody>
             {currentTriggers.map((trigger) => (
-              <tr key={trigger.id}>
-                <td>{trigger.name}</td>
-                <td>{trigger.table}</td>
-                <td>{trigger.event}</td>
-                <td>{trigger.timing}</td>
-                <td className="description-cell">
-                  {trigger.description.length > 30
-                    ? `${trigger.description.substring(0, 30)}...`
-                    : trigger.description}
-                </td>
+              <tr key={trigger.triggerName}>
+                <td>{trigger.triggerName}</td>
+                <td>{trigger.tableName}</td>
+                <td>{trigger.triggeringEvent}</td>
+                <td>{trigger.triggerType}</td>
                 <td>
                   <StatusBadge status={trigger.status} />
                 </td>
-                <td>{trigger.createdDate}</td>
                 <td className="actions-cell">
                   <button
                     className="btn-icon"
@@ -397,22 +408,33 @@ const SQLTriggerTable = () => {
                   >
                     <ViewIcon />
                   </button>
-                  <button
+                  {/* <button
                     className="btn-icon"
                     onClick={() => handleEditTrigger(trigger)}
                     title="Edit"
                   >
                     <EditIcon />
+                  </button> */}
+                  <button
+                    className={`btn-icon ${
+                      trigger.status === "ENABLED"
+                        ? "btn-toggle-disable"
+                        : "btn-toggle-enable"
+                    }`}
+                    onClick={() => handleStatusToggle(trigger)}
+                    title={trigger.status === "ENABLED" ? "Disable" : "Enable"}
+                  >
+                    {trigger.status === "ENABLED" ? "Disable" : "Enable"}
                   </button>
                   <button
                     className="btn-icon"
-                    onClick={() => handleStatusToggle(trigger.id)}
-                    title={trigger.status === "Active" ? "Disable" : "Enable"}
+                    onClick={() => handleViewLogs(trigger)}
+                    title="View Logs"
                   >
-                    {trigger.status === "Active" ? "Disable" : "Enable"}
+                    <LogIcon />
                   </button>
-                  <button 
-                    className="btn-icon btn-delete" 
+                  <button
+                    className="btn-icon btn-delete"
                     onClick={() => handleDeleteTrigger(trigger)}
                     title="Delete"
                   >
@@ -423,7 +445,7 @@ const SQLTriggerTable = () => {
             ))}
             {currentTriggers.length === 0 && (
               <tr>
-                <td colSpan="8" className="no-data">
+                <td colSpan="6" className="no-data">
                   No triggers found
                 </td>
               </tr>
@@ -474,35 +496,31 @@ const SQLTriggerTable = () => {
               <div className="trigger-details">
                 <div className="detail-row">
                   <span className="detail-label">Trigger Name:</span>
-                  <span className="detail-value">{selectedTrigger.name}</span>
+                  <span className="detail-value">
+                    {selectedTrigger.triggerName}
+                  </span>
                 </div>
                 <div className="detail-row">
                   <span className="detail-label">Table:</span>
-                  <span className="detail-value">{selectedTrigger.table}</span>
+                  <span className="detail-value">
+                    {selectedTrigger.tableName}
+                  </span>
                 </div>
                 <div className="detail-row">
                   <span className="detail-label">Event:</span>
-                  <span className="detail-value">{selectedTrigger.event}</span>
-                </div>
-                <div className="detail-row">
-                  <span className="detail-label">Timing:</span>
-                  <span className="detail-value">{selectedTrigger.timing}</span>
-                </div>
-                <div className="detail-row">
-                  <span className="detail-label">Description:</span>
                   <span className="detail-value">
-                    {selectedTrigger.description}
+                    {selectedTrigger.triggeringEvent}
+                  </span>
+                </div>
+                <div className="detail-row">
+                  <span className="detail-label">Type:</span>
+                  <span className="detail-value">
+                    {selectedTrigger.triggerType}
                   </span>
                 </div>
                 <div className="detail-row">
                   <span className="detail-label">Status:</span>
                   <StatusBadge status={selectedTrigger.status} />
-                </div>
-                <div className="detail-row">
-                  <span className="detail-label">Created Date:</span>
-                  <span className="detail-value">
-                    {selectedTrigger.createdDate}
-                  </span>
                 </div>
               </div>
 
@@ -535,36 +553,36 @@ const SQLTriggerTable = () => {
             <div className="modal-body">
               <div className="form-grid">
                 <div className="form-group">
-                  <label htmlFor="name">Trigger Name</label>
+                  <label htmlFor="triggerName">Trigger Name</label>
                   <input
                     type="text"
-                    id="name"
-                    name="name"
-                    value={newTrigger.name}
-                    onChange={(e) => handleInputChange(e, 'add')}
+                    id="triggerName"
+                    name="triggerName"
+                    value={newTrigger.triggerName}
+                    onChange={(e) => handleInputChange(e, "add")}
                     placeholder="tr_TriggerName"
                     required
                   />
                 </div>
                 <div className="form-group">
-                  <label htmlFor="table">Table Name</label>
+                  <label htmlFor="tableName">Table Name</label>
                   <input
                     type="text"
-                    id="table"
-                    name="table"
-                    value={newTrigger.table}
-                    onChange={(e) => handleInputChange(e, 'add')}
+                    id="tableName"
+                    name="tableName"
+                    value={newTrigger.tableName}
+                    onChange={(e) => handleInputChange(e, "add")}
                     placeholder="TableName"
                     required
                   />
                 </div>
                 <div className="form-group">
-                  <label htmlFor="event">Event</label>
+                  <label htmlFor="triggeringEvent">Event</label>
                   <select
-                    id="event"
-                    name="event"
-                    value={newTrigger.event}
-                    onChange={(e) => handleInputChange(e, 'add')}
+                    id="triggeringEvent"
+                    name="triggeringEvent"
+                    value={newTrigger.triggeringEvent}
+                    onChange={(e) => handleInputChange(e, "add")}
                   >
                     <option value="INSERT">INSERT</option>
                     <option value="UPDATE">UPDATE</option>
@@ -572,16 +590,18 @@ const SQLTriggerTable = () => {
                     <option value="INSERT,UPDATE">INSERT,UPDATE</option>
                     <option value="INSERT,DELETE">INSERT,DELETE</option>
                     <option value="UPDATE,DELETE">UPDATE,DELETE</option>
-                    <option value="INSERT,UPDATE,DELETE">INSERT,UPDATE,DELETE</option>
+                    <option value="INSERT,UPDATE,DELETE">
+                      INSERT,UPDATE,DELETE
+                    </option>
                   </select>
                 </div>
                 <div className="form-group">
-                  <label htmlFor="timing">Timing</label>
+                  <label htmlFor="triggerType">Type</label>
                   <select
-                    id="timing"
-                    name="timing"
-                    value={newTrigger.timing}
-                    onChange={(e) => handleInputChange(e, 'add')}
+                    id="triggerType"
+                    name="triggerType"
+                    value={newTrigger.triggerType}
+                    onChange={(e) => handleInputChange(e, "add")}
                   >
                     <option value="AFTER">AFTER</option>
                     <option value="BEFORE">BEFORE</option>
@@ -594,31 +614,25 @@ const SQLTriggerTable = () => {
                     id="status"
                     name="status"
                     value={newTrigger.status}
-                    onChange={(e) => handleInputChange(e, 'add')}
+                    onChange={(e) => handleInputChange(e, "add")}
                   >
                     <option value="Active">Active</option>
                     <option value="Disabled">Disabled</option>
                   </select>
                 </div>
                 <div className="form-group full-width">
-                  <label htmlFor="description">Description</label>
+                  <label htmlFor="triggerBody">Trigger SQL Body</label>
                   <textarea
-                    id="description"
-                    name="description"
-                    value={newTrigger.description}
-                    onChange={(e) => handleInputChange(e, 'add')}
-                    placeholder="Describe what this trigger does..."
+                    id="triggerBody"
+                    name="triggerBody"
+                    value={newTrigger.triggerBody}
+                    onChange={(e) => handleInputChange(e, "add")}
+                    placeholder="CREATE TRIGGER [triggerName] ON [dbo].[tableName]..."
                     required
-                    rows="3"
+                    rows="8"
+                    className="code-textarea"
                   ></textarea>
                 </div>
-              </div>
-
-              <div className="trigger-code">
-                <h4>Preview SQL Code</h4>
-                <pre className="code-block">
-                  {generateSQLCode(newTrigger)}
-                </pre>
               </div>
             </div>
             <div className="modal-footer">
@@ -646,34 +660,34 @@ const SQLTriggerTable = () => {
             <div className="modal-body">
               <div className="form-grid">
                 <div className="form-group">
-                  <label htmlFor="edit-name">Trigger Name</label>
+                  <label htmlFor="edit-triggerName">Trigger Name</label>
                   <input
                     type="text"
-                    id="edit-name"
-                    name="name"
-                    value={editedTrigger.name}
-                    onChange={(e) => handleInputChange(e, 'edit')}
+                    id="edit-triggerName"
+                    name="triggerName"
+                    value={editedTrigger.triggerName}
+                    onChange={(e) => handleInputChange(e, "edit")}
                     required
                   />
                 </div>
                 <div className="form-group">
-                  <label htmlFor="edit-table">Table Name</label>
+                  <label htmlFor="edit-tableName">Table Name</label>
                   <input
                     type="text"
-                    id="edit-table"
-                    name="table"
-                    value={editedTrigger.table}
-                    onChange={(e) => handleInputChange(e, 'edit')}
+                    id="edit-tableName"
+                    name="tableName"
+                    value={editedTrigger.tableName}
+                    onChange={(e) => handleInputChange(e, "edit")}
                     required
                   />
                 </div>
                 <div className="form-group">
-                  <label htmlFor="edit-event">Event</label>
+                  <label htmlFor="edit-triggeringEvent">Event</label>
                   <select
-                    id="edit-event"
-                    name="event"
-                    value={editedTrigger.event}
-                    onChange={(e) => handleInputChange(e, 'edit')}
+                    id="edit-triggeringEvent"
+                    name="triggeringEvent"
+                    value={editedTrigger.triggeringEvent}
+                    onChange={(e) => handleInputChange(e, "edit")}
                   >
                     <option value="INSERT">INSERT</option>
                     <option value="UPDATE">UPDATE</option>
@@ -681,16 +695,18 @@ const SQLTriggerTable = () => {
                     <option value="INSERT,UPDATE">INSERT,UPDATE</option>
                     <option value="INSERT,DELETE">INSERT,DELETE</option>
                     <option value="UPDATE,DELETE">UPDATE,DELETE</option>
-                    <option value="INSERT,UPDATE,DELETE">INSERT,UPDATE,DELETE</option>
+                    <option value="INSERT,UPDATE,DELETE">
+                      INSERT,UPDATE,DELETE
+                    </option>
                   </select>
                 </div>
                 <div className="form-group">
-                  <label htmlFor="edit-timing">Timing</label>
+                  <label htmlFor="edit-triggerType">Type</label>
                   <select
-                    id="edit-timing"
-                    name="timing"
-                    value={editedTrigger.timing}
-                    onChange={(e) => handleInputChange(e, 'edit')}
+                    id="edit-triggerType"
+                    name="triggerType"
+                    value={editedTrigger.triggerType}
+                    onChange={(e) => handleInputChange(e, "edit")}
                   >
                     <option value="AFTER">AFTER</option>
                     <option value="BEFORE">BEFORE</option>
@@ -703,30 +719,24 @@ const SQLTriggerTable = () => {
                     id="edit-status"
                     name="status"
                     value={editedTrigger.status}
-                    onChange={(e) => handleInputChange(e, 'edit')}
+                    onChange={(e) => handleInputChange(e, "edit")}
                   >
                     <option value="Active">Active</option>
                     <option value="Disabled">Disabled</option>
                   </select>
                 </div>
                 <div className="form-group full-width">
-                  <label htmlFor="edit-description">Description</label>
+                  <label htmlFor="edit-triggerBody">Trigger SQL Body</label>
                   <textarea
-                    id="edit-description"
-                    name="description"
-                    value={editedTrigger.description}
-                    onChange={(e) => handleInputChange(e, 'edit')}
+                    id="edit-triggerBody"
+                    name="triggerBody"
+                    value={editedTrigger.triggerBody}
+                    onChange={(e) => handleInputChange(e, "edit")}
                     required
-                    rows="3"
+                    rows="8"
+                    className="code-textarea"
                   ></textarea>
                 </div>
-              </div>
-
-              <div className="trigger-code">
-                <h4>Preview SQL Code</h4>
-                <pre className="code-block">
-                  {generateSQLCode(editedTrigger)}
-                </pre>
               </div>
             </div>
             <div className="modal-footer">
@@ -753,8 +763,14 @@ const SQLTriggerTable = () => {
             </div>
             <div className="modal-body">
               <div className="delete-message">
-                <p>Are you sure you want to delete the trigger <strong>{selectedTrigger.name}</strong>?</p>
-                <p className="warning">This action cannot be undone. The trigger will be permanently removed from the system.</p>
+                <p>
+                  Are you sure you want to delete the trigger{" "}
+                  <strong>{selectedTrigger.triggerName}</strong>?
+                </p>
+                <p className="warning">
+                  This action cannot be undone. The trigger will be permanently
+                  removed from the system.
+                </p>
               </div>
             </div>
             <div className="modal-footer">
@@ -763,6 +779,65 @@ const SQLTriggerTable = () => {
               </button>
               <button className="btn-danger" onClick={confirmDeleteTrigger}>
                 Delete Trigger
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Log Modal */}
+      {isLogModalOpen && selectedTrigger && (
+        <div className="modal-overlay">
+          <div className="modal-container log-modal wide-modal">
+            <div className="modal-header">
+              <h3>
+                Logs for {selectedTrigger.triggerName} (
+                {selectedTrigger.tableName})
+              </h3>
+              <button className="close-button" onClick={closeModal}>
+                <CloseIcon />
+              </button>
+            </div>
+            <div className="modal-body">
+              <div className="log-table-container">
+                {logData.columns.length > 0 ? (
+                  <table className="log-table">
+                    <thead>
+                      <tr>
+                        {logData.columns.map((column, index) => (
+                          <th key={index}>{column}</th>
+                        ))}
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {logData.rows.length > 0 ? (
+                        logData.rows.map((row, rowIndex) => (
+                          <tr key={rowIndex}>
+                            {row.map((cell, cellIndex) => (
+                              <td key={cellIndex}>{cell}</td>
+                            ))}
+                          </tr>
+                        ))
+                      ) : (
+                        <tr>
+                          <td
+                            colSpan={logData.columns.length}
+                            className="no-data"
+                          >
+                            No log data available
+                          </td>
+                        </tr>
+                      )}
+                    </tbody>
+                  </table>
+                ) : (
+                  <div className="loading">Loading log data...</div>
+                )}
+              </div>
+            </div>
+            <div className="modal-footer">
+              <button className="btn-secondary" onClick={closeModal}>
+                Close
               </button>
             </div>
           </div>
