@@ -313,6 +313,29 @@ const getTop10Products = async (req, res) => {
   }
 }
 
+const getProductCount = async (req, res) => {
+  try {
+    const result = await productRepository.getProductCount();
+    if (result.success) {
+      res.status(HttpStatus.OK).json({
+        success: true,
+        data: result.count,
+      });
+    } else {
+      res.status(HttpStatus.NOT_FOUND).json({
+        success: false,
+        message: "No products found",
+      });
+    }
+  } catch (error) {
+    console.error("Error in getProductCount controller:", error.message);
+    res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
+      success: false,
+      message: "Error retrieving product count",
+    });
+  }
+}
+
 export default {
   getAllProducts,
   getProductById,
@@ -321,5 +344,6 @@ export default {
   updateProduct,
   searchProducts,
   getProductsBySupplierId,
-  getTop10Products
+  getTop10Products,
+  getProductCount
 };
