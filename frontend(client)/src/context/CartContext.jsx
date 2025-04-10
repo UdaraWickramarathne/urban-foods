@@ -33,6 +33,7 @@ export const CartProvider = ({ children }) => {
     }
   }, [userId]);
 
+
   // Add product to cart
   const addToCart = async (product) => {
     const result = await handleAddToCart(product.productId, 1);

@@ -218,5 +218,34 @@ const getTop10Products = async () => {
   }
 }
 
-export default { getAllProducts,getProductById, insertProduct, deleteProduct, updateProduct, searchProducts, getProductsBySupplierId, getTop10Products };
+const getProductCount = async (categoryId = null) => {
+  let connection;
+  try {
+    connection = await getConnection();
+    
+    // Build the SQL query to call the function
+    const sql = `BEGIN :result := get_product_count(:categoryId); END;`;
+    
+    // Bind parameters
+    const binds = {
+      categoryId: categoryId,
+      result: { dir: oracledb.BIND_OUT, type: oracledb.NUMBER }
+    };
+    
+    // Execute the function call
+    const result = await connection.execute(sql, binds);
+    
+    // Return the count
+    return { success: true, count: result.outBinds.result };
+  } catch (error) {
+    console.error('Error getting product count:', error.message);
+    return { success: false, message: "Error getting product count" };
+  } finally {
+    if (connection) {
+      await connection.close();
+    }
+  }
+}
+
+export default { getAllProducts, getProductById, insertProduct, deleteProduct, updateProduct, searchProducts, getProductsBySupplierId, getTop10Products, getProductCount };
 

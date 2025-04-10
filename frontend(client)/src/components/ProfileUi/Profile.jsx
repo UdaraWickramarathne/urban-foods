@@ -4,7 +4,8 @@ import axios from 'axios';
 import './Profile.css';
 import storeContext from "../../context/storeContext";
 import { CUSTOMERS, SUPPLIERS, CUSTOMER_IMAGES, SUPPLIER_IMAGES, GET_USER, } from '../../context/constants';
-import { FaPencilAlt } from 'react-icons/fa';
+import { FaPencilAlt, FaUserEdit, FaTrashAlt, FaSave } from 'react-icons/fa';
+import { useNotification } from '../../context/notificationContext';
 
 const Profile = () => {
   const [userData, setUserData] = useState({
@@ -21,6 +22,8 @@ const Profile = () => {
   const role = localStorage.getItem('role');
   const { setToken, setUserId, setRole } = storeContext();
   const navigate = useNavigate();
+
+  const { showNotification } = useNotification();
 
   useEffect(() => {
     const fetchUserData = async () => {
@@ -97,7 +100,7 @@ const Profile = () => {
       });
 
       if (response.data.success) {
-        alert('Profile updated successfully!');
+        showNotification('Profile updated successfully!', 'success');
         setIsEditing(false);
 
         const updatedImageUrl = response.data.data.imageUrl.startsWith('http')
@@ -109,7 +112,7 @@ const Profile = () => {
           imageUrl: updatedImageUrl,
         }));
       } else {
-        alert('Failed to update profile: ' + response.data.message);
+        showNotification('Failed to update profile: ' + response.data.message, 'error');
       }
     } catch (error) {
       console.error('Error updating profile:', error);
@@ -121,15 +124,15 @@ const Profile = () => {
       try {
         const response = await axios.delete(`${GET_USER}/${userId}`);
         if (response.data.success) {
-          alert("Profile deleted successfully!");
+          showNotification("Profile deleted successfully!", "success");
           handleLogout();
           navigate("/");
         } else {
-          alert("Failed to delete profile: " + response.data.message);
+          showNotification("Failed to delete profile: " + response.data.message, "error");
         }
       } catch (error) {
         console.error("Error deleting profile:", error);
-        alert("An error occurred while deleting the profile.");
+        showNotification("An error occurred while deleting the profile.", "error");
       }
     }
   };
@@ -150,7 +153,7 @@ const Profile = () => {
             <div className="pro">
               <div className="profile-pic-container">
                 <img
-                  src={userData.imageUrl && userData.imageUrl.trim() !== '' ? userData.imageUrl : 'default-image.jpg'}
+                   src={userData.imageUrl && userData.imageUrl.trim() !== '' ? userData.imageUrl : 'default-image.jpg'}
                   alt="Profile"
                   className="profile-pic"
                 />
@@ -174,24 +177,16 @@ const Profile = () => {
             <div className="pro">
               {role === 'supplier' ? (
                 <>
-                  <h2>{userData.businessName}</h2>
-                  <p className="email">{userData.email}</p>
+                  <h2>{userData.businessName || 'Company Name'}</h2>
+                  <p className="email">{userData.email || 'email@example.com'}</p>
                 </>
               ) : (
                 <>
-                  <h2>{`${userData.firstName} ${userData.lastName}`}</h2>
-                  <p className="email">{userData.email}</p>
+                  <h2>{`${userData.firstName || 'First'} ${userData.lastName || 'Last'}`}</h2>
+                  <p className="email">{userData.email || 'email@example.com'}</p>
                 </>
               )}
             </div>
-          </div>
-          <div className="button-group">
-            <button className="edit-btn" onClick={handleEditClick}>
-              Edit
-            </button>
-            <button className="delete-btn" onClick={handleDeleteClick}>
-              Delete
-            </button>
           </div>
         </div>
 
@@ -258,13 +253,24 @@ const Profile = () => {
           )}
         </div>
 
-        {isEditing && (
-          <div className="email-section">
-            <button className="add-email-btn" onClick={handleSaveClick}>
-              Save
-            </button>
-          </div>
-        )}
+        <div className="profile-actions">
+          {!isEditing ? (
+            <div className="button-container">
+              <button className="profile-btn edit-profile-btn" onClick={handleEditClick}>
+                <FaUserEdit /> Edit Profile
+              </button>
+              <button className="profile-btn delete-profile-btn" onClick={handleDeleteClick}>
+                <FaTrashAlt /> Delete Account
+              </button>
+            </div>
+          ) : (
+            <div className="button-container">
+              <button className="profile-btn save-profile-btn" onClick={handleSaveClick}>
+                <FaSave /> Save Changes
+              </button>
+            </div>
+          )}
+        </div>
       </div>
     </div>
   );
