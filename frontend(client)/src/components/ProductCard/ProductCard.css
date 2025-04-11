@@ -1,0 +1,375 @@
+.product-card {
+  width: 320px;
+  width: 320px;
+  background-color: white;
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.product-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
+  
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.product-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
+  
+}
+
+.product-image {
+  height: 260px;
+  width: 100%;
+  position: relative;
+  overflow: hidden;
+  cursor: pointer;
+}
+
+.product-image img {
+  height: 260px;
+  width: 100%;
+  position: relative;
+  overflow: hidden;
+  cursor: pointer;
+}
+
+.product-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.5s ease;
+}
+
+.product-card:hover .product-image img {
+  transform: scale(1.05);
+}
+
+.wishlist {
+  position: absolute;
+  top: 15px;
+  right: 15px;
+  background-color: white;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.5s ease;
+}
+
+.product-card:hover .product-image img {
+  transform: scale(1.05);
+}
+
+.wishlist {
+  position: absolute;
+  top: 15px;
+  right: 15px;
+  background-color: white;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
+  z-index: 1;
+}
+
+.wishlist svg {
+  width: 18px;
+  height: 18px;
+  fill: none;
+  stroke: #333;
+  stroke-width: 2;
+  transition: all 0.2s ease;
+}
+
+.wishlist:hover svg {
+  stroke: #ff4545;
+  transform: scale(1.1);
+  cursor: pointer;
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
+  z-index: 1;
+}
+
+.wishlist svg {
+  width: 18px;
+  height: 18px;
+  fill: none;
+  stroke: #333;
+  stroke-width: 2;
+  transition: all 0.2s ease;
+}
+
+.wishlist:hover svg {
+  stroke: #ff4545;
+  transform: scale(1.1);
+}
+
+
+.product-tag {
+  position: absolute;
+  top: 15px;
+  left: 15px;
+  background-color: #ff4545;
+  color: white;
+  padding: 6px 12px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 600;
+  z-index: 1;
+}
+
+.product-info {
+  padding: 20px;
+}
+
+.product-category {
+  font-size: 12px;
+  color: #777;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin-bottom: 8px;
+  text-align: left;
+  padding: 20px;
+}
+
+.product-category {
+  font-size: 12px;
+  color: #777;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin-bottom: 8px;
+  text-align: left;
+}
+
+.product-name {
+  font-size: 18px;
+  font-weight: 600;
+  color: #111;
+  margin-bottom: 10px;
+  line-height: 1.3;
+  text-align: left;
+  height: 46.8px; /* 2 lines of text: 2 * 18px * 1.3 */
+  overflow: hidden;
+  display: -webkit-box;
+  line-clamp: 2;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+}
+
+.product-price {
+  display: flex;
+  align-items: center;
+  margin-bottom: 15px;
+}
+
+.current-price {
+  font-size: 22px;
+  font-weight: 700;
+  color: #111;
+}
+
+.original-price {
+  font-size: 16px;
+  font-weight: 400;
+  color: #777;
+  text-decoration: line-through;
+  margin-left: 10px;
+}
+
+.discount {
+  font-size: 14px;
+  font-weight: 600;
+  color: #ff4545;
+  margin-left: 10px;
+}
+
+.product-rating {
+  display: flex;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.stars {
+  display: flex;
+  margin-right: 8px;
+}
+
+.star {
+  color: #ffc107;
+  margin-right: 2px;
+}
+
+.review-count {
+  display: flex;
+  align-items: center;
+  margin-bottom: 15px;
+}
+
+.current-price {
+  font-size: 22px;
+  font-weight: 700;
+  color: #111;
+}
+
+.original-price {
+  font-size: 16px;
+  font-weight: 400;
+  color: #777;
+  text-decoration: line-through;
+  margin-left: 10px;
+}
+
+.discount {
+  font-size: 14px;
+  font-weight: 600;
+  color: #ff4545;
+  margin-left: 10px;
+}
+
+.product-rating {
+  display: flex;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.stars {
+  display: flex;
+  margin-right: 8px;
+}
+
+.star {
+  color: #ffc107;
+  margin-right: 2px;
+}
+
+.review-count {
+  font-size: 14px;
+  color: #777;
+  color: #777;
+}
+
+.product-actions {
+  display: flex;
+  gap: 10px;
+}
+
+.add-to-cart {
+  width: 100%;
+  background-color: #16a34a;
+  color: white;
+  border: none;
+  padding: 12px 15px;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 14px;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+  border: none;
+  padding: 12px 15px;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 14px;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+  display: flex;
+  align-items: center;
+  align-items: center;
+  justify-content: center;
+}
+
+.add-to-cart:hover {
+  background-color: #15803d;
+}
+
+.add-to-cart svg {
+  margin-right: 8px;
+  width: 16px;
+  height: 16px;
+}
+
+.quantity-control {
+  width: 100%;
+  display: flex;
+}
+
+.add-to-cart:hover {
+  background-color: #15803d;
+}
+
+.add-to-cart svg {
+  margin-right: 8px;
+  width: 16px;
+  height: 16px;
+}
+
+.quantity-control {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background-color: #f5f5f7;
+  border-radius: 8px;
+  overflow: hidden;
+  justify-content: space-between;
+  background-color: #f5f5f7;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.quantity-btn {
+  width: 44px;
+  height: 44px;
+  background-color: #16a34a;
+  width: 44px;
+  height: 44px;
+  background-color: #16a34a;
+  border: none;
+  color: white;
+  display: flex;
+  align-items: center;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.quantity-btn:hover {
+  background-color: #15803d;
+}
+
+.quantity-btn svg {
+  width: 18px;
+  height: 18px;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.quantity-btn:hover {
+  background-color: #15803d;
+}
+
+.quantity-btn svg {
+  width: 18px;
+  height: 18px;
+}
+
+.quantity {
+  font-size: 16px;
+  font-weight: 600;
+  color: #111;
+  font-size: 16px;
+  font-weight: 600;
+  color: #111;
+}

@@ -1,0 +1,177 @@
+.store-procedure {
+    width: 100%;
+    padding: 20px;
+  }
+  
+  .store-procedure h2 {
+    font-size: 1.8rem;
+    margin-bottom: 20px;
+    color: #333;
+  }
+  
+  .procedure-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+    grid-gap: 20px;
+  }
+  
+  .procedure-card {
+    background-color: #fff;
+    border-radius: 8px;
+    padding: 20px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+  }
+  
+  .procedure-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+  }
+  
+  .procedure-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 12px;
+  }
+  
+  .procedure-header h3 {
+    font-size: 1.2rem;
+    font-weight: 600;
+    color: #333;
+    margin: 0;
+  }
+  
+  .procedure-badge {
+    padding: 4px 10px;
+    border-radius: 50px;
+    font-size: 0.75rem;
+    font-weight: 500;
+  }
+  
+  .procedure-badge.success {
+    background-color: rgba(46, 213, 115, 0.15);
+    color: #2ed573;
+  }
+  
+  .procedure-badge.warning {
+    background-color: rgba(255, 164, 46, 0.15);
+    color: #ffa42e;
+  }
+  
+  .procedure-badge.danger {
+    background-color: rgba(255, 71, 87, 0.15);
+    color: #ff4757;
+  }
+  
+  .procedure-card p {
+    color: #666;
+    font-size: 0.9rem;
+    margin-bottom: 20px;
+    line-height: 1.5;
+  }
+  
+  .procedure-footer {
+    display: flex;
+    justify-content: space-between;
+  }
+  
+  .procedure-btn {
+    padding: 8px 12px;
+    border-radius: 6px;
+    font-size: 0.85rem;
+    font-weight: 500;
+    cursor: pointer;
+    border: none;
+    transition: background-color 0.2s ease;
+  }
+  
+  .procedure-btn.run {
+    background-color: #5F2EEA;
+    color: white;
+  }
+  
+  .procedure-btn.run:hover {
+    background-color: #4a25b7;
+  }
+  
+  .procedure-btn.view {
+    background-color: #f1f1f1;
+    color: #333;
+  }
+  
+  .procedure-btn.view:hover {
+    background-color: #e1e1e1;
+  }
+  
+  .btn-disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+
+  .modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+  }
+  
+  .modal-content {
+    background-color: white;
+    border-radius: 8px;
+    width: 80%;
+    max-width: 600px;
+    max-height: 80vh;
+    display: flex;
+    flex-direction: column;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+  }
+  
+  .modal-header {
+    padding: 15px 20px;
+    border-bottom: 1px solid #e0e0e0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  
+  .modal-body {
+    padding: 20px;
+    overflow-y: auto;
+    flex-grow: 1;
+  }
+  
+  .modal-footer {
+    padding: 15px 20px;
+    border-top: 1px solid #e0e0e0;
+    display: flex;
+    justify-content: flex-end;
+  }
+  
+  .close-btn {
+    background: none;
+    border: none;
+    font-size: 24px;
+    cursor: pointer;
+    color: #666;
+  }
+  
+  .result-container {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  
+  .result-line {
+    padding: 8px;
+    background-color: #f8f9fa;
+    border-left: 3px solid #4a6ee0;
+    border-radius: 4px;
+    font-family: monospace;
+  }

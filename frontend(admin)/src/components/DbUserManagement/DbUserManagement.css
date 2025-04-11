@@ -1,0 +1,549 @@
+/* DbUserManagement.css */
+.db-user-management {
+    padding: 20px;
+  }
+  
+  .header-actions {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+  }
+  
+  .data-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 15px;
+  }
+  
+  .data-table th, 
+  .data-table td {
+    padding: 12px 15px;
+    text-align: left;
+    border-bottom: 1px solid #e0e0e0;
+  }
+  
+  .data-table th {
+    background-color: #f8f8f8;
+    font-weight: 600;
+  }
+  
+  .actions-cell {
+    display: flex;
+    gap: 10px;
+  }
+  
+  .btn-icon {
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: #5F2EEA;
+    padding: 5px;
+    border-radius: 4px;
+  }
+  
+  .btn-icon:hover {
+    background-color: rgba(95, 46, 234, 0.1);
+  }
+  
+  .btn-icon.delete {
+    color: #e53935;
+  }
+  
+  .btn-icon.delete:hover {
+    background-color: rgba(229, 57, 53, 0.1);
+  }
+  
+  .modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+  }
+  
+  .modal-content {
+    background-color: white;
+    padding: 25px;
+    border-radius: 8px;
+    width: 500px;
+    max-width: 100%;
+  }
+  
+  .form-group {
+    margin-bottom: 20px;
+  }
+  
+  .form-group label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: 500;
+  }
+  
+  .form-group input,
+  .form-group select {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+  }
+  
+  .checkbox-group {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 15px;
+  }
+  
+  .checkbox-label {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+  }
+  
+  .modal-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    margin-top: 20px;
+  }
+
+  .db-users-container {
+    background-color: #fff;
+    border-radius: 8px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  }
+  
+  .users-table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+  
+  .users-table th,
+  .users-table td {
+    padding: 12px 16px;
+    text-align: left;
+    border-bottom: 1px solid #e2e8f0;
+  }
+  
+  .users-table th {
+    color: #718096;
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+  
+  .users-table tr:hover {
+    background-color: #f7fafc;
+  }
+  
+  .action-buttons {
+    display: flex;
+    gap: 8px;
+  }
+  
+  .action-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    border-radius: 4px;
+    border: none;
+    background-color: #f7fafc;
+    color: #4a5568;
+    cursor: pointer;
+  }
+  
+  .action-btn.edit:hover {
+    background-color: #e6fffa;
+    color: #0694a2;
+  }
+  
+  .action-btn.delete:hover {
+    background-color: #fef2f2;
+    color: #e53e3e;
+  }
+
+  /* Status Badge styles */
+  .status-active {
+    background-color: #e6f7ef;
+    color: #047857;
+  }
+  
+  .status-inactive {
+    background-color: #f3f4f6;
+    color: #4b5563;
+  }
+  
+  /* Modal styles */
+  .modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+  }
+  
+  .modal-container {
+    background-color: #fff;
+    border-radius: 8px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1), 0 1px 3px rgba(0, 0, 0, 0.08);
+    width: 500px;
+    max-width: 90%;
+    max-height: 90vh;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .modal-header {
+    padding: 16px 20px;
+    border-bottom: 1px solid #e2e8f0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  
+  .modal-header h3 {
+    font-size: 18px;
+    font-weight: 600;
+    color: #1e293b;
+    margin: 0;
+  }
+  
+  .close-btn {
+    background: transparent;
+    border: none;
+    color: #64748b;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 4px;
+    border-radius: 4px;
+  }
+  
+  .close-btn:hover {
+    background-color: #f1f5f9;
+    color: #0f172a;
+  }
+  
+  .modal-content {
+    padding: 20px;
+    flex: 1;
+  }
+  
+  .modal-footer {
+    padding: 16px 20px;
+    border-top: 1px solid #e2e8f0;
+    display: flex;
+    gap: 12px;
+    justify-content: flex-end;
+  }
+  
+  /* Delete modal footer specific styles */
+  .delete-modal .modal-footer {
+    justify-content: flex-end;
+    margin-top: 16px;
+  }
+
+  /* Delete modal footer specific styles - with stronger specificity */
+  .delete-modal .modal-footer,
+  .delete-modal .modal-actions,
+  .modal-container .delete-warning + .modal-footer,
+  .modal-content .delete-warning + .modal-actions {
+    display: flex !important;
+    flex-direction: row !important;
+    justify-content: flex-end !important;
+    width: 100% !important;
+    text-align: right !important;
+    margin-top: 16px !important;
+  }
+
+  /* Make sure buttons within the delete modal footer have appropriate spacing */
+  .delete-modal .modal-footer button,
+  .delete-modal .modal-actions button,
+  .modal-container .delete-warning + .modal-footer button,
+  .modal-content .delete-warning + .modal-actions button {
+    margin-left: 10px !important;
+    margin-right: 0 !important;
+  }
+  
+  /* Form styles */
+  .form-group {
+    margin-bottom: 16px;
+  }
+  
+  .form-group label {
+    display: block;
+    margin-bottom: 6px;
+    font-size: 14px;
+    font-weight: 500;
+    color: #4b5563;
+  }
+  
+  .form-group input,
+  .form-group select {
+    width: 100%;
+    padding: 10px 12px;
+    border: 1px solid #d1d5db;
+    border-radius: 6px;
+    font-size: 14px;
+    color: #1f2937;
+    background-color: #fff;
+  }
+  
+  .form-group input:focus,
+  .form-group select:focus {
+    outline: none;
+    border-color: #5f2eea;
+    box-shadow: 0 0 0 3px rgba(95, 46, 234, 0.1);
+  }
+  
+  /* Delete confirmation modal */
+  .delete-modal {
+    width: 400px;
+  }
+  
+  .delete-warning {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+  }
+  
+  .delete-warning svg {
+    margin-bottom: 16px;
+  }
+  
+  .delete-warning p {
+    color: #4b5563;
+    font-size: 15px;
+    line-height: 1.5;
+  }
+  
+  .btn-danger {
+    background-color: #e53e3e;
+    color: white;
+    border-color: #e53e3e;
+  }
+  
+  .btn-danger:hover {
+    background-color: #c53030;
+  }
+  
+  /* Button disabled state */
+  .btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+
+/* Form Section Styles */
+.form-section {
+  margin-top: 16px;
+  border-top: 1px solid #e0e0e0;
+  padding-top: 16px;
+}
+
+.section-title {
+  font-size: 1rem;
+  font-weight: 600;
+  margin-bottom: 12px;
+  color: #333;
+}
+
+/* Checkbox Group Styles */
+.checkbox-group {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-top: 8px;
+}
+
+.checkbox-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background-color: #f5f8fa;
+  padding: 6px 12px;
+  border-radius: 4px;
+  border: 1px solid #e0e0e0;
+}
+
+.checkbox-item input[type="checkbox"] {
+  margin: 0;
+  cursor: pointer;
+}
+
+.checkbox-item label {
+  font-size: 0.85rem;
+  margin: 0;
+  cursor: pointer;
+}
+
+/* Permission Header Styles */
+.permission-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.btn-sm {
+  padding: 4px 8px;
+  font-size: 0.8rem;
+}
+
+.btn-outline {
+  background-color: transparent;
+  border: 1px solid #3498db;
+  color: #3498db;
+}
+
+.btn-outline:hover {
+  background-color: #3498db;
+  color: white;
+}
+
+/* Table Permissions List Styles */
+.table-permissions-list {
+  background-color: #f9f9f9;
+  border-radius: 4px;
+  max-height: 150px;
+  overflow-y: auto;
+  border: 1px solid #e0e0e0;
+}
+
+.table-permission-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 12px;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+.table-permission-item:last-child {
+  border-bottom: none;
+}
+
+.permission-info {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.table-name {
+  font-weight: 500;
+  color: #2c3e50;
+  font-size: 0.9rem;
+}
+
+.permission-badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+
+.permission-badge {
+  background-color: #e0f2fe;
+  color: #0369a1;
+  padding: 2px 6px;
+  border-radius: 3px;
+  font-size: 0.7rem;
+  font-weight: 500;
+}
+
+.remove-permission-btn {
+  background: none;
+  border: none;
+  color: #e74c3c;
+  font-size: 1.2rem;
+  cursor: pointer;
+  padding: 0 4px;
+}
+
+.remove-permission-btn:hover {
+  color: #c0392b;
+}
+
+.no-permissions {
+  padding: 12px;
+  text-align: center;
+  color: #7f8c8d;
+  font-style: italic;
+  font-size: 0.9rem;
+}
+
+/* Table Permission Modal Styles */
+.permission-modal {
+  max-width: 450px;
+}
+
+.permissions-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 10px;
+  margin-top: 8px;
+}
+
+.permission-checkbox {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background-color: #f5f8fa;
+  padding: 8px 12px;
+  border-radius: 4px;
+  border: 1px solid #e0e0e0;
+}
+
+.permission-checkbox input[type="checkbox"] {
+  margin: 0;
+  cursor: pointer;
+}
+
+.permission-checkbox label {
+  font-size: 0.85rem;
+  margin: 0;
+  cursor: pointer;
+}
+
+/* Modal Content Scrollable */
+.modal-content {
+  max-height: 60vh;
+  overflow-y: auto;
+  padding-right: 5px;
+}
+
+/* Make scrollbar more aesthetic */
+.modal-content::-webkit-scrollbar {
+  width: 6px;
+}
+
+.modal-content::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 10px;
+}
+
+.modal-content::-webkit-scrollbar-thumb {
+  background: #c0c0c0;
+  border-radius: 10px;
+}
+
+.modal-content::-webkit-scrollbar-thumb:hover {
+  background: #a0a0a0;
+}
+.btn-disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}

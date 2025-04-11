@@ -1,0 +1,150 @@
+.product-section {
+  margin: 40px auto;
+  padding: 0 20px;
+  max-width: 1500px;
+  position: relative;
+}
+
+.section-header {
+  text-align: center;
+  margin-bottom: 30px;
+}
+
+.section-header h2 {
+  font-size: 24px;
+  background-color: #2f9e44;
+  color: white;
+  padding: 5px 10px;
+  border-radius: 5px;
+  display: inline-block;
+  font-weight: bold;
+  margin-bottom: 10px;
+}
+
+.section-header p {
+  color: #666;
+  max-width: 600px;
+  margin: 0 auto;
+  font-size: 20px;
+}
+
+.products-wrapper {
+  position: relative;
+}
+
+.products-container {
+  display: flex;
+  overflow-x: auto;
+  gap: 20px;
+  padding: 20px 0;
+  scroll-behavior: smooth;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+/* Hide scrollbar for Chrome, Safari and Opera */
+.products-container::-webkit-scrollbar {
+  display: none;
+}
+
+/* Ensure ProductCard maintains proper width */
+.product-card {
+  min-width: 280px;
+  flex: 0 0 auto;
+}
+
+/* Navigation controls */
+.navigation-controls {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 15px;
+  margin-top: 20px;
+}
+
+/* Navigation buttons */
+.nav-button {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background-color: #fff;
+  border: 1px solid #e0e0e0;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s ease;
+}
+
+.nav-button:hover {
+  background-color: #f5f5f5;
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.15);
+}
+
+.nav-button.disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.nav-button svg {
+  width: 20px;
+  height: 20px;
+}
+
+.nav-button.prev {
+  left: 0;
+}
+
+.nav-button.next {
+  right: 0;
+}
+
+/* Indicators */
+.indicators {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+}
+
+.indicator {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background-color: #ccc;
+  border: none;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  padding: 0;
+}
+
+.indicator.active {
+  background-color: #333;
+  transform: scale(1.2);
+}
+
+/* Mobile responsiveness */
+@media (max-width: 768px) {
+  .product-card {
+    min-width: 240px;
+  }
+  
+  .section-header h2 {
+    font-size: 1.5rem;
+  }
+  
+  .nav-button {
+    width: 30px;
+    height: 30px;
+  }
+  
+  .nav-button svg {
+    width: 16px;
+    height: 16px;
+  }
+  
+  .products-wrapper {
+    padding: 0 35px;
+  }
+}

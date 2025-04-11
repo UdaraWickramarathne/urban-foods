@@ -1,0 +1,531 @@
+.sql-trigger-table-container {
+  background-color: #fff;
+  border-radius: 8px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+  padding: 20px;
+}
+
+.table-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.table-header h2 {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: #333;
+  margin: 0;
+}
+
+.toolbar {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+
+.search-container {
+  position: relative;
+}
+
+.search-input {
+  padding: 8px 12px;
+  border: 1px solid #e1e1e1;
+  border-radius: 6px;
+  font-size: 0.9rem;
+  width: 220px;
+}
+
+.filter-select {
+  padding: 8px 12px;
+  border: 1px solid #e1e1e1;
+  border-radius: 6px;
+  font-size: 0.9rem;
+  background-color: white;
+}
+
+.btn-add {
+  background-color: #5f2eea;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  padding: 8px 16px;
+  cursor: pointer;
+  font-weight: 500;
+  transition: background-color 0.2s;
+}
+
+.btn-add:hover {
+  background-color: #4a1dc2;
+}
+
+.table-container {
+  overflow-x: auto;
+}
+
+.trigger-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.9rem;
+}
+
+.trigger-table th {
+  text-align: left;
+  padding: 12px 16px;
+  background-color: #f9fafb;
+  border-bottom: 1px solid #e5e7eb;
+  font-weight: 600;
+  color: #4b5563;
+}
+
+.trigger-table td {
+  padding: 12px 16px;
+  border-bottom: 1px solid #e5e7eb;
+  color: #374151;
+}
+
+.description-cell {
+  max-width: 250px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.status-badge {
+  padding: 4px 8px;
+  border-radius: 16px;
+  font-size: 0.75rem;
+  font-weight: 500;
+  display: inline-block;
+}
+
+/* Enhanced status colors */
+.status-active {
+  background-color: #e6f9e6;
+  color: #008000;
+  font-weight: 600;
+}
+
+.status-disabled {
+  background-color: #fef2f2;
+  color: #b91c1c;
+}
+
+.actions-cell {
+  display: flex;
+  gap: 8px;
+}
+
+/* Enhanced action button colors */
+.btn-icon {
+  background: none;
+  border: 1px solid #e5e7eb;
+  border-radius: 4px;
+  padding: 4px 6px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #4b5563;
+  transition: all 0.2s;
+}
+
+/* Edit/View button styles */
+.btn-edit {
+  color: #5f2eea;
+  border-color: #ddd3fc;
+}
+
+.btn-edit:hover {
+  background-color: #f5f0ff;
+  color: #4a1dc2;
+  border-color: #c4b5fd;
+}
+
+/* View details button styles */
+.btn-view {
+  color: #0284c7;
+  border-color: #bae6fd;
+}
+
+.btn-view:hover {
+  background-color: #f0f9ff;
+  color: #0369a1;
+  border-color: #7dd3fc;
+}
+
+/* Delete button styles - enhanced */
+.btn-delete {
+  color: #dc2626;
+  border-color: #fecaca;
+}
+
+.btn-delete:hover {
+  background-color: #fef2f2;
+  color: #b91c1c;
+  border-color: #fca5a5;
+}
+
+/* Default hover for any other action buttons */
+.btn-icon:hover {
+  background-color: #f9fafb;
+  color: #5f2eea;
+}
+
+.pagination {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+  margin-top: 20px;
+}
+
+.pagination-button {
+  padding: 6px 12px;
+  border: 1px solid #e5e7eb;
+  background-color: white;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.pagination-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.pagination-button.active {
+  background-color: #5f2eea;
+  color: white;
+  border-color: #5f2eea;
+}
+
+.no-data {
+  text-align: center;
+  padding: 32px 0;
+  color: #6b7280;
+}
+
+/* Modal Styles */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 999;
+}
+
+.modal-container {
+  background-color: white;
+  border-radius: 8px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+  width: 80%;
+  max-width: 700px;
+  max-height: 90vh;
+  overflow-y: auto;
+}
+
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px 24px;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.modal-header h3 {
+  margin: 0;
+  color: #1f2937;
+}
+
+.close-button {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: #6b7280;
+}
+
+.modal-body {
+  padding: 24px;
+}
+
+.modal-footer {
+  padding: 16px 24px;
+  border-top: 1px solid #e5e7eb;
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+}
+
+.btn-primary {
+  background-color: #5f2eea;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  padding: 8px 16px;
+  cursor: pointer;
+  font-weight: 500;
+}
+
+.btn-secondary {
+  background-color: white;
+  color: #4b5563;
+  border: 1px solid #e5e7eb;
+  border-radius: 6px;
+  padding: 8px 16px;
+  cursor: pointer;
+  font-weight: 500;
+}
+
+.trigger-details {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.detail-row {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.detail-label {
+  font-size: 0.85rem;
+  color: #6b7280;
+  font-weight: 500;
+}
+
+.detail-value {
+  font-size: 0.95rem;
+  color: #1f2937;
+}
+
+.trigger-code {
+  margin-top: 24px;
+}
+
+.trigger-code h4 {
+  margin-bottom: 12px;
+  color: #1f2937;
+}
+
+.code-block {
+  background-color: #f9fafb;
+  border: 1px solid #e5e7eb;
+  border-radius: 6px;
+  padding: 16px;
+  font-family: 'Courier New', Courier, monospace;
+  font-size: 0.85rem;
+  overflow-x: auto;
+  white-space: pre-wrap;
+  color: #1f2937;
+}
+
+/* Form Styles */
+.form-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.form-group.full-width {
+  grid-column: 1 / -1;
+}
+
+.form-group label {
+  font-size: 0.85rem;
+  color: #4b5563;
+  font-weight: 500;
+}
+
+.form-group input,
+.form-group select,
+.form-group textarea {
+  padding: 10px;
+  border: 1px solid #e5e7eb;
+  border-radius: 6px;
+  font-size: 0.9rem;
+  background-color: #fff;
+}
+
+.form-group input:focus,
+.form-group select:focus,
+.form-group textarea:focus {
+  outline: none;
+  border-color: #5f2eea;
+  box-shadow: 0 0 0 2px rgba(95, 46, 234, 0.1);
+}
+
+.form-group textarea {
+  resize: vertical;
+  min-height: 80px;
+}
+
+/* Delete Modal */
+.delete-modal {
+  max-width: 500px;
+}
+
+.delete-message {
+  text-align: center;
+  padding: 16px 0;
+}
+
+.delete-message .warning {
+  color: #dc2626;
+  margin-top: 12px;
+  font-size: 0.9rem;
+}
+
+.btn-danger {
+  background-color: #dc2626;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  padding: 8px 16px;
+  cursor: pointer;
+  font-weight: 500;
+}
+
+.btn-danger:hover {
+  background-color: #b91c1c;
+}
+
+/* Button State Styles */
+.btn-primary:hover {
+  background-color: #4a1dc2;
+}
+
+.btn-secondary:hover {
+  background-color: #f3f4f6;
+  border-color: #d1d5db;
+}
+
+.btn-disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* Add this to your existing CSS file */
+
+.wide-modal {
+  width: 90% !important;
+  max-width: 1200px !important;
+}
+
+.log-table-container {
+  overflow-x: auto;
+  margin-bottom: 1rem;
+}
+
+.log-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.9rem;
+}
+
+.log-table th {
+  background-color: #f5f5f5;
+  padding: 10px;
+  text-align: left;
+  border-bottom: 2px solid #ddd;
+  font-weight: 600;
+}
+
+.log-table td {
+  padding: 8px 10px;
+  border-bottom: 1px solid #eee;
+}
+
+.log-table tr:hover {
+  background-color: #f9f9f9;
+}
+
+/* Add these new styles for the code textarea */
+
+.code-textarea {
+  font-family: 'Courier New', Courier, monospace;
+  font-size: 0.9rem;
+  tab-size: 4;
+  white-space: pre;
+  overflow-x: auto;
+  resize: vertical;
+  min-height: 200px;
+  line-height: 1.5;
+}
+
+/* Status toggle button styles */
+.btn-toggle-enable {
+  color: #008000;
+  border-color: #c7e6c7;
+  background-color: #f0fff0;
+}
+
+.btn-toggle-enable:hover {
+  background-color: #e6f9e6;
+  color: #006400;
+  border-color: #a3d9a3;
+}
+
+.btn-toggle-disable {
+  color: #dc2626;
+  border-color: #fecaca;
+  background-color: #fff5f5;
+}
+
+.btn-toggle-disable:hover {
+  background-color: #fef2f2;
+  color: #b91c1c;
+  border-color: #fca5a5;
+}
+
+/* Status toggle button styles - making more specific with !important for key properties */
+.btn-icon.btn-toggle-enable {
+  color: #008000 !important;
+  border-color: #c7e6c7 !important;
+  background-color: #f0fff0 !important;
+  padding: 6px 12px !important;
+  font-weight: 500;
+}
+
+.btn-icon.btn-toggle-enable:hover {
+  background-color: #e6f9e6 !important;
+  color: #006400 !important;
+  border-color: #a3d9a3 !important;
+}
+
+.btn-icon.btn-toggle-disable {
+  color: #dc2626 !important;
+  border-color: #fecaca !important;
+  background-color: #fff5f5 !important;
+  padding: 6px 12px !important;
+  font-weight: 500;
+}
+
+.btn-icon.btn-toggle-disable:hover {
+  background-color: #fef2f2 !important;
+  color: #b91c1c !important;
+  border-color: #fca5a5 !important;
+}
+
+/* Make sure text is visible */
+.btn-icon.btn-toggle-enable,
+.btn-icon.btn-toggle-disable {
+  display: inline-flex !important;
+  align-items: center;
+  justify-content: center;
+  min-width: 70px;
+  text-align: center;
+}

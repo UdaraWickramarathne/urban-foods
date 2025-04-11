@@ -1,0 +1,150 @@
+.explore-menu {
+  padding: 8px 0;
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+.explore-menu h1 {
+  color: #262626;
+  font-size: 45px;
+  margin-top: 20px;
+}
+
+.explore-menu-list {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 30px;
+  text-align: center;
+  margin: 20px 0;
+  overflow-x: scroll;
+  padding: 10px;
+}
+
+.explore-menu-list::-webkit-scrollbar {
+  display: none;
+}
+
+.explore-menu-list-item {
+  width: 7.5vw;
+  min-width: 80px;
+  cursor: pointer;
+  border-radius: 50%;
+  transition: 0.2s;
+}
+
+.explore-menu-list-item img {
+  width: 7.5vw;
+  min-width: 80px;
+  cursor: pointer;
+  border-radius: 50%;
+  transition: 0.2s;
+}
+
+.explore-menu-list-item p {
+  margin-top: 10px;
+  color: #747474;
+  font-size: max(1.4vw, 16px);
+  cursor: pointer;
+}
+
+.explore-menu-list-item:hover {
+  transform: scale(1.05);
+}
+
+.explore-menu hr {
+  margin: 10px 0px;
+  height: 2px;
+  background-color: #e2e2e2;
+  border: none;
+}
+
+.explore-menu-list-item .active {
+  border: 4px solid #64bf47;
+}
+
+.search-bar-container {
+  margin-bottom: 30px;
+  text-align: center;
+}
+
+.search-bar-wrapper {
+  display: inline-flex;
+  align-items: center;
+  border: 1px solid #ccc;
+  border-radius: 80px 0 80px 0;
+  padding: 5px 10px;
+  background-color: #f9f9f9;
+  width: 1000px;
+}
+
+.search-bar {
+  border: none;
+  outline: none;
+  padding: 8px;
+  font-size: 16px;
+  flex: 1;
+}
+
+.clear-button {
+  background: none;
+  border: none;
+  font-size: 16px;
+  cursor: pointer;
+  color: #888;
+}
+
+.typing-animation p {
+  font-size: 14px;
+  color: #aaa;
+  text-align: center;
+}
+.typing-text {
+  display: inline-block;
+  overflow: hidden;
+  white-space: nowrap;
+  border-right: 2px solid #aaa;
+  font-size: 26px;
+  animation: typing 5s steps(45) infinite, blink 0.5s step-end infinite;
+}
+
+.product-section {
+  margin-top: 20px;
+}
+
+.product-list {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  row-gap: 18px;
+  column-gap: 20px;
+}
+
+
+@keyframes typing {
+  from {
+    width: 0;
+  }
+  to {
+    width: 100%;
+  }
+}
+
+@keyframes blink {
+  from {
+    border-color: transparent;
+  }
+  to {
+    border-color: #aaa;
+  }
+}
+
+@media (max-width: 1050px) {
+  .explore-menu-text {
+    max-width: 100%;
+    font-size: 14px;
+  }
+}
+
+.explore-menu-list-item .active-name {
+  color: #64bf47;
+}
