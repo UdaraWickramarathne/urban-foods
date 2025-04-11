@@ -9,26 +9,26 @@ const Feedback = () => {
   const [editingId, setEditingId] = useState(null);
   const [isFormOpen, setIsFormOpen] = useState(false);
 
+  const fetchFeedbacks = async () => {
+    const userId = localStorage.getItem("userId");
+    if (!userId) {
+      alert("User not logged in. Please log in to view your feedback.");
+      return;
+    }
+
+    try {
+      const response = await axios.get(`http://localhost:5000/api/feedback?userId=${userId}`);
+      if (response.data.success) {
+        setFeedbacks(response.data.feedback);
+      } else {
+        console.error("Failed to fetch feedback:", response.data.message);
+      }
+    } catch (error) {
+      console.error("Error fetching feedback:", error);
+    }
+  };
+
   useEffect(() => {
-    const fetchFeedbacks = async () => {
-      const userId = localStorage.getItem("userId");
-      if (!userId) {
-        alert("User not logged in. Please log in to view your feedback.");
-        return;
-      }
-  
-      try {
-        const response = await axios.get(`http://localhost:5000/api/feedback?userId=${userId}`);
-        if (response.data.success) {
-          setFeedbacks(response.data.feedback);
-        } else {
-          console.error("Failed to fetch feedback:", response.data.message);
-        }
-      } catch (error) {
-        console.error("Error fetching feedback:", error);
-      }
-    };
-  
     fetchFeedbacks();
   }, []);
 
@@ -82,7 +82,7 @@ const Feedback = () => {
       } else {
         const response = await axios.post("http://localhost:5000/api/feedback", feedback);
         if (response.data.success) {
-          setFeedbacks([response.data.feedback, ...feedbacks]);
+          fetchFeedbacks();
         }
       }
       setNewFeedback({ rating: 0, title: "", comment: "" });

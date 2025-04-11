@@ -215,4 +215,29 @@ WHERE OWNER = 'URBANFOOD_USER'
   AND TYPE = 'PROCEDURE'
 ORDER BY LINE;
 
---Test 
+
+SELECT TABLE_NAME, PRIVILEGE 
+       FROM DBA_TAB_PRIVS 
+       WHERE GRANTEE = 'ASIN'
+
+TRUNCATE TABLE users_log;
+TRUNCATE TABLE customers_log;
+TRUNCATE TABLE suppliers_log;
+TRUNCATE TABLE categories_log;
+TRUNCATE TABLE products_log;
+TRUNCATE TABLE cart_log;
+TRUNCATE TABLE orders_log;
+TRUNCATE TABLE orderitems_log;
+TRUNCATE TABLE payments_log;
+
+TRUNCATE TABLE orderitems;
+TRUNCATE TABLE payments;
+TRUNCATE TABLE deliveries;
+TRUNCATE TABLE orders;
+TRUNCATE TABLE cart;
+TRUNCATE TABLE products;
+TRUNCATE TABLE delivery_agents;
+TRUNCATE TABLE customers;
+TRUNCATE TABLE suppliers;
+TRUNCATE TABLE categories;
+TRUNCATE TABLE users;

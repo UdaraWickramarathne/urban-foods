@@ -289,7 +289,7 @@ const Dashboard = () => {
                 Orders
               </li>
             )}
-            {hasPermission(userPermissions, PERMISSIONS.VIEW_ORDERS) && (
+            {hasPermission(userPermissions, PERMISSIONS.VIEW_DELIVERIES) && (
               <li
                 className={`nav-item ${
                   activeComponent === "delivery" ? "active" : ""
@@ -367,8 +367,9 @@ const Dashboard = () => {
               </div>
               Store Procedures
             </li>
-
-            <li
+            
+            {hasPermission(userPermissions, PERMISSIONS.DB_USER_PERMISSIONS) && (
+              <li
               className={`nav-item ${
                 activeComponent === "dbusers" ? "active" : ""
               }`}
@@ -390,6 +391,7 @@ const Dashboard = () => {
               </div>
               DB Users
             </li>
+            )}
 
             <li
               className={`nav-item ${

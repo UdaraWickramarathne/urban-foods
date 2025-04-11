@@ -6,6 +6,7 @@ import { ADMIN_PERMISSIONS, DB_PRIVILEGE_MAP } from "../enums/permissions.js";
 import DbUser from "../models/dbUser.js";
 import Trigger from "../models/trigger.js";
 import oracledb from "oracledb";  // Add this import
+import { DELIVERY } from "../../frontend(admin)/src/context/constants.js";
 
 const { generateToken } = auth;
 
@@ -307,6 +308,8 @@ const mapDbPrivilegesToPermissionsList = (privilegesRows) => {
       CATEGORIES: "CATEGORIES",
       USERS: "USERS",
       SUPPLIERS: "SUPPLIERS",
+      ORDERS: "ORDERS",
+      DELIVERIES: "DELIVERIES",
     };
 
     const tableConstant = tables[tableName];

@@ -35,7 +35,7 @@ const registerCustomer = async (req, res) => {
       return res.status(HttpStatus.BAD_REQUEST).json({
         success: false,
         message:
-          "Missing required fields: username, password, email, firstName, and lastName are required",
+          "Missing required fields: Please provide all required fields",
       });
     }
     if (password.length < 8) {

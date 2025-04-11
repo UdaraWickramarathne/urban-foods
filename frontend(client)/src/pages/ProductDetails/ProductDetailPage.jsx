@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useContext } from 'react';
 import { useParams, useLocation } from 'react-router-dom';
 import './ProductDetailPage.css';
-import { PRODUCT_IMAGES } from '../../context/constants';
+import { DEFAULT_IMAGE, PRODUCT_IMAGES } from '../../context/constants';
 import { CartContext } from '../../context/CartContext';
 import FeedbackPopup from '../../components/ProductReview/ProductReview';
 import { CUSTOMER_IMAGES } from "../../context/constants.js";
@@ -19,10 +19,20 @@ const ProductDetailPage = () => {
   const { showNotification } = useNotification();
 
   const openPopup = () => setIsPopupOpen(true);
-  const closePopup = () => setIsPopupOpen(false);
+  const closePopup = () => {
+    setIsPopupOpen(false);
+    setEditingReview(null);
+  }
 
-  const handleReviewAdded = (newReview) => {
-    setReviews((prevReviews) => [newReview, ...prevReviews]);
+  const handleReviewAdded = async () => {
+    fetch(`http://localhost:5000/api/reviews?productId=${id}`)
+      .then((response) => response.json())
+      .then((data) => {
+        if (data.success) {
+          setReviews(data.reviews);
+        }
+      })
+      .catch((error) => console.error('Error fetching reviews:', error));
   };
 
   const [editingReview, setEditingReview] = useState(null);
@@ -286,61 +296,91 @@ const ProductDetailPage = () => {
                 <div className="product-details-review-average">
                   <h3>Customer Reviews</h3>
                   <div className="product-details-average-rating">
-                    <span className="product-details-big-rating">{product.rating}</span>
+                    <div className="product-details-rating-circle">
+                      <span>{calculateAverageRating()}</span>
+                      <small>/5</small>
+                    </div>
                     <div>
                       <div className="product-details-stars product-details-big-stars">{renderStars(calculateAverageRating())}</div>
-                      <p>Based on {reviews.length} reviews</p>
+                      <p>Based on <strong>{reviews.length}</strong> reviews</p>
                     </div>
                   </div>
                 </div>
 
-                <button className="product-details-write-review-btn" onClick={openPopup}>Write a Review</button>
+                <button className="product-details-write-review-btn" onClick={openPopup}>
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+                    <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+                  </svg>
+                  Write a Review
+                </button>
               </div>
 
               <div className="product-details-review-list">
-                {reviews.map(review => (
-                  <div key={review.id} className="product-details-review-item">
-                    <div className="product-details-review-header">
-                      <div className="product-details-reviewer-info">
-                        <img src={`${CUSTOMER_IMAGES}/${review.image}`} className="product-details-reviewer-avatar" />
-                        <div>
-                          <h4 className="product-details-reviewer-name">{review.first_name}</h4>
-                          <div className="product-details-review-date">{review.date}</div>
+                {reviews.length === 0 ? (
+                  <div className="product-details-no-reviews">
+                    <svg width="60" height="60" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+                      <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+                    </svg>
+                    <p>No reviews yet. Be the first to review this product!</p>
+                  </div>
+                ) : (
+                  reviews.map(review => (
+                    <div key={review.id} className="product-details-review-card">
+                      <div className="product-details-review-header">
+                        <div className="product-details-reviewer-info">
+                          <img src={review.image == null ? DEFAULT_IMAGE : `${CUSTOMER_IMAGES}/${review.image}`} className="product-details-reviewer-avatar" alt={review.first_name} />
+                          <div>
+                            <h4 className="product-details-reviewer-name">{review.first_name}</h4>
+                            <div className="product-details-stars">{renderStars(review.rating)}</div>
+                          </div>
+                        </div>
+                        <div className="product-details-review-date-badge">
+                          <span>{review.date}</span>
                         </div>
                       </div>
-                      <div className="product-details-review-rating">
-                        {renderStars(review.rating)}
+
+                      <div className="product-details-review-content">
+                        {review.title && <h5 className="product-details-review-title">{review.title}</h5>}
+                        <p className="product-details-review-comment">{review.comment}</p>
                       </div>
+
+                      {String(localStorage.getItem('userId')) === String(review.userId) && (
+                        <div className="product-details-review-actions">
+                          <button
+                            className="product-details-edit-review-btn"
+                            onClick={() => handleEditReview(review)}
+                          >
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                              <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+                              <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+                            </svg>
+                            Edit
+                          </button>
+                          <button
+                            className="product-details-delete-review-btn"
+                            onClick={() => handleDeleteReview(review.id)}
+                          >
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                              <polyline points="3 6 5 6 21 6"></polyline>
+                              <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                              <line x1="10" y1="11" x2="10" y2="17"></line>
+                              <line x1="14" y1="11" x2="14" y2="17"></line>
+                            </svg>
+                            Delete
+                          </button>
+                        </div>
+                      )}
                     </div>
-
-                    <h5 className="product-details-review-title">{review.title}</h5>
-                    <p className="product-details-review-comment">{review.comment}</p>
-
-                    {String(localStorage.getItem('userId')) === String(review.userId) && (
-                      <div className="product-details-review-actions">
-                        <button
-                          className="product-details-edit-review-btn"
-                          onClick={() => handleEditReview(review)}
-                        >
-                          Edit
-                        </button>
-                        <button
-                          className="product-details-delete-review-btn"
-                          onClick={() => handleDeleteReview(review.id)}
-                        >
-                          Delete
-                        </button>
-                      </div>
-                    )}
-                  </div>
-                ))}
+                  ))
+                )}
               </div>
             </div>
           )}
         </div>
       </div>
       {isPopupOpen && <FeedbackPopup onClose={closePopup} productId={id}
-        onReviewAdded={handleReviewAdded} review={editingReview} />}
+        onReviewAdded={handleReviewAdded} review={editingReview}/>}
     </div>
   );
 };

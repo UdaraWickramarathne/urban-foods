@@ -3,6 +3,7 @@ import axios from "axios";
 import "./Register.css";
 import loadingImage from "../../images/loading.gif";
 import storeContext from "../../context/storeContext";
+import { useNotification } from "../../context/notificationContext";
 
 const Register = ({ onClose, onSwitchToLogin }) => {
   const [step, setStep] = useState(1);
@@ -20,17 +21,27 @@ const Register = ({ onClose, onSwitchToLogin }) => {
   const [isLoading, setIsLoading] = useState(false);
 
   const {setToken,setUserId,setRole} = storeContext();
+  const {showNotification} = useNotification();
 
   const handleSendOtp = async () => {
     setIsLoading(true);
+    if(userType == "customer" && (!firstName || !lastName)) {
+      showNotification("First name and last name are required", "error");
+      setIsLoading(false);
+      return;
+    }
+
     try {
       const response = await axios.post("http://localhost:5000/api/otp/request-otp", { email });
       if (response.status === 200) {
         setStep(2);
-        setError("");
+        showNotification("OTP sent successfully", "success");
+      }else{
+        showNotification(response.data.message || 'OTP send field! Try Again', "error");
       }
     } catch (error) {
-      setError("Failed to send OTP");
+      let errorMessage = error.response?.data?.message || "Failed to send OTP";
+      showNotification(errorMessage, "error");
     } finally {
       setIsLoading(false);
     }
@@ -44,7 +55,8 @@ const Register = ({ onClose, onSwitchToLogin }) => {
         setError("");
       }
     } catch (error) {
-      setError("Invalid OTP");
+      const errorMessage = error.response?.data?.message || "Invalid or expired OTP. Please try again.";
+      showNotification(errorMessage, "error");
     }
   };
 
@@ -100,17 +112,21 @@ const Register = ({ onClose, onSwitchToLogin }) => {
           setToken(result.token);
           setUserId(result.userId);
           setRole(result.role || 'customer');
-          console.log(response.result);
           onClose();
+        }else{
+          showNotification(response.data.message || 'Registration failed! Try Again', "error");
         }
       } catch (error) {
-        setError("Failed to register");
+        let errorMessage = error.response?.data?.message || "Failed to register";
+        showNotification(errorMessage, "error");
       } finally {
         setIsLoading(false);
       }
     }else if(userType === "supplier") {
+      console.log("Registering as supplier", { email, password, businessName, username, address });
+      
       if (!email || !password || !businessName || !username) {
-        setError("All fields are required");
+        showNotification("Missing required fields: Please provide all required fields ui", "error");
         return;
       }
   
@@ -131,9 +147,11 @@ const Register = ({ onClose, onSwitchToLogin }) => {
           setUserId(result.userId);
           console.log(result);
           onClose();
+        }else{
+          showNotification(response.data.message || 'Registration failed! Try Again', "error");
         }
       } catch (error) {
-        setError(error.response?.data?.message || "Failed to register");
+        showNotification(error.response?.data?.message || "Failed to register", "error");
       } finally {
         setIsLoading(false);
       }
@@ -181,18 +199,30 @@ const Register = ({ onClose, onSwitchToLogin }) => {
                           Sign in here
                         </a>
                       </p>
+                      {userType === "customer" && (
+                         <>
+                           <input
+                           type="text"
+                           placeholder="Enter your first name"
+                           value={firstName}
+                           onChange={(e) => setfName(e.target.value)}
+                           className="input-field"
+                         />
+                         <input
+                           type="text"
+                           placeholder="Enter your last name"
+                           value={lastName}
+                           onChange={(e) => setlName(e.target.value)}
+                           className="input-field"
+                         />
+                         </>
+                      )}
+                     
                       <input
                         type="email"
                         placeholder="Enter your email"
                         value={email}
                         onChange={(e) => setEmail(e.target.value)}
-                        className="input-field"
-                      />
-                      <input
-                        type="password"
-                        placeholder="Enter your Password"
-                        value={password}
-                        onChange={(e) => setPassword(e.target.value)}
                         className="input-field"
                       />
                       <button onClick={handleSendOtp} className="continue-btn">
@@ -231,18 +261,12 @@ const Register = ({ onClose, onSwitchToLogin }) => {
                   {userType === "customer" ? (
                     <>
                       <h2>Register as Customer</h2>
+                     
                       <input
                         type="text"
-                        placeholder="Enter your first name"
-                        value={firstName}
-                        onChange={(e) => setfName(e.target.value)}
-                        className="input-field"
-                      />
-                      <input
-                        type="text"
-                        placeholder="Enter your last name"
-                        value={lastName}
-                        onChange={(e) => setlName(e.target.value)}
+                        placeholder="Enter your address"
+                        value={address}
+                        onChange={(e) => setAddress(e.target.value)}
                         className="input-field"
                       />
                       <input
@@ -253,10 +277,10 @@ const Register = ({ onClose, onSwitchToLogin }) => {
                         className="input-field"
                       />
                       <input
-                        type="text"
-                        placeholder="Enter your address"
-                        value={address}
-                        onChange={(e) => setAddress(e.target.value)}
+                        type="password"
+                        placeholder="Enter your Password"
+                        value={password}
+                        onChange={(e) => setPassword(e.target.value)}
                         className="input-field"
                       />
                       <button onClick={handleRegister} className="continue-btn">
@@ -269,11 +293,18 @@ const Register = ({ onClose, onSwitchToLogin }) => {
                   ) : (
                     <>
                       <h2>Register as Supplier</h2>
-                      <input
+                        <input
+                         type="text"
+                         placeholder="Enter your business name"
+                         value={businessName}
+                         onChange={(e) => setbusinessName(e.target.value)}
+                         className="input-field"
+                       />
+                       <input
                         type="text"
-                        placeholder="Enter your business name"
-                        value={businessName}
-                        onChange={(e) => setbusinessName(e.target.value)}
+                        placeholder="Enter your address"
+                        value={address}
+                        onChange={(e) => setAddress(e.target.value)}
                         className="input-field"
                       />
                       <input
@@ -283,13 +314,14 @@ const Register = ({ onClose, onSwitchToLogin }) => {
                         onChange={(e) => setUsername(e.target.value)}
                         className="input-field"
                       />
-                      <input
-                        type="text"
-                        placeholder="Enter your address"
-                        value={address}
-                        onChange={(e) => setAddress(e.target.value)}
+                       <input
+                        type="password"
+                        placeholder="Enter your Password"
+                        value={password}
+                        onChange={(e) => setPassword(e.target.value)}
                         className="input-field"
                       />
+                    
                       <button onClick={handleRegister} className="continue-btn">
                         Register
                       </button>

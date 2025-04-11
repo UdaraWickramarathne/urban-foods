@@ -183,7 +183,7 @@ const Navbar = ({ onUserIconClick }) => {
                     <span className="dropdown-icon">👤</span> Profile
                   </Link>
                   {role === "supplier" && (
-                    <Link to="/dashboard" className="dropdown-item">
+                    <Link to="/dashboard" className="dropdown-item" onClick={() => setDropdownVisible(false)}>
                       <span className="dropdown-icon">📊</span> Dashboard
                     </Link>
                   )}
