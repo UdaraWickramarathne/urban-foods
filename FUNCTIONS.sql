@@ -132,6 +132,7 @@ END;
 /
 
 -- Function to get total customer count
+
 CREATE OR REPLACE FUNCTION get_customer_count
 RETURN NUMBER
 AS

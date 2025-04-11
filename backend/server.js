@@ -41,7 +41,9 @@ app.use("/api/category", categoryRoutes);
 app.use('/api/payment', paymentRoutes);
 app.use("/api/cart", cartRoutes);
 app.use('/api/backups', backupRoutes);
+
 app.use('/api/delivery', deliveryRouts);
+
 
 app.use("/api/images/products", express.static("uploads/products"));
 app.use("/api/images/suppliers", express.static("uploads/suppliers"));
