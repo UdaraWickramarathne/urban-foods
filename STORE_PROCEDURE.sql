@@ -123,7 +123,7 @@ BEGIN
 
 END get_suppliers_details;
 
-CREATE OR REPLACE PROCEDURE GetAllCustomersWithTotalSpends 
+CREATE OR REPLACE PROCEDURE customer_details 
 IS
     CURSOR customer_cursor IS
         SELECT c.customer_id, c.first_name, c.last_name, c.email, c.address, c.image_url, 
@@ -160,5 +160,5 @@ SET SERVEROUTPUT ON;
 EXEC get_supplier_details(7);
 
 SET SERVEROUTPUT ON;
-EXEC get_suppliers_details;
+EXEC CUSTOMER_DETAILS;
 

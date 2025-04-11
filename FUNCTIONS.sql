@@ -132,23 +132,14 @@ END;
 /
 
 -- Function to get total customer count
-CREATE OR REPLACE FUNCTION get_customer_count(
-    p_start_date DATE DEFAULT NULL,
-    p_end_date DATE DEFAULT NULL
-) RETURN NUMBER
+
+CREATE OR REPLACE FUNCTION get_customer_count
+RETURN NUMBER
 AS
     v_customer_count NUMBER;
 BEGIN
-    -- If dates are provided, filter by registration date
-    -- Otherwise, get all-time customer count
-    IF p_start_date IS NOT NULL AND p_end_date IS NOT NULL THEN
-        SELECT COUNT(*) INTO v_customer_count
-        FROM Customers
-        WHERE registration_date BETWEEN p_start_date AND p_end_date;
-    ELSE
-        SELECT COUNT(*) INTO v_customer_count
-        FROM Customers;
-    END IF;
+    SELECT COUNT(*) INTO v_customer_count
+    FROM Customers;
     
     -- Handle NULL result (no customers found)
     RETURN NVL(v_customer_count, 0);

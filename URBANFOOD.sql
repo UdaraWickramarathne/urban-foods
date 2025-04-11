@@ -172,3 +172,27 @@ WHERE o.customer_id = 89 ORDER BY o.order_date
 
 SELECT o.order_id, c.first_name || ' ' || c.last_name as customer_name, o.status, o.order_date, o.total_amount, o.address 
 FROM Orders o INNER JOIN Customers c ON o.customer_id = c.customer_id ORDER BY o.order_date DESC
+
+
+
+GRANT READ, WRITE ON DIRECTORY data_pump_dir TO urbanfood_user
+
+SELECT TEXT
+FROM DBA_SOURCE
+WHERE OWNER = 'URBANFOOD_USER'
+  AND NAME = 'GET_TOTAL_SALES'
+  AND TYPE = 'FUNCTION'
+ORDER BY LINE;
+
+
+SELECT OBJECT_NAME, OBJECT_TYPE FROM USER_OBJECTS WHERE OBJECT_TYPE IN ('PROCEDURE')
+
+SELECT TEXT
+FROM DBA_SOURCE
+WHERE OWNER = 'URBANFOOD_USER'
+  AND NAME = 'GET_SUPPLIERS_DETAILS'
+  AND TYPE = 'PROCEDURE'
+ORDER BY LINE;
+
+
+--Test 
