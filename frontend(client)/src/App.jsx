@@ -15,6 +15,7 @@ import { ContextWrapper } from './context/contextWrapper';
 import ProductDisplay from './pages/ProductDisplay/ProductDisplay.jsx';
 import ProductDetailPage from './pages/ProductDetails/ProductDetailPage.jsx';
 import MyOrders from './pages/MyOrders/MyOrders.jsx';
+import Feedback from "./pages/Feedback/Feedback.jsx";
 
 function App() {
   const [showLogin, setShowLogin] = useState(false);
@@ -62,6 +63,7 @@ function App() {
         <Route path="/about"  element={<About />} />
         <Route path='/dashboard' element={<Dashboard/>}/>
         <Route path="/orders" element={<MyOrders />} />
+        <Route path="/feedback" element={<Feedback />} />
       </Routes>
     </ContextWrapper>
   );

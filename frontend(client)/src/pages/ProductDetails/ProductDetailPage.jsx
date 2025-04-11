@@ -1,19 +1,93 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState, useContext } from 'react';
+import { useParams, useLocation } from 'react-router-dom';
 import './ProductDetailPage.css';
+import { PRODUCT_IMAGES } from '../../context/constants';
+import { CartContext } from '../../context/CartContext';
+import FeedbackPopup from '../../components/ProductReview/ProductReview';
+import { CUSTOMER_IMAGES } from "../../context/constants.js";
+import { useNotification } from '../../context/notificationContext';
 
 const ProductDetailPage = () => {
+  const { id } = useParams();
+  const location = useLocation();
+  const [product, setProduct] = useState(location.state || null);
   const [quantity, setQuantity] = useState(1);
   const [activeTab, setActiveTab] = useState('description');
+  const { addToCart} = useContext(CartContext);
+  const [isPopupOpen, setIsPopupOpen] = useState(false);
+  const [reviews, setReviews] = useState([]);
+  const { showNotification } = useNotification();
 
-  // Updated product data with single image
-  const product = {
-    name: "Ultra Comfort Wireless Headphones",
-    category: "Headphones",
-    price: 149.99,
+  const openPopup = () => setIsPopupOpen(true);
+  const closePopup = () => setIsPopupOpen(false);
+
+  const handleReviewAdded = (newReview) => {
+    setReviews((prevReviews) => [newReview, ...prevReviews]);
+  };
+
+  const [editingReview, setEditingReview] = useState(null);
+
+  const handleEditReview = (review) => {
+    setEditingReview(review);
+    setIsPopupOpen(true);
+  };
+
+  useEffect(() => {
+    if (!product) {
+      fetch(`http://localhost:5000/api/products/${id}`)
+        .then((response) => response.json())
+        .then((data) => setProduct(data))
+        .catch((error) => console.error('Error fetching product:', error));
+    }
+
+    fetch(`http://localhost:5000/api/reviews?productId=${id}`)
+      .then((response) => response.json())
+      .then((data) => {
+        if (data.success) {
+          setReviews(data.reviews);
+        }
+      })
+      .catch((error) => console.error('Error fetching reviews:', error));
+  }, [id, product]);
+
+  const handleDeleteReview = async (reviewId) => {
+    const userId = localStorage.getItem('userId');
+    if (window.confirm('Are you sure you want to delete this review?')) {
+      try {
+        const response = await fetch(`http://localhost:5000/api/reviews`, {
+          method: 'DELETE',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ reviewId, userId }),
+        });
+
+        const data = await response.json();
+        if (data.success) {
+          setReviews((prevReviews) => prevReviews.filter((review) => review.id !== reviewId));
+          showNotification('Review deleted successfully.', 'success');
+        } else {
+          alert(data.message || 'Failed to delete review.');
+        }
+      } catch (error) {
+        console.error('Error deleting review:', error);
+        alert('An error occurred while deleting the review.');
+      }
+    }
+  };
+
+  if (!product) {
+    return <div>Loading...</div>;
+  }
+
+  const product1 = {
+    name: product.name,
+    category: "Shop",
+    price: product.price,
     originalPrice: 199.99,
     rating: 4.2,
     reviewCount: 128,
-    description: "Experience the ultimate in audio comfort with our Ultra Comfort Wireless Headphones. Featuring premium noise cancellation, 40-hour battery life, and memory foam ear cushions for extended wear.",
+    description: "Lorem ipsum dolor, sit amet consectetur adipisicing elit. Est illum dolor nostrum quas voluptates, consequuntur repudiandae laborum pariatur dolores accusantium magnam, commodi corrupti hic! Officiis eaque cum nihil officia amet.",
     features: [
       "Active Noise Cancellation",
       "40-hour battery life",
@@ -22,42 +96,10 @@ const ProductDetailPage = () => {
       "Voice assistant compatible",
       "Quick charge (10 mins for 5 hours)",
     ],
-    image: "https://placehold.co/600x600", // Changed from images array to single image
-    inStock: true,
+    image: `${PRODUCT_IMAGES}/${product.imageUrl}`,
+    inStock: product.stock > 0,
     shipping: "Free shipping",
-    sku: "HP-001-BLK"
   };
-
-  // Sample reviews
-  const reviews = [
-    {
-      id: 1,
-      user: "Alex Johnson",
-      date: "March 15, 2025",
-      rating: 5,
-      title: "Best headphones I've ever owned",
-      comment: "These headphones are incredible. The sound quality is outstanding, and the comfort is unmatched. I can wear them all day without any discomfort. The noise cancellation works perfectly in noisy environments.",
-      avatar: "https://placehold.co/50x50"
-    },
-    {
-      id: 2,
-      user: "Sarah Miller",
-      date: "March 10, 2025",
-      rating: 4,
-      title: "Great sound but battery could be better",
-      comment: "The sound quality is amazing and they're very comfortable. My only complaint is that the battery doesn't quite last the full 40 hours as advertised. I get about 35 hours which is still pretty good.",
-      avatar: "https://placehold.co/50x50"
-    },
-    {
-      id: 3,
-      user: "David Chen",
-      date: "February 28, 2025",
-      rating: 4,
-      title: "Premium quality, worth the price",
-      comment: "The build quality is excellent and the sound is crisp and clear. The noise cancellation is effective but not quite as good as some competitors. Overall very satisfied with my purchase.",
-      avatar: "https://placehold.co/50x50"
-    }
-  ];
 
   const increaseQuantity = () => {
     setQuantity(quantity + 1);
@@ -67,6 +109,26 @@ const ProductDetailPage = () => {
     if (quantity > 1) {
       setQuantity(quantity - 1);
     }
+  };
+
+  const calculateTotalPrice = () => {
+    return (product1.price * quantity).toFixed(2);
+  };
+
+  const calculateAverageRating = () => {
+    if (!reviews || reviews.length === 0) return 0;
+    const totalRating = reviews.reduce((sum, review) => sum + (review?.rating || 0), 0);
+    return (totalRating / reviews.length).toFixed(1);
+  };
+
+  const handleAddToCart = () => {
+    addToCart({
+      productId: id,
+      name: product1.name,
+      price: product1.price,
+      imageUrl: product.imageUrl,
+      quantity,
+    });
   };
 
   const renderStars = (rating) => {
@@ -85,43 +147,41 @@ const ProductDetailPage = () => {
 
   return (
     <div className="product-details-detail-container">
-      {/* Product Section */}
       <div className="product-details-section">
-        {/* Left: Product Image - Updated for single image */}
         <div className="product-details-images">
           <div className="product-details-main-image">
-            <img src={product.image} alt={product.name} />
+            <img src={product1.image} alt={product1.name} />
           </div>
         </div>
-
-        {/* Right: Product Details */}
         <div className="product-details-details">
           <div className="product-details-breadcrumbs">
-            Home / Headphones / {product.name}
+            Home / {product1.category} / {product1.name}
           </div>
-          
-          <div className="product-details-category">{product.category}</div>
-          <h1 className="product-details-name">{product.name}</h1>
-          
+
+          <div className="product-details-category">{product1.category}</div>
+          <h1 className="product-details-name">{product1.name}</h1>
+
           <div className="product-details-rating">
-            <div className="product-details-stars">{renderStars(product.rating)}</div>
-            <div className="product-details-review-count">{product.rating} ({product.reviewCount} reviews)</div>
+            <div className="product-details-stars">{renderStars(calculateAverageRating())}</div>
+            <div className="product-details-review-count">
+              {calculateAverageRating()} ({reviews.length} reviews)
+            </div>
           </div>
-          
+
           <div className="product-details-price">
-            <div className="product-details-current-price">${product.price.toFixed(2)}</div>
-            {product.originalPrice && (
+            <div className="product-details-current-price">${calculateTotalPrice()}</div>
+            {product1.originalPrice && (
               <>
-                <div className="product-details-original-price">${product.originalPrice.toFixed(2)}</div>
+                <div className="product-details-original-price">${product1.originalPrice.toFixed(2)}</div>
                 <div className="product-details-discount">
-                  {Math.round((1 - product.price / product.originalPrice) * 100)}% OFF
+                  {Math.round((1 - product1.price / product1.originalPrice) * 100)}% OFF
                 </div>
               </>
             )}
           </div>
-          
+
           <div className="product-details-description">
-            {product.description}
+            {product1.description}
           </div>
 
           <div className="product-details-actions">
@@ -139,8 +199,8 @@ const ProductDetailPage = () => {
                 </svg>
               </button>
             </div>
-            
-            <button className="product-details-add-to-cart-btn">
+
+            <button className="product-details-add-to-cart-btn" onClick={handleAddToCart}>
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                 <circle cx="9" cy="21" r="1"></circle>
                 <circle cx="20" cy="21" r="1"></circle>
@@ -148,69 +208,66 @@ const ProductDetailPage = () => {
               </svg>
               Add to Cart
             </button>
-            
+
             <button className="product-details-wishlist-btn">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                 <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
               </svg>
             </button>
           </div>
-          
+
           <div className="product-details-meta">
             <div className="product-details-meta-item">
-              <span className="product-details-meta-label">SKU:</span>
-              <span className="product-details-meta-value">{product.sku}</span>
-            </div>
-            <div className="product-details-meta-item">
               <span className="product-details-meta-label">Availability:</span>
-              <span className="product-details-meta-value product-details-availability">
-                {product.inStock ? 'In Stock' : 'Out of Stock'}
+              <span
+                className={`product-details-meta-value product-details-availability ${product1.inStock ? 'in-stock' : 'out-of-stock'
+                  }`}
+              >
+                {product1.inStock ? 'In Stock' : 'Out of Stock'}
               </span>
             </div>
             <div className="product-details-meta-item">
               <span className="product-details-meta-label">Shipping:</span>
-              <span className="product-details-meta-value">{product.shipping}</span>
+              <span className="product-details-meta-value">{product1.shipping}</span>
             </div>
           </div>
         </div>
       </div>
-
-      {/* Tabs Section */}
       <div className="product-details-tabs">
         <div className="product-details-tab-headers">
-          <button 
+          <button
             className={`product-details-tab-btn ${activeTab === 'description' ? 'product-details-active' : ''}`}
             onClick={() => setActiveTab('description')}
           >
             Description
           </button>
-          <button 
+          <button
             className={`product-details-tab-btn ${activeTab === 'features' ? 'product-details-active' : ''}`}
             onClick={() => setActiveTab('features')}
           >
             Features
           </button>
-          <button 
+          <button
             className={`product-details-tab-btn ${activeTab === 'reviews' ? 'product-details-active' : ''}`}
             onClick={() => setActiveTab('reviews')}
           >
-            Reviews ({product.reviewCount})
+            Reviews ({reviews.length})
           </button>
         </div>
-        
+
         <div className="product-details-tab-content">
           {activeTab === 'description' && (
             <div className="product-details-tab-description">
-              <p>{product.description}</p>
+              <p>{product1.description}</p>
               <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</p>
               <p>Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
             </div>
           )}
-          
+
           {activeTab === 'features' && (
             <div className="product-details-tab-features">
               <ul className="product-details-feature-list">
-                {product.features.map((feature, index) => (
+                {product1.features.map((feature, index) => (
                   <li key={index} className="product-details-feature-item">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                       <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
@@ -222,7 +279,7 @@ const ProductDetailPage = () => {
               </ul>
             </div>
           )}
-          
+
           {activeTab === 'reviews' && (
             <div className="product-details-tab-reviews">
               <div className="product-details-review-summary">
@@ -231,13 +288,13 @@ const ProductDetailPage = () => {
                   <div className="product-details-average-rating">
                     <span className="product-details-big-rating">{product.rating}</span>
                     <div>
-                      <div className="product-details-stars product-details-big-stars">{renderStars(product.rating)}</div>
-                      <p>Based on {product.reviewCount} reviews</p>
+                      <div className="product-details-stars product-details-big-stars">{renderStars(calculateAverageRating())}</div>
+                      <p>Based on {reviews.length} reviews</p>
                     </div>
                   </div>
                 </div>
-                
-                <button className="product-details-write-review-btn">Write a Review</button>
+
+                <button className="product-details-write-review-btn" onClick={openPopup}>Write a Review</button>
               </div>
 
               <div className="product-details-review-list">
@@ -245,9 +302,9 @@ const ProductDetailPage = () => {
                   <div key={review.id} className="product-details-review-item">
                     <div className="product-details-review-header">
                       <div className="product-details-reviewer-info">
-                        <img src={review.avatar} alt={review.user} className="product-details-reviewer-avatar" />
+                        <img src={`${CUSTOMER_IMAGES}/${review.image}`} className="product-details-reviewer-avatar" />
                         <div>
-                          <h4 className="product-details-reviewer-name">{review.user}</h4>
+                          <h4 className="product-details-reviewer-name">{review.first_name}</h4>
                           <div className="product-details-review-date">{review.date}</div>
                         </div>
                       </div>
@@ -255,9 +312,26 @@ const ProductDetailPage = () => {
                         {renderStars(review.rating)}
                       </div>
                     </div>
-                    
+
                     <h5 className="product-details-review-title">{review.title}</h5>
                     <p className="product-details-review-comment">{review.comment}</p>
+
+                    {String(localStorage.getItem('userId')) === String(review.userId) && (
+                      <div className="product-details-review-actions">
+                        <button
+                          className="product-details-edit-review-btn"
+                          onClick={() => handleEditReview(review)}
+                        >
+                          Edit
+                        </button>
+                        <button
+                          className="product-details-delete-review-btn"
+                          onClick={() => handleDeleteReview(review.id)}
+                        >
+                          Delete
+                        </button>
+                      </div>
+                    )}
                   </div>
                 ))}
               </div>
@@ -265,6 +339,8 @@ const ProductDetailPage = () => {
           )}
         </div>
       </div>
+      {isPopupOpen && <FeedbackPopup onClose={closePopup} productId={id}
+        onReviewAdded={handleReviewAdded} review={editingReview} />}
     </div>
   );
 };

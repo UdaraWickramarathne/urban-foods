@@ -1,21 +1,21 @@
 import React, { useState, useEffect } from "react";
 import Slider from "react-slick";
 import axios from "axios";
-import ReviewPopup from "./CustomerFeedbackAdd.jsx";
 import "./CustomerFeedbackshow.css";
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
+import { CUSTOMER_IMAGES } from "../../context/constants.js";
 
 const CustomerReviewsSection = () => {
   const [reviews, setReviews] = useState([]);
   const [autoPlay, setAutoPlay] = useState(true);
   const [isPopupOpen, setIsPopupOpen] = useState(false);
 
-  // Fetch combined feedback and user details from the backend
   useEffect(() => {
     const fetchFeedbackData = async () => {
       try {
         const response = await axios.get("http://localhost:5000/api/feedback");
+        console.log("Feedback data:", response.data);
         if (response.data.success) {
           setReviews(response.data.feedback);
         } else {
@@ -25,7 +25,7 @@ const CustomerReviewsSection = () => {
         console.error("Error fetching feedback data:", error);
       }
     };
-
+  
     fetchFeedbackData();
   }, []);
 
@@ -70,14 +70,15 @@ const CustomerReviewsSection = () => {
       >
         {reviews.map((review) => (
           <div className="review-card" key={review.id}>
-            <img
-              src={review.image}
+            <img className="review-img"
+              src={`${CUSTOMER_IMAGES}/${review.image}`}
               alt={review.name}
-              className="review-img"
             />
             <h3 className="review-name">{review.name}</h3>
-            <p className="review-text">{review.text}</p>
+            <p className="review-title">{review.title}</p>
+            <p className="review-text">{review.comment}</p>
             <div className="review-rating">{"⭐".repeat(review.rating)}</div>
+            <p className="review-date">{new Date(review.date).toLocaleDateString()}</p>
           </div>
         ))}
       </Slider>

@@ -15,6 +15,7 @@ import deliveryRouts  from './routes/deliveryRoutes.js';
 import bodyParser from "body-parser";
 import { connectToDatabase } from "./db/mongodbConnection.js";
 import backupRoutes from './routes/backupRoutes.js';
+import reviewRoutes from './routes/reviewRoutes.js';
 
 const app = express();
 
@@ -52,6 +53,7 @@ app.use("/api/images/default", express.static("uploads/defaults"));
 
 app.use('/api/suppliers', supplierRoutes);
 app.use('/api/feedback', feedbackRoutes);
+app.use('/api/reviews', reviewRoutes);
 app.listen(5000, () => {
     console.log('Server started on http://localhost:5000');
 });
