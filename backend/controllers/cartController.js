@@ -1,5 +1,6 @@
 import HttpStatus from "../enums/httpsStatus.js";
 import cartRepository from "../repositories/cartRepository.js";
+import productRepository from "../repositories/productRepository.js";
 
 const getCartItems = async (req, res) => {
   try {
@@ -28,7 +29,17 @@ const addToCart = async (req, res) => {
 const updateCartItem = async (req, res) => {
   try {
     const { userId, quantity } = req.body;
-    const result = await cartRepository.updateCartItem(userId, req.params.product_id, quantity);
+    const productId = req.params.product_id;
+
+    const isProductOutOfStock = await productRepository.isProductOutOfStock(productId, quantity);
+    if (isProductOutOfStock) {
+      return res.status(HttpStatus.BAD_REQUEST).json({
+        success: false,
+        message: "Product is out of stock",
+      });
+    }
+
+    const result = await cartRepository.updateCartItem(userId, productId, quantity);
     res.status(HttpStatus.OK).json(result);
   } catch (error) {
     console.error("Error updating cart item:", error.message);

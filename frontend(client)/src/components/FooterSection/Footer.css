@@ -1,142 +1,260 @@
-.footer-container {
-  background-color: white;
-  color: black;
-  padding: 2rem;
-  box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
+.ft-footer-container {
+  position: relative;
+  background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+  color: #212529;
+  padding: 0 0 2rem;
+  overflow: hidden;
 }
 
-.footer-content {
+.ft-footer-top {
+  position: relative;
+  height: 80px;
+}
+
+.ft-footer-wave {
+  position: absolute;
+  top: -30px;
+  left: 0;
+  width: 100%;
+}
+
+.ft-footer-content {
   display: flex;
-  justify-content: space-around;
+  justify-content: space-between;
   flex-wrap: wrap;
   max-width: 1200px;
   margin: 0 auto;
-  padding-bottom: 2rem;
+  padding: 2rem;
 }
 
-.footer-logo-section {
+.ft-footer-logo-section {
   flex: 1;
   min-width: 250px;
   margin: 1rem;
   display: flex;
   flex-direction: column;
-  align-items: center;
+  align-items: flex-start;
 }
 
-.footer-logo {
-  width: 150px;
+.ft-footer-logo {
+  width: 120px;
   height: auto;
   margin-bottom: 1rem;
+  filter: drop-shadow(0 4px 6px rgba(0,0,0,0.1));
 }
 
-.footer-logo-section h2 {
-  font-size: 1.5rem;
-  font-weight: bold;
-  color: #2c3e50;
+.ft-footer-logo-section h2 {
+  font-size: 1.8rem;
+  font-weight: 700;
+  color: #343a40;
+  margin-bottom: 0.25rem;
 }
 
-.footer-section {
-  flex: 1;
-  min-width: 250px;
-  margin: 1rem;
+.ft-tagline {
+  color: #6c757d;
+  font-style: italic;
+  margin-bottom: 1.5rem;
 }
 
-.footer-section h3 {
-  color: #2c3e50;
-  margin-bottom: 1rem;
-  font-size: 1.2rem;
-}
-
-.footer-section ul {
-  list-style: none;
-  padding: 0;
-}
-
-.footer-section ul li {
-  margin-bottom: 1rem;
-  color: #7f8c8d;
-  cursor: pointer;
-  transition: color 0.3s ease;
-  display: flex;
-  align-items: center;
-}
-
-.footer-section ul li svg {
-  margin-right: 0.5rem;
-}
-
-.footer-section ul li:hover {
-  color: #3498db;
-}
-
-.newsletter-box {
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
-}
-
-.email-input {
-  display: flex;
-  gap: 0.5rem;
-}
-
-.email-input input {
-  padding: 0.5rem;
-  border: 1px solid #bdc3c7;
-  border-radius: 4px;
-  flex: 1;
-}
-
-.email-input button {
-  padding: 0.5rem 1rem;
-  background-color: #3498db;
-  border: none;
-  border-radius: 4px;
-  color: white;
-  cursor: pointer;
-  transition: background-color 0.3s ease;
-}
-
-.email-input button:hover {
-  background-color: #2980b9;
-}
-
-.footer-links {
+.ft-social-icons {
   display: flex;
   gap: 1rem;
   margin-top: 1rem;
 }
 
-.footer-links a {
-  color: #7f8c8d;
+.ft-social-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: white;
+  color: #495057;
+  font-size: 1.2rem;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+  transition: transform 0.3s ease, background 0.3s ease, color 0.3s ease;
+}
+
+.ft-social-icon:hover {
+  transform: translateY(-3px);
+  background: #16a34a;
+  color: white;
+}
+
+.ft-footer-section {
+  flex: 1;
+  min-width: 250px;
+  margin: 1rem;
+}
+
+.ft-footer-section h3 {
+  color: #343a40;
+  margin-bottom: 1.5rem;
+  font-size: 1.3rem;
+  font-weight: 600;
+  position: relative;
+  padding-bottom: 0.5rem;
+}
+
+.ft-footer-section h3::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  width: 50px;
+  height: 3px;
+  background: linear-gradient(90deg, #16a34a, #15803d);
+  border-radius: 2px;
+}
+
+.ft-contact-list, .ft-quick-links {
+  list-style: none;
+  padding: 0;
+}
+
+.ft-contact-list li, .ft-quick-links li {
+  margin-bottom: 1rem;
+  color: #495057;
+  display: flex;
+  align-items: center;
+  transition: transform 0.3s ease;
+}
+
+.ft-contact-list li svg, .ft-quick-links li svg {
+  margin-right: 0.8rem;
+  color: #16a34a;
+  min-width: 16px;
+}
+
+.ft-quick-links li a {
+  display: flex;
+  align-items: center;
+  color: #495057;
   text-decoration: none;
   transition: color 0.3s ease;
 }
 
-.footer-links a:hover {
-  color: #3498db;
+.ft-contact-list li:hover, .ft-quick-links li:hover {
+  transform: translateX(5px);
 }
 
-.footer-links a svg {
-  margin-right: 0.5rem;
+.ft-quick-links li a:hover {
+  color: #16a34a;
 }
 
-.copyright {
+.ft-newsletter-section {
+  flex: 1.2;
+}
+
+.ft-newsletter-box {
+  background-color: white;
+  padding: 1.5rem;
+  border-radius: 10px;
+  box-shadow: 0 8px 16px rgba(0,0,0,0.08);
+}
+
+.ft-email-input {
+  display: flex;
+  gap: 0.5rem;
+  margin: 1rem 0;
+}
+
+.ft-email-input input {
+  padding: 0.8rem 1rem;
+  border: 1px solid #dee2e6;
+  border-radius: 6px;
+  flex: 1;
+  font-size: 0.95rem;
+  transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.ft-email-input input:focus {
+  outline: none;
+  border-color: #16a34a;
+  box-shadow: 0 0 0 3px rgba(22, 163, 74, 0.25);
+}
+
+.ft-subscribe-btn {
+  padding: 0 1.2rem;
+  background: linear-gradient(45deg, #16a34a, #15803d);
+  border: none;
+  border-radius: 6px;
+  color: white;
+  cursor: pointer;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.ft-subscribe-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(22, 163, 74, 0.4);
+}
+
+.ft-newsletter-info {
+  font-size: 0.85rem;
+  color: #6c757d;
+  margin-top: 0.5rem;
+}
+
+.ft-copyright {
   text-align: center;
   padding-top: 2rem;
-  border-top: 1px solid #bdc3c7;
-  margin-top: 2rem;
-  color: #7f8c8d;
+  border-top: 1px solid rgba(0,0,0,0.1);
+  margin: 2rem auto 0;
+  max-width: 1200px;
+  color: #6c757d;
+  font-size: 0.9rem;
+}
+
+@media (max-width: 992px) {
+  .ft-footer-content {
+    gap: 2rem;
+  }
 }
 
 @media (max-width: 768px) {
-  .footer-content {
+  .ft-footer-content {
     flex-direction: column;
     align-items: center;
+  }
+  
+  .ft-footer-section {
+    width: 100%;
+    margin: 0.5rem 0;
     text-align: center;
   }
   
-  .email-input {
+  .ft-footer-logo-section {
+    align-items: center;
+    text-align: center;
+    margin-bottom: 2rem;
+  }
+  
+  .ft-footer-section h3::after {
+    left: 50%;
+    transform: translateX(-50%);
+  }
+  
+  .ft-contact-list, .ft-quick-links {
+    display: flex;
     flex-direction: column;
+    align-items: center;
+  }
+  
+  .ft-footer-section h3 {
+    text-align: center;
+  }
+}
+
+@media (max-width: 480px) {
+  .ft-email-input {
+    flex-direction: column;
+  }
+  
+  .ft-subscribe-btn {
+    padding: 0.8rem;
   }
 }

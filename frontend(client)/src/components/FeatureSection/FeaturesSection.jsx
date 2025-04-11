@@ -30,11 +30,15 @@ const features = [
 
 const FeatureCard = ({ title, description, image, isActive }) => {
   return (
-    <div className={`feature-card ${isActive ? "active" : ""}`}>
-      <img src={image} alt={title} />
-      <h3>{title}</h3>
-      <p>{description}</p>
-      <button>Read More</button>
+    <div className={`feature-card`}>
+      <div className="feature-icon">
+        <img src={image} alt={title} />
+      </div>
+      <div className="feature-content">
+        <h3>{title}</h3>
+        <p>{description}</p>
+        <button className="feature-btn">Learn More</button>
+      </div>
     </div>
   );
 };
@@ -42,7 +46,7 @@ const FeatureCard = ({ title, description, image, isActive }) => {
 const FeaturesSection = () => {
   return (
     <section className="features-section">
-      <h2>
+      <h2 className="section-title" style={{ fontSize: "24px" }}>
         Our <span>Features</span>
       </h2>
       <div className="features-container">

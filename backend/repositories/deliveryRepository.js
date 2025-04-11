@@ -53,6 +53,7 @@ const getAllDeliveries = async () => {
         d.status,
         d.tracking_number,
         d.estimated_date,
+        d.delivered_date,
         d.assign_agent_id
         FROM deliveries d
         JOIN Orders o ON d.order_id = o.order_id
@@ -68,7 +69,8 @@ const getAllDeliveries = async () => {
                 status: row[3],
                 trackingNumber: row[4],
                 estimatedDate: row[5],
-                assignedAgentId: row[6]
+                deliveredDate: row[6],
+                assignedAgentId: row[7]
             };
         });
         await connection.close();
@@ -108,6 +110,15 @@ const updateDeliveryStatus = async (deliveryId, status) => {
             deliveryId,
         };
         await connection.execute(query, binds);
+
+        if (status === "DELIVERED") {
+            const updateQuery = `UPDATE orders SET status = 'COMPLETED' WHERE order_id = (SELECT order_id FROM deliveries WHERE delivery_id = :deliveryId)`;
+            await connection.execute(updateQuery, { deliveryId });
+
+            const deliveredDateQuery = `UPDATE deliveries SET delivered_date = SYSDATE WHERE delivery_id = :deliveryId`;
+            await connection.execute(deliveredDateQuery, { deliveryId });
+        }
+
         await connection.commit();
         await connection.close();
         return { success: true };
@@ -167,7 +178,8 @@ const getDeliveryByAgentId = async (agentId) => {
         FROM deliveries d 
         JOIN Orders o ON d.order_id = o.order_id
         JOIN Customers c ON o.customer_id = c.customer_id
-        WHERE d.assign_agent_id = :agentId`;
+        WHERE d.assign_agent_id = :agentId
+        ORDER BY d.delivery_id DESC`;
         const binds = { agentId };
         const result = await connection.execute(query, binds);
         const deliveries = result.rows.map((row) => {

@@ -17,6 +17,7 @@ import { connectToDatabase } from "./db/mongodbConnection.js";
 import backupRoutes from './routes/backupRoutes.js';
 import reviewRoutes from './routes/reviewRoutes.js';
 
+
 const app = express();
 
 app.use(cors());
@@ -42,7 +43,6 @@ app.use("/api/category", categoryRoutes);
 app.use('/api/payment', paymentRoutes);
 app.use("/api/cart", cartRoutes);
 app.use('/api/backups', backupRoutes);
-
 app.use('/api/delivery', deliveryRouts);
 
 

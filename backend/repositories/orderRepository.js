@@ -119,6 +119,15 @@ const addOrder = async (orderData, orderItemsData) => {
           unitPrice: item.price,
         }
       );
+
+      // update product stock
+      await connection.execute(
+        "UPDATE Products SET stock = stock - :quantity WHERE product_id = :productId",
+        {
+          quantity: item.quantity,
+          productId: item.productId,
+        }
+      );
     }
     await connection.commit();
 

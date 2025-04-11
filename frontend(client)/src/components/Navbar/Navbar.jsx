@@ -145,11 +145,11 @@ const Navbar = ({ onUserIconClick }) => {
               Shop
             </Link>
             <Link
-              to="/sale"
-              className={menu === "sale" ? "active" : ""}
-              onClick={() => setMenu("sale")}
+              to="/services"
+              className={menu === "services" ? "active" : ""}
+              onClick={() => setMenu("services")}
             >
-              Sale
+              Our Services
             </Link>
             <Link
               to="/about"
