@@ -16,6 +16,8 @@ import ProductDetailPage from './pages/ProductDetails/ProductDetailPage.jsx';
 import MyOrders from './pages/MyOrders/MyOrders.jsx';
 import Contact from './pages/Contact/Contact.jsx';
 import OurServices from './pages/OurServices/OurServices.jsx';
+import Feedback from "./pages/Feedback/Feedback.jsx";
+
 
 function App() {
   const [showLogin, setShowLogin] = useState(false);
@@ -65,6 +67,7 @@ function App() {
         <Route path="/orders" element={<MyOrders />} />
         <Route path='/contact' element={<Contact />} />
         <Route path='/services' element={<OurServices/>}/>
+        <Route path="/feedback" element={<Feedback />} />
       </Routes>
     </ContextWrapper>
   );
