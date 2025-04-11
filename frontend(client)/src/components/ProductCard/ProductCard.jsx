@@ -1,22 +1,51 @@
-import React, { use, useContext, useEffect } from 'react';
+import React, { use, useContext, useEffect, useState } from 'react';
 import './ProductCard.css';
 import { useNavigate } from 'react-router-dom';
 import { PRODUCT_IMAGES } from '../../context/constants';
 import { CartContext } from '../../context/CartContext';
+import axios from 'axios';
 
 const ProductCard = ({ product }) => {
   const navigate = useNavigate();
   const { addToCart, removeFromCart, updateQuantity, getQuantity, cartItems } = useContext(CartContext);
-  
-  // Get current quantity from cart context
-  let quantity = getQuantity(product.productId);
-  let isInCart = quantity > 0;
+
+  const [averageRating, setAverageRating] = useState(0);
+  const [reviewCount, setReviewCount] = useState(0);
+
+  const quantity = getQuantity(product.productId) || 0;
+  const isInCart = quantity > 0;
 
   useEffect(() => {
-    quantity = getQuantity(product.productId);
-    isInCart = quantity > 0;    
-  },[cartItems]);
-  
+    const fetchReviews = async () => {
+      try {
+        const response = await axios.get(`http://localhost:5000/api/reviews?productId=${product.productId}`);
+        if (response.data.success) {
+          const reviews = response.data.reviews;
+          setReviewCount(reviews.length);
+
+          const totalRating = reviews.reduce((sum, review) => sum + (review.rating || 0), 0);
+          const avgRating = reviews.length > 0 ? (totalRating / reviews.length).toFixed(1) : 0;
+          setAverageRating(avgRating);
+        }
+      } catch (error) {
+        console.error('Error fetching reviews:', error);
+      }
+    };
+
+    fetchReviews();
+  }, [product.productId]);
+
+  const renderStars = (rating) => {
+    const stars = [];
+    for (let i = 1; i <= 5; i++) {
+      stars.push(
+        <span key={i} className={i <= Math.floor(rating) ? 'star filled' : 'star'}>
+          ★
+        </span>
+      );
+    }
+    return stars;
+  };
 
   const handleAddToCart = () => {
     addToCart(product);
@@ -38,11 +67,8 @@ const ProductCard = ({ product }) => {
     navigate(`/product/${product.productId}`);
   };
 
-  // Hardcoded values for properties not in the database
   const originalPrice = (product.price * 1.25).toFixed(2);
   const discount = 20;
-  const rating = 4.5;
-  const reviewCount = 120;
   const isNew = true;
 
   return (
@@ -65,14 +91,10 @@ const ProductCard = ({ product }) => {
           <div className="discount">-{discount}%</div>
         </div>
         <div className="product-rating">
-          <div className="stars">
-            {[1, 2, 3, 4, 5].map((star) => (
-              <div key={star} className="star">
-                {star <= Math.floor(rating) ? '★' : '☆'}
-              </div>
-            ))}
+          <div className="stars">{renderStars(averageRating)}</div>
+          <div className="review-count">
+            {averageRating} ({reviewCount} reviews)
           </div>
-          <div className="review-count">{rating} ({reviewCount} reviews)</div>
         </div>
         <div className="product-actions">
           {!isInCart ? (
