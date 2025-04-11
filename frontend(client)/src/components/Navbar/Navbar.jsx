@@ -26,7 +26,7 @@ const Navbar = ({ onUserIconClick }) => {
     navigate("/feedback");
   };
 
-  const {cartItems, removeFromCart, updateQuantity} = useContext(CartContext);
+  const { cartItems, removeFromCart, updateQuantity, setCartItems} = useContext(CartContext);
 
 
   useEffect(() => {

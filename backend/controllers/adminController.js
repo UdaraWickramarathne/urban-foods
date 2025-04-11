@@ -333,6 +333,124 @@ const changeTriggerStatus = async (req, res) => {
   }
 }
 
+const getSQLFunctions = async (req, res) => {
+  try {
+    const result = await adminRepository.getSQLFuntions();
+    if (result.success) {
+      return res.status(HttpStatus.OK).json({
+        success: true,
+        data: result.data,
+      });
+    } else {
+      return res.status(HttpStatus.BAD_REQUEST).json({
+        success: false,
+        message: result.message,
+      });
+    }
+  } catch (error) {
+    console.log("Error getting SQL functions:", error);
+    return res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
+      success: false,
+      message: "Error getting SQL functions",
+    });
+  }
+};
+
+const getSQLFunctionDetails = async (req, res) => {
+  try {
+    const functionName = req.params.functionName;
+    const result = await adminRepository.getSQLFunctionDetails(functionName);
+    if (result.success) {
+      return res.status(HttpStatus.OK).json({
+        success: true,
+        data: result.data,
+      });
+    } else {
+      return res.status(HttpStatus.BAD_REQUEST).json({
+        success: false,
+        message: result.message,
+      });
+    }
+  } catch (error) {
+    console.log("Error getting SQL function details:", error);
+    return res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
+      success: false,
+      message: "Error getting SQL function details",
+    });
+  }
+}
+
+const getProcedures = async (req, res) => {
+  try {
+    const result = await adminRepository.getProcedures();
+    if (result.success) {
+      return res.status(HttpStatus.OK).json({
+        success: true,
+        data: result.data,
+      });
+    } else {
+      return res.status(HttpStatus.BAD_REQUEST).json({
+        success: false,
+        message: result.message,
+      });
+    }
+  } catch (error) {
+    console.log("Error getting procedures:", error);
+    return res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
+      success: false,
+      message: "Error getting procedures",
+    });
+  }
+}
+
+const executeProcedure = async (req, res) => {
+  try {
+    const procedureName = req.params.procedureName;
+    const result = await adminRepository.executeProcedure(procedureName);
+    if (result.success) {
+      return res.status(HttpStatus.OK).json({
+        success: true,
+        data: result.data,
+      });
+    } else {
+      return res.status(HttpStatus.BAD_REQUEST).json({
+        success: false,
+        message: result.message,
+      });
+    }
+  } catch (error) {
+    console.log("Error executing procedure:", error);
+    return res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
+      success: false,
+      message: "Error executing procedure",
+    });
+  }
+}
+
+const getProcedureDetails = async (req, res) => {
+  try {
+    const procedureName = req.params.procedureName;
+    const result = await adminRepository.procedureDetails(procedureName);
+    if (result.success) {
+      return res.status(HttpStatus.OK).json({
+        success: true,
+        data: result.data,
+      });
+    } else {
+      return res.status(HttpStatus.BAD_REQUEST).json({
+        success: false,
+        message: result.message,
+      });
+    }
+  } catch (error) {
+    console.log("Error getting procedure details:", error);
+    return res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
+      success: false,
+      message: "Error getting procedure details",
+    });
+  }
+}
+
 export default {
   addOrcleUser,
   adminLogin,
@@ -345,5 +463,10 @@ export default {
   getAllTrigger,
   getLogDetails,
   dropTrigger,
-  changeTriggerStatus
+  changeTriggerStatus,
+  getSQLFunctions,
+  getSQLFunctionDetails,
+  getProcedures,
+  executeProcedure,
+  getProcedureDetails
 };

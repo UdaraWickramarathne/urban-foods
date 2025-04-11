@@ -218,6 +218,33 @@ const getTotalSales = async (startDate = null, endDate = null) => {
   }
 };
 
+const getOrderCount = async (startDate = null, endDate = null) => {
+  try {
+    const connection = await getConnection();
+
+    let query;
+    let binds = {};
+
+    if (startDate && endDate) {
+      // Call the function with date range
+      query = `SELECT get_completed_order_count(TO_DATE(:startDate, 'YYYY-MM-DD'), TO_DATE(:endDate, 'YYYY-MM-DD')) AS order_count FROM DUAL`;
+      binds = { startDate, endDate };
+    } else {
+      // Call the function without parameters for all-time order count
+      query = `SELECT get_completed_order_count() AS order_count FROM DUAL`;
+    }
+
+    const result = await connection.execute(query, binds);
+    const orderCount = result.rows[0][0] || 0; // Get the first column of the first row
+
+    await connection.close();
+    return { success: true, data: orderCount };
+  } catch (error) {
+    console.error("Error getting order count:", error.message);
+    return { success: false, message: error.message };
+  }
+};
+
 export default {
   getAllOrders,
   getOrderItems,
@@ -225,4 +252,5 @@ export default {
   getOrdersByUserId,
   updateOrderStatus,
   getTotalSales,
+  getOrderCount,
 };

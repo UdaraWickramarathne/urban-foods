@@ -8,14 +8,12 @@ import customerRoutes from './routes/customerRoutes.js';
 import categoryRoutes from './routes/categoryRoutes.js';
 import adminRoutes from './routes/adminRoutes.js';
 import supplierRoutes from './routes/supplierRoutes.js';
-
 import feedbackRoutes from './routes/feedbackRoutes.js';
-
 import paymentRoutes from './routes/paymentRoutes.js';
 import cartRoutes from './routes/cartRoutes.js';
 import bodyParser from "body-parser";
 import { connectToDatabase } from "./db/mongodbConnection.js";
-
+import backupRoutes from './routes/backupRoutes.js';
 
 const app = express();
 
@@ -41,7 +39,7 @@ app.use("/api/admin", adminRoutes);
 app.use("/api/category", categoryRoutes);
 app.use('/api/payment', paymentRoutes);
 app.use("/api/cart", cartRoutes);
-
+app.use('/api/backups', backupRoutes);
 
 app.use("/api/images/products", express.static("uploads/products"));
 app.use("/api/images/suppliers", express.static("uploads/suppliers"));

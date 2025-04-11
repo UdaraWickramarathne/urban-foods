@@ -52,6 +52,32 @@ BEGIN
 END;
 /
 
+-- Function to get total successful order count
+CREATE OR REPLACE FUNCTION get_completed_order_count(
+    p_start_date DATE DEFAULT NULL,
+    p_end_date DATE DEFAULT NULL
+) RETURN NUMBER
+AS
+    v_order_count NUMBER;
+BEGIN
+    -- If dates are provided, filter by date range
+    -- Otherwise, get all-time completed order count
+    IF p_start_date IS NOT NULL AND p_end_date IS NOT NULL THEN
+        SELECT COUNT(*) INTO v_order_count
+        FROM Orders
+        WHERE status = 'COMPLETED'
+        AND order_date BETWEEN p_start_date AND p_end_date;
+    ELSE
+        SELECT COUNT(*) INTO v_order_count
+        FROM Orders
+        WHERE status = 'COMPLETED';
+    END IF;
+    
+    -- Handle NULL result (no orders found)
+    RETURN NVL(v_order_count, 0);
+END;
+/
+
 DECLARE
    product_cursor SYS_REFCURSOR;
    v_product_id Products.product_id%TYPE;
@@ -90,3 +116,93 @@ BEGIN
     DBMS_OUTPUT.PUT_LINE('Total sales for 2023: $' || v_total);
 END;
 /
+
+-- Example usage of get_completed_order_count:
+DECLARE
+    v_count NUMBER;
+BEGIN
+    -- Get all-time total completed orders
+    v_count := get_completed_order_count();
+    DBMS_OUTPUT.PUT_LINE('All-time completed orders: ' || v_count);
+    
+    -- Get completed orders for a specific date range
+    v_count := get_completed_order_count(TO_DATE('2023-01-01', 'YYYY-MM-DD'), TO_DATE('2023-12-31', 'YYYY-MM-DD'));
+    DBMS_OUTPUT.PUT_LINE('Completed orders for 2023: ' || v_count);
+END;
+/
+
+-- Function to get total customer count
+CREATE OR REPLACE FUNCTION get_customer_count(
+    p_start_date DATE DEFAULT NULL,
+    p_end_date DATE DEFAULT NULL
+) RETURN NUMBER
+AS
+    v_customer_count NUMBER;
+BEGIN
+    -- If dates are provided, filter by registration date
+    -- Otherwise, get all-time customer count
+    IF p_start_date IS NOT NULL AND p_end_date IS NOT NULL THEN
+        SELECT COUNT(*) INTO v_customer_count
+        FROM Customers
+        WHERE registration_date BETWEEN p_start_date AND p_end_date;
+    ELSE
+        SELECT COUNT(*) INTO v_customer_count
+        FROM Customers;
+    END IF;
+    
+    -- Handle NULL result (no customers found)
+    RETURN NVL(v_customer_count, 0);
+END;
+/
+
+-- Function to get total product count
+CREATE OR REPLACE FUNCTION get_product_count(
+    p_category_id NUMBER DEFAULT NULL
+) RETURN NUMBER
+AS
+    v_product_count NUMBER;
+BEGIN
+    -- If category is provided, filter by category
+    -- Otherwise, get total product count
+    IF p_category_id IS NOT NULL THEN
+        SELECT COUNT(*) INTO v_product_count
+        FROM Products
+        WHERE category_id = p_category_id;
+    ELSE
+        SELECT COUNT(*) INTO v_product_count
+        FROM Products;
+    END IF;
+    
+    -- Handle NULL result (no products found)
+    RETURN NVL(v_product_count, 0);
+END;
+/
+
+-- Example usage of get_customer_count:
+DECLARE
+    v_count NUMBER;
+BEGIN
+    -- Get total customer count
+    v_count := get_customer_count();
+    DBMS_OUTPUT.PUT_LINE('Total customers: ' || v_count);
+    
+    -- Get customers registered in 2023
+    v_count := get_customer_count(TO_DATE('2023-01-01', 'YYYY-MM-DD'), TO_DATE('2023-12-31', 'YYYY-MM-DD'));
+    DBMS_OUTPUT.PUT_LINE('Customers registered in 2023: ' || v_count);
+END;
+/
+
+-- Example usage of get_product_count:
+DECLARE
+    v_count NUMBER;
+BEGIN
+    -- Get total product count
+    v_count := get_product_count();
+    DBMS_OUTPUT.PUT_LINE('Total products: ' || v_count);
+    
+    -- Get products in category 1
+    v_count := get_product_count(1);
+    DBMS_OUTPUT.PUT_LINE('Products in category 1: ' || v_count);
+END;
+/
+
