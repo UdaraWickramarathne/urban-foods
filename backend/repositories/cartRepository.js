@@ -1,6 +1,5 @@
 import { getConnection } from "../db/dbConnection.js";
-import Cart from "../models/cart.js";
-import oracledb from "oracledb";
+
 
 const getCartItems = async (userId) => {
   let connection;
@@ -34,6 +33,8 @@ const getCartItems = async (userId) => {
 };
 
 const addToCart = async (cartData) => {
+  console.log("Adding to cart:", cartData);
+  
   let connection;
   try {
     connection = await getConnection();

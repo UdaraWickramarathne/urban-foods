@@ -180,7 +180,7 @@ const getCustomersWithTotalSpends = async () => {
     
     await connection.execute(`BEGIN DBMS_OUTPUT.ENABLE(NULL); END;`);
     
-    await connection.execute(`BEGIN GetAllCustomersWithTotalSpends; END;`);
+    await connection.execute(`BEGIN customer_details; END;`);
     
     const outputResult = await connection.execute(`
       DECLARE
@@ -239,11 +239,46 @@ const getCustomersWithTotalSpends = async () => {
   }
 };
 
+const getCustomerCount = async () => {
+  let connection;
+  try {
+    connection = await getConnection();
+    const result = await connection.execute(
+      `BEGIN
+         :result := get_customer_count();
+       END;`,
+      { 
+        result: { dir: oracledb.BIND_OUT, type: oracledb.NUMBER }
+      }
+    );
+    
+    return {
+      success: true,
+      count: result.outBinds.result
+    };
+  } catch (error) {
+    console.error("Error getting customer count:", error);
+    return {
+      success: false,
+      message: "Error getting customer count"
+    };
+  } finally {
+    if (connection) {
+      try {
+        await connection.close();
+      } catch (err) {
+        console.error("Error closing connection:", err.message);
+      }
+    }
+  }
+};
+
 export default { 
   getCustomerById, 
   getCustomerByEmail, 
   getAllCustomers, 
   deleteCustomer, 
   editCustomer,
-  getCustomersWithTotalSpends 
+  getCustomersWithTotalSpends,
+  getCustomerCount 
 };

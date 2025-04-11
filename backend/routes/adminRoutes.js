@@ -18,4 +18,11 @@ router.post('/log', adminController.getLogDetails);
 router.delete('/triggers/:triggerName', adminController.dropTrigger);
 router.put('/triggers/:triggerName', adminController.changeTriggerStatus);
 
+router.get('/functions', adminController.getSQLFunctions);
+router.get('/functions/:functionName', adminController.getSQLFunctionDetails);
+
+router.get('/procedure', adminController.getProcedures);
+router.get('/procedure/:procedureName/details', adminController.getProcedureDetails);
+router.get('/procedure/:procedureName', adminController.executeProcedure);
+
 export default router;

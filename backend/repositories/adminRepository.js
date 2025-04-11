@@ -5,8 +5,10 @@ import auth from "../middlewares/auth.js";
 import { ADMIN_PERMISSIONS, DB_PRIVILEGE_MAP } from "../enums/permissions.js";
 import DbUser from "../models/dbUser.js";
 import Trigger from "../models/trigger.js";
+import oracledb from "oracledb";  // Add this import
 
 const { generateToken } = auth;
+
 
 const createOracleUser = async (userData) => {
   let connection;
@@ -782,6 +784,181 @@ const changeTriggerStatus = async (triggerName, status) => {
     }
   }
 }
+
+
+const getSQLFuntions = async () => {
+  let connection;
+  try {
+    connection = await getConnection();
+    const result = await connection.execute(
+      `SELECT OBJECT_NAME, OBJECT_TYPE FROM USER_OBJECTS WHERE OBJECT_TYPE IN ('FUNCTION')`
+    );
+    return { success: true, data: result.rows };
+  } catch (err) {
+    console.error("Error listing Oracle functions:", err);
+    return { success: false, message: err.message };
+  } finally {
+    if (connection) {
+      try {
+        await connection.close();
+      } catch (err) {
+        console.error("Error closing connection:", err);
+      }
+    }
+  }
+}
+
+const getSQLFunctionDetails = async (functionName) => {
+  let connection;
+  try {
+    connection = await getConnection();
+    const result = await connection.execute(
+      `SELECT TEXT FROM DBA_SOURCE WHERE NAME = :functionName AND TYPE = 'FUNCTION' AND OWNER = 'URBANFOOD_USER'`,
+      { functionName: functionName.toUpperCase() }
+    );
+    
+    // Combine all lines into a single string
+    let sourceCode = '';
+    if (result.rows && result.rows.length > 0) {
+      sourceCode = result.rows.map(row => row[0]).join('');
+    }
+    
+    return { success: true, data: sourceCode };
+  } catch (err) {
+    console.error("Error getting SQL function details:", err);
+    return { success: false, message: err.message };
+  } finally {
+    if (connection) {
+      try {
+        await connection.close();
+      } catch (err) {
+        console.error("Error closing connection:", err);
+      }
+    }
+  }
+}
+
+const getProcedures = async () => {
+  let connection;
+  try {
+    connection = await getConnection();
+    const result = await connection.execute(
+      `SELECT OBJECT_NAME, OBJECT_TYPE FROM USER_OBJECTS WHERE OBJECT_TYPE IN ('PROCEDURE')`
+    );
+    return { success: true, data: result.rows };
+  } catch (err) {
+    console.error("Error listing Oracle procedures:", err);
+    return { success: false, message: err.message };
+  } finally {
+    if (connection) {
+      try {
+        await connection.close();
+      } catch (err) {
+        console.error("Error closing connection:", err);
+      }
+    }
+  }
+}
+
+const executeProcedure = async (procedureName, params = []) => {
+  let connection;
+  try {
+    connection = await getConnection();
+    
+    // Enable DBMS_OUTPUT buffer
+    await connection.execute(`BEGIN DBMS_OUTPUT.ENABLE(NULL); END;`);
+    
+    // Build the execution command
+    let executionCommand;
+    if (params.length > 0) {
+      // If there are parameters, format them correctly
+      const paramPlaceholders = params.map((_, index) => `:${index + 1}`).join(', ');
+      executionCommand = `BEGIN ${procedureName}(${paramPlaceholders}); END;`;
+    } else {
+      // For procedures without parameters
+      executionCommand = `BEGIN ${procedureName}; END;`;
+    }
+    
+    // Execute the procedure
+    await connection.execute(executionCommand, params);
+    
+    // Retrieve output from DBMS_OUTPUT buffer
+    const output = [];
+    let status = true;
+    
+    while (status) {
+      const result = await connection.execute(
+        `DECLARE
+          l_line VARCHAR2(32767);
+          l_status INTEGER;
+        BEGIN
+          DBMS_OUTPUT.GET_LINE(l_line, l_status);
+          :line := l_line;
+          :status := l_status;
+        END;`,
+        {
+          line: { dir: oracledb.BIND_OUT, type: oracledb.STRING, maxSize: 32767 },
+          status: { dir: oracledb.BIND_OUT, type: oracledb.NUMBER }
+        }
+      );
+      
+      const line = result.outBinds.line;
+      status = result.outBinds.status === 0; // 0 means success, 1 means no more lines
+      
+      if (status && line !== null) {
+        output.push(line);
+      }
+    }
+    
+    return { 
+      success: true, 
+      data: output.join('\n'),
+      message: `Procedure ${procedureName} executed successfully` 
+    };
+  } catch (err) {
+    console.error(`Error executing procedure ${procedureName}:`, err);
+    return { success: false, message: err.message };
+  } finally {
+    if (connection) {
+      try {
+        await connection.close();
+      } catch (err) {
+        console.error("Error closing connection:", err);
+      }
+    }
+  }
+};
+
+const procedureDetails = async (procedureName) => {
+  let connection;
+  try {
+    connection = await getConnection();
+    const result = await connection.execute(
+      `SELECT TEXT FROM DBA_SOURCE WHERE NAME = :procedureName AND TYPE = 'PROCEDURE' AND OWNER = 'URBANFOOD_USER'`,
+      { procedureName: procedureName.toUpperCase() }
+    );
+    
+    // Combine all lines into a single string
+    let sourceCode = '';
+    if (result.rows && result.rows.length > 0) {
+      sourceCode = result.rows.map(row => row[0]).join('');
+    }
+    
+    return { success: true, data: sourceCode };
+  } catch (err) {
+    console.error("Error getting SQL function details:", err);
+    return { success: false, message: err.message };
+  } finally {
+    if (connection) {
+      try {
+        await connection.close();
+      } catch (err) {
+        console.error("Error closing connection:", err);
+      }
+    }
+  }
+}
+
 export default {
   createOracleUser,
   listOracleUsers,
@@ -795,5 +972,10 @@ export default {
   getAllTriggers,
   getLogDetails,
   dropTrigger,
-  changeTriggerStatus
+  changeTriggerStatus,
+  getSQLFuntions,
+  getSQLFunctionDetails,
+  getProcedures,
+  executeProcedure,
+  procedureDetails
 };

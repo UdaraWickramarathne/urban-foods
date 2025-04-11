@@ -7,8 +7,50 @@ const DashboardContent = () => {
   const [sales, setSales] = useState([]);
   const [customers, setCustomers] = useState([]);
   const [totalSales, setTotalSales] = useState(0);
+  const [orderCount, setOrderCount] = useState(0);
+  const [productCount, setProductCount] = useState(0);
+  const [customerCount, setCustomerCount] = useState(0);
+  
+  // Animation state values
+  const [animatedTotalSales, setAnimatedTotalSales] = useState(0);
+  const [animatedOrderCount, setAnimatedOrderCount] = useState(0);
+  const [animatedProductCount, setAnimatedProductCount] = useState(0);
+  const [animatedCustomerCount, setAnimatedCustomerCount] = useState(0);
 
-  const { getTotalSales } = apiContext();
+  const { getTotalSales, getOrderCount, getProductCount, getCustomerCount } = apiContext();
+
+  const fetchOrderCount = async () => {
+    try {
+      const response = await getOrderCount();
+      if (response.success) {
+        setOrderCount(response.orderCount);
+      }
+    } catch (error) {
+      console.error("Error fetching order count:", error);
+    }
+  }
+
+  const fethcCoustomerCount = async () => {
+    try {
+      const response = await getCustomerCount();
+      if (response.success) {
+        setCustomerCount(response.count);
+      }
+    } catch (error) {
+      console.error("Error fetching customer count:", error);
+    }
+  }
+
+  const fetchProductCount = async () => {
+    try {
+      const response = await getProductCount();
+      if (response.success) {
+        setProductCount(response.data);
+      }
+    } catch (error) {
+      console.error("Error fetching product count:", error);
+    }
+  }
 
   const fetchTotalSales = async () => {
     try {
@@ -21,8 +63,59 @@ const DashboardContent = () => {
     }
   }
 
+  // Helper function to animate counting
+  const animateCount = (startValue, endValue, setter, duration = 1000, decimalPlaces = 0) => {
+    // Clear any existing animations
+    let startTime;
+    const startValueNum = Number(startValue) || 0;
+    const endValueNum = Number(endValue) || 0;
+    
+    if (startValueNum === endValueNum) {
+      setter(endValueNum);
+      return;
+    }
+
+    const step = (timestamp) => {
+      if (!startTime) startTime = timestamp;
+      const progress = Math.min((timestamp - startTime) / duration, 1);
+      const currentValue = startValueNum + progress * (endValueNum - startValueNum);
+      
+      if (decimalPlaces > 0) {
+        setter(parseFloat(currentValue.toFixed(decimalPlaces)));
+      } else {
+        setter(Math.floor(currentValue));
+      }
+      
+      if (progress < 1) {
+        window.requestAnimationFrame(step);
+      }
+    };
+    
+    window.requestAnimationFrame(step);
+  };
+
+  // Trigger animations when actual data changes
+  useEffect(() => {
+    animateCount(0, totalSales, setAnimatedTotalSales, 1000, 2);
+  }, [totalSales]);
+
+  useEffect(() => {
+    animateCount(0, orderCount, setAnimatedOrderCount);
+  }, [orderCount]);
+
+  useEffect(() => {
+    animateCount(0, productCount, setAnimatedProductCount);
+  }, [productCount]);
+
+  useEffect(() => {
+    animateCount(0, customerCount, setAnimatedCustomerCount);
+  }, [customerCount]);
+
   useEffect(() => {
     fetchTotalSales();
+    fetchOrderCount();
+    fetchProductCount();
+    fethcCoustomerCount();
   },[])
 
   return (
@@ -37,7 +130,7 @@ const DashboardContent = () => {
           </div>
           <div className="stat-content">
             <h3>Total Sales</h3>
-            <p className="stat-value">${totalSales.toFixed(2)}</p>
+            <p className="stat-value count-animation">${animatedTotalSales.toFixed(2)}</p>
             <p className="stat-change positive">+12.5% <span>vs last month</span></p>
           </div>
         </div>
@@ -50,8 +143,8 @@ const DashboardContent = () => {
           </div>
           <div className="stat-content">
             <h3>Orders</h3>
-            <p className="stat-value">{sales.length}</p>
-            <p className="stat-change positive">+8.2% <span>vs last month</span></p>
+            <p className="stat-value count-animation">{animatedOrderCount}</p>
+            <p class="stat-change positive">+8.2% <span>vs last month</span></p>
           </div>
         </div>
         
@@ -63,7 +156,7 @@ const DashboardContent = () => {
           </div>
           <div className="stat-content">
             <h3>Customers</h3>
-            <p className="stat-value">{customers.length}</p>
+            <p className="stat-value count-animation">{animatedCustomerCount}</p>
             <p className="stat-change positive">+5.3% <span>vs last month</span></p>
           </div>
         </div>
@@ -76,7 +169,7 @@ const DashboardContent = () => {
           </div>
           <div className="stat-content">
             <h3>Products</h3>
-            <p className="stat-value">{products.length}</p>
+            <p className="stat-value">{productCount}</p>
             <p className="stat-change negative">-2.1% <span>vs last month</span></p>
           </div>
         </div>

@@ -6,12 +6,16 @@ const getAllProducts = async () => {
   let connection;
   try {
     connection = await getConnection();
-    const result = await connection.execute(`SELECT p.*, c.name as category_name FROM products p INNER JOIN categories c ON p.category_id = c.category_id`);    
-    const products = result.rows.map((row) => Product.fromDbRow(row, result.metaData));
-    return {success: true, data: products};
+    const result = await connection.execute(
+      `SELECT p.*, c.name as category_name FROM products p INNER JOIN categories c ON p.category_id = c.category_id`
+    );
+    const products = result.rows.map((row) =>
+      Product.fromDbRow(row, result.metaData)
+    );
+    return { success: true, data: products };
   } catch (error) {
     console.error("Error retrieving products:", error.message);
-    return {success: false, message: "Error retrieving products"};
+    return { success: false, message: "Error retrieving products" };
   } finally {
     if (connection) {
       await connection.close();
@@ -77,9 +81,12 @@ const deleteProduct = async (productId) => {
   let connection;
   try {
     connection = await getConnection();
-    const  result = await connection.execute("DELETE FROM products WHERE product_id = :productId", {
-      productId,
-    });
+    const result = await connection.execute(
+      "DELETE FROM products WHERE product_id = :productId",
+      {
+        productId,
+      }
+    );
     if (result.rowsAffected === 0) {
       return { success: false, message: "Product not found" };
     }
@@ -139,7 +146,9 @@ const searchProducts = async (keyword) => {
       `SELECT * FROM products WHERE name LIKE :keyword`,
       { keyword: `%${keyword}%` }
     );
-    const products = result.rows.map((row) => Product.fromDbRow(row, result.metaData));
+    const products = result.rows.map((row) =>
+      Product.fromDbRow(row, result.metaData)
+    );
     return products;
   } catch (error) {
     console.error("Error searching products:", error.message);
@@ -149,8 +158,7 @@ const searchProducts = async (keyword) => {
       await connection.close();
     }
   }
-}
-
+};
 
 const getProductsBySupplierId = async (supplierId) => {
   let connection;
@@ -160,7 +168,9 @@ const getProductsBySupplierId = async (supplierId) => {
       `SELECT * FROM products WHERE supplier_id = :supplierId`,
       { supplierId }
     );
-    const products = result.rows.map((row) => Product.fromDbRow(row, result.metaData));
+    const products = result.rows.map((row) =>
+      Product.fromDbRow(row, result.metaData)
+    );
     return products;
   } catch (error) {
     console.error("Error retrieving products by supplier ID:", error.message);
@@ -170,7 +180,7 @@ const getProductsBySupplierId = async (supplierId) => {
       await connection.close();
     }
   }
-}
+};
 
 const getTop10Products = async () => {
   let connection;
@@ -185,15 +195,17 @@ const getTop10Products = async () => {
       END;
     `;
 
-    const result = await connection.execute(sql, [], { outFormat: oracledb.OUT_FORMAT_OBJECT });
+    const result = await connection.execute(sql, [], {
+      outFormat: oracledb.OUT_FORMAT_OBJECT,
+    });
 
     const resultSet = result.implicitResults[0];
-    
+
     if (!resultSet) {
       return [];
     }
-    
-    const products = resultSet.map(row => {
+
+    const products = resultSet.map((row) => {
       return {
         productId: row.PRODUCT_ID,
         name: row.NAME,
@@ -202,21 +214,78 @@ const getTop10Products = async () => {
         imageUrl: row.IMAGE_URL,
         supplierId: row.SUPPLIER_ID,
         categoryId: row.CATEGORY_ID,
-        categoryName: row.CATEGORY_NAME
+        categoryName: row.CATEGORY_NAME,
       };
     });
-    
-    return products;
 
+    return products;
   } catch (error) {
-    console.error('Error fetching top 10 products:', error);
+    console.error("Error fetching top 10 products:", error);
     throw error;
   } finally {
     if (connection) {
       await connection.close();
     }
   }
-}
+};
 
-export default { getAllProducts,getProductById, insertProduct, deleteProduct, updateProduct, searchProducts, getProductsBySupplierId, getTop10Products };
+const getProductCount = async (categoryId = null) => {
+  let connection;
+  try {
+    connection = await getConnection();
 
+    // Build the SQL query to call the function
+    const sql = `BEGIN :result := get_product_count(:categoryId); END;`;
+
+    // Bind parameters
+    const binds = {
+      categoryId: categoryId,
+      result: { dir: oracledb.BIND_OUT, type: oracledb.NUMBER },
+    };
+
+    // Execute the function call
+    const result = await connection.execute(sql, binds);
+
+    // Return the count
+    return { success: true, count: result.outBinds.result };
+  } catch (error) {
+    console.error("Error getting product count:", error.message);
+    return { success: false, message: "Error getting product count" };
+  } finally {
+    if (connection) {
+      await connection.close();
+    }
+  }
+};
+
+const isProductOutOfStock = async (productId, quantity) => {
+  let connection;
+  try {
+    connection = await getConnection();
+    const result = await connection.execute(
+      `SELECT stock FROM products WHERE product_id = :productId`,
+      { productId }
+    );
+    if (result.rows.length === 0) {
+      return null;
+    }
+    const stock = result.rows[0][0];
+    return stock < quantity;
+  } catch (error) {
+    log.error("Error checking product stock:", error.message);
+    return null;
+  }
+};
+
+export default {
+  getAllProducts,
+  getProductById,
+  insertProduct,
+  deleteProduct,
+  updateProduct,
+  searchProducts,
+  getProductsBySupplierId,
+  getTop10Products,
+  getProductCount,
+  isProductOutOfStock
+};

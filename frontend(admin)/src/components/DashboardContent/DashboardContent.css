@@ -57,6 +57,14 @@
   margin: 0 0 4px 0;
 }
 
+.count-animation {
+  transition: color 0.3s;
+}
+
+.count-animation.animating {
+  color: #5F2EEA;
+}
+
 .stat-change {
   font-size: 12px;
   font-weight: 500;

@@ -167,10 +167,34 @@ const getCustomersWithSpends = async (req, res) => {
   }
 };
 
+const getCustomerCount = async (req, res) => {
+  try {
+    const result = await customerRepository.getCustomerCount();
+
+    if (result.success) {
+      res.status(HttpStatus.OK).json({
+        success: true,
+        count: result.count,
+      });
+    } else {
+      res.status(HttpStatus.NOT_FOUND).json({
+        success: false,
+        message: "No customer count found",
+      });
+    }
+  } catch (error) {
+    res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
+      success: false,
+      message: "Error retrieving customer count",
+    });
+  }
+}
+
 export default {
   editCustomer,
   deleteCustomer,
   getCustomerById,
   getCustomers,
   getCustomersWithSpends,
+  getCustomerCount
 };

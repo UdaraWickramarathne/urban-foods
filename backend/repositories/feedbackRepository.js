@@ -14,33 +14,67 @@ class FeedbackRepository {
   async getCustomerDetailsFromOracle(userId) {
     let connection;
     try {
-      const connection = await getConnection();
+      connection = await getConnection();
+
+      if (!Array.isArray(userId)) {
+        throw new Error("userId must be an array");
+      }
+  
+      const sanitizedUserIds = userId
+        .filter((id) => id !== undefined && id !== null)
+        .map((id) => `'${String(id).replace(/'/g, "''")}'`)
+        .join(",");
+  
+      if (!sanitizedUserIds) {
+        throw new Error("No valid user IDs provided");
+      }
+  
       const query = `
-      SELECT customer_id, FIRST_NAME, IMAGE_URL
-      FROM customers
-      WHERE customer_id IN (${userId.map((id) => `'${id}'`).join(",")})
-    `;
-    const result = await connection.execute(query);
+        SELECT customer_id, FIRST_NAME, IMAGE_URL
+        FROM customers
+        WHERE customer_id IN (${sanitizedUserIds})
+      `;
+      const result = await connection.execute(query);
 
-    // Map the results to an object for easy lookup
-    const customerDetails = {};
-    result.rows.forEach((row) => {
-      customerDetails[row[0]] = {
-        name: row[1],
-        image: row[2] || "src/images/default-user.png", // Default image if null
-      };
-    });
-
-    return customerDetails;
-  } catch (error) {
-    console.error("Error fetching customer details from OracleDB:", error);
-    throw error;
-  } finally {
-    if (connection) {
-      await connection.close();
+      const customerDetails = {};
+      result.rows.forEach((row) => {
+        customerDetails[row[0]] = {
+          name: row[1],
+          imageUrl: row[2],
+        };
+      });
+  
+      return customerDetails;
+    } catch (error) {
+      console.error("Error fetching customer details from OracleDB:", error);
+      throw error;
+    } finally {
+      if (connection) {
+        await connection.close();
+      }
     }
   }
+
+  async editfeedback(feedbackId, feedbackData) {
+  return await Feedback.updateMany(
+    { _id: feedbackId },
+    {
+      $set: {
+        rating: feedbackData.rating,
+        title: feedbackData.title,
+        comment: feedbackData.comment,
+      },
+    }
+  );
 }
+
+  async deleteFeedback(feedbackId) {
+    return await Feedback.deleteOne({ _id: feedbackId });
+  }
+
+  async getFeedbackByUserId(userId) {
+    return await Feedback.find({ userId });
+  }
 }
 
 export default new FeedbackRepository();

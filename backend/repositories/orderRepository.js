@@ -1,5 +1,6 @@
 import { getConnection } from "../db/dbConnection.js";
 import oracledb from "oracledb";
+import deliveyRepository from "./deliveryRepository.js";
 
 const getAllOrders = async () => {
   try {
@@ -118,8 +119,20 @@ const addOrder = async (orderData, orderItemsData) => {
           unitPrice: item.price,
         }
       );
+
+      // update product stock
+      await connection.execute(
+        "UPDATE Products SET stock = stock - :quantity WHERE product_id = :productId",
+        {
+          quantity: item.quantity,
+          productId: item.productId,
+        }
+      );
     }
     await connection.commit();
+
+    await deliveyRepository.addDelevery(orderId);
+
     return { success: true, orderId: orderId };
   } catch (error) {
     await connection.rollback();
@@ -218,6 +231,33 @@ const getTotalSales = async (startDate = null, endDate = null) => {
   }
 };
 
+const getOrderCount = async (startDate = null, endDate = null) => {
+  try {
+    const connection = await getConnection();
+
+    let query;
+    let binds = {};
+
+    if (startDate && endDate) {
+      // Call the function with date range
+      query = `SELECT get_completed_order_count(TO_DATE(:startDate, 'YYYY-MM-DD'), TO_DATE(:endDate, 'YYYY-MM-DD')) AS order_count FROM DUAL`;
+      binds = { startDate, endDate };
+    } else {
+      // Call the function without parameters for all-time order count
+      query = `SELECT get_completed_order_count() AS order_count FROM DUAL`;
+    }
+
+    const result = await connection.execute(query, binds);
+    const orderCount = result.rows[0][0] || 0; // Get the first column of the first row
+
+    await connection.close();
+    return { success: true, data: orderCount };
+  } catch (error) {
+    console.error("Error getting order count:", error.message);
+    return { success: false, message: error.message };
+  }
+};
+
 export default {
   getAllOrders,
   getOrderItems,
@@ -225,4 +265,5 @@ export default {
   getOrdersByUserId,
   updateOrderStatus,
   getTotalSales,
+  getOrderCount,
 };

@@ -38,7 +38,7 @@ const getOrderItems = async (req, res) => {
         message: "No items found for this order",
       });
     }
-    
+
     return res.status(HttpStatus.OK).json({
       success: true,
       data: orderItems,
@@ -150,7 +150,7 @@ const updateOrderStatus = async (req, res) => {
   try {
     const { orderId } = req.params;
     const { status } = req.body;
-    
+
     const result = await orderRepository.updateOrderStatus(orderId, status);
     if (!result) {
       return res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
@@ -190,6 +190,37 @@ const getTotalSales = async (req, res) => {
       message: "Error retrieving total sales",
     });
   }
+};
+
+const getOrderCount = async (req, res) => {
+  try {
+   
+    const orderCount = await orderRepository.getOrderCount();
+    if (!orderCount) {
+      return res.status(HttpStatus.NOT_FOUND).json({
+        success: false,
+        message: "No order count found",
+      });
+    }
+    return res.status(HttpStatus.OK).json({
+      success: true,
+      orderCount: orderCount.data,
+    });
+  } catch (error) {
+    console.error("Error:", error.message);
+    return res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
+      success: false,
+      message: "Error retrieving order count",
+    });
+  }
 }
 
-export default { getOrders, getOrderItems, addOrder, getOrdersByUserId, updateOrderStatus, getTotalSales };
+export default {
+  getOrders,
+  getOrderItems,
+  addOrder,
+  getOrdersByUserId,
+  updateOrderStatus,
+  getTotalSales,
+  getOrderCount
+};

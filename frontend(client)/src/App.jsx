@@ -5,7 +5,6 @@ import { Route, Routes } from 'react-router-dom';
 import Homepage from './pages/Homepage/Homepage';
 import LoginPage from './components/AuthUi/Login';
 import Register from './components/AuthUi/Register';
-import ExplorePage from "./components/ExploreMenu/ExploreMenu.jsx";
 import ShoppingCart from "./components/Cart/ShoppingCart.jsx";
 import PaymentSuccess from "./pages/PaymentSuccess/PaymentSuccess";
 import Profile from './components/ProfileUi/Profile.jsx';
@@ -15,6 +14,10 @@ import { ContextWrapper } from './context/contextWrapper';
 import ProductDisplay from './pages/ProductDisplay/ProductDisplay.jsx';
 import ProductDetailPage from './pages/ProductDetails/ProductDetailPage.jsx';
 import MyOrders from './pages/MyOrders/MyOrders.jsx';
+import Contact from './pages/Contact/Contact.jsx';
+import OurServices from './pages/OurServices/OurServices.jsx';
+import Feedback from "./pages/Feedback/Feedback.jsx";
+
 
 function App() {
   const [showLogin, setShowLogin] = useState(false);
@@ -62,6 +65,9 @@ function App() {
         <Route path="/about"  element={<About />} />
         <Route path='/dashboard' element={<Dashboard/>}/>
         <Route path="/orders" element={<MyOrders />} />
+        <Route path='/contact' element={<Contact />} />
+        <Route path='/services' element={<OurServices/>}/>
+        <Route path="/feedback" element={<Feedback />} />
       </Routes>
     </ContextWrapper>
   );

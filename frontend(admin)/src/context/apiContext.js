@@ -1,7 +1,7 @@
 import axios from "axios";
 import { create } from "zustand";
 import HttpStatus from "../enums/httpsStatus";
-import { GET_CATEGORY, CUSTOMERS, SUPPLIERS, REQUEST_OTP, VALIDATE_OTP, USERS, PRODUCTS, ADMIN, ORDERS } from "./constants";
+import { GET_CATEGORY, CUSTOMERS, SUPPLIERS, REQUEST_OTP, VALIDATE_OTP, USERS, PRODUCTS, ADMIN, ORDERS, BACKUPS, DELIVERY } from "./constants";
 
 export const apiContext = create((set, get) => ({
   // Category API
@@ -363,6 +363,203 @@ export const apiContext = create((set, get) => ({
       }
       return { success: false, message: "Failed to retrieve total sales" };
     }
-  }
-
+  },
+  getBackups: async () => {
+    try {
+      const response = await axios.get(BACKUPS);
+      return response.data;
+    } catch (error) {
+      if (error.response) {
+        return error.response.data;
+      }
+      return { success: false, message: "Failed to retrieve backups" };
+    }
+  },
+  downloadBackup: async (backupId) => {
+    try {
+      // Use responseType: 'blob' for binary data
+      const response = await axios.get(`${BACKUPS}/${backupId}/download`, {
+        responseType: 'blob'
+      });
+         
+      // Get the filename from Content-Disposition header or use a default name
+      const contentDisposition = response.headers['content-disposition'];
+      let currentTimeStamp = new Date().toISOString().replace(/:/g, '-').split('.')[0];
+      let filename = `urban-food-backup-${currentTimeStamp}.dmp`;
+      
+      if (contentDisposition) {
+        const filenameMatch = contentDisposition.match(/filename="?(.+)"?/);
+        if (filenameMatch && filenameMatch[1]) {
+          filename = filenameMatch[1];
+        }
+      }
+      
+      // Create a blob URL for the file data
+      const blobUrl = window.URL.createObjectURL(new Blob([response.data]));
+      
+      // Create a temporary anchor element to trigger download
+      const downloadLink = document.createElement('a');
+      downloadLink.href = blobUrl;
+      downloadLink.setAttribute('download', filename);
+      downloadLink.style.display = 'none';
+      document.body.appendChild(downloadLink);
+      
+      // Start download
+      downloadLink.click();
+      
+      // Clean up
+      document.body.removeChild(downloadLink);
+      window.URL.revokeObjectURL(blobUrl);
+      
+      return { success: true, message: "Download started" };
+    } catch (error) {
+      if (error.response) {
+        return { success: false, message: "Failed to download backup file" };
+      }
+      return { success: false, message: "Failed to download backup file" };
+    }
+  },
+  createBackup: async () => {
+    try {
+      const response = await axios.post(BACKUPS);
+      return response.data; // This handles successful responses
+    } catch (error) {
+      if (error.response) {
+        return error.response.data;
+      }
+      return { success: false, message: "Failed to create backup" };
+    }
+  },
+  getSQLFunctions: async () => {
+    try {
+      const response = await axios.get(`${ADMIN}/functions`);
+      return response.data;
+    } catch (error) {
+      if (error.response) {
+        return error.response.data;
+      }
+      return { success: false, message: "Failed to retrieve SQL functions" };
+    }
+  },
+  getSQLFunctionDetails: async (functionName) => {
+    try {
+      const response = await axios.get(`${ADMIN}/functions/${functionName}`);
+      return response.data;
+    } catch (error) {
+      if (error.response) {
+        return error.response.data;
+      }
+      return { success: false, message: "Failed to retrieve SQL function details" };
+    }
+  },
+  getProcedures: async () => {
+    try {
+      const response = await axios.get(`${ADMIN}/procedure`);
+      return response.data;
+    } catch (error) {
+      if (error.response) {
+        return error.response.data;
+      }
+      return { success: false, message: "Failed to retrieve procedures" };
+    }
+  },
+  executeProcedure: async (procedureName) => {
+    try {
+      const response = await axios.get(`${ADMIN}/procedure/${procedureName}`);
+      return response.data;
+    } catch (error) {
+      if (error.response) {
+        return error.response.data;
+      }
+      return { success: false, message: "Failed to execute procedure" };
+    }
+  },
+  getProcedureDetails: async (procedureName) => {
+    try {
+      const response = await axios.get(`${ADMIN}/procedure/${procedureName}/details`);
+      return response.data;
+    } catch (error) {
+      if (error.response) {
+        return error.response.data;
+      }
+      return { success: false, message: "Failed to retrieve procedure details" };
+    }
+  },
+  getOrderCount: async () => {
+    try {
+      const response = await axios.get(`${ORDERS}/orderCount`);
+      return response.data;
+    } catch (error) {
+      if (error.response) {
+        return error.response.data;
+      }
+      return { success: false, message: "Failed to retrieve order count" };
+    }
+  },
+  getProductCount: async () => {
+    try {
+      const response = await axios.get(`${PRODUCTS}/productCount`);
+      return response.data;
+    } catch (error) {
+      if (error.response) {
+        return error.response.data;
+      }
+      return { success: false, message: "Failed to retrieve product count" };
+    }
+  },
+  getCustomerCount: async () => {
+    try {
+      const response = await axios.get(`${CUSTOMERS}/customerCount`);
+      return response.data;
+    } catch (error) {
+      if (error.response) {
+        return error.response.data;
+      }
+      return { success: false, message: "Failed to retrieve customer count" };
+    }
+  },
+  getAllDeliveries: async () => {
+    try {
+      const response = await axios.get(`${DELIVERY}`);
+      return response.data;
+    } catch (error) {
+      if (error.response) {
+        return error.response.data;
+      }
+      return { success: false, message: "Failed to retrieve deliveries" };
+    }
+  },
+  getDeliveryAgents: async () => {
+    try {
+      const response = await axios.get(`${DELIVERY}/agents`);
+      return response.data;
+    } catch (error) {
+      if (error.response) {
+        return error.response.data;
+      }
+      return { success: false, message: "Failed to retrieve delivery agents" };
+    }
+  },
+  updateDeliveryStatus: async (deliveryId, status) => {
+    try {
+      const response = await axios.post(`${DELIVERY}/update-status`, { deliveryId, status });
+      return response.data;
+    } catch (error) {
+      if (error.response) {
+        return error.response.data;
+      }
+      return { success: false, message: "Failed to update delivery status" };
+    }
+  },
+  assignDeliveryAgent: async (deliveryId, agentId) => {
+    try {
+      const response = await axios.post(`${DELIVERY}/assign-agent`, { deliveryId, agentId });
+      return response.data;
+    } catch (error) {
+      if (error.response) {
+        return error.response.data;
+      }
+      return { success: false, message: "Failed to assign delivery agent" };
+    }
+  },
 }));

@@ -5,6 +5,120 @@
   padding: 20px;
 }
 
+/* Loading and error states */
+.sql-function-loading {
+  text-align: center;
+  padding: 32px 0;
+  color: #6b7280;
+  font-size: 1rem;
+}
+
+.sql-function-error {
+  text-align: center;
+  padding: 32px 0;
+  color: #dc2626;
+  font-size: 1rem;
+}
+
+/* Function cards container */
+.function-container {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 20px;
+  margin-top: 20px;
+}
+
+.no-functions {
+  text-align: center;
+  padding: 32px 0;
+  color: #6b7280;
+  font-style: italic;
+  background-color: #f9fafb;
+  border-radius: 6px;
+  grid-column: 1 / -1;
+}
+
+/* Function card styles */
+.function-card {
+  background-color: white;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  display: flex;
+  flex-direction: column;
+  transition: transform 0.2s, box-shadow 0.2s;
+  padding: 16px;
+}
+
+.function-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.function-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.function-header h3 {
+  margin: 0;
+  font-size: 1.1rem;
+  color: #1f2937;
+}
+
+.function-badge {
+  display: inline-block;
+  padding: 4px 8px;
+  border-radius: 16px;
+  font-size: 0.75rem;
+  font-weight: 500;
+}
+
+.function-badge.success {
+  background-color: #ecfdf5;
+  color: #047857;
+}
+
+.function-footer {
+  margin-top: 16px;
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+}
+
+.function-btn {
+  padding: 8px 12px;
+  border-radius: 6px;
+  font-size: 0.85rem;
+  cursor: pointer;
+  font-weight: 500;
+  border: 1px solid;
+  transition: all 0.2s ease;
+}
+
+.function-btn.run {
+  background-color: #ecfdf5;
+  color: #047857;
+  border-color: #a7f3d0;
+}
+
+.function-btn.run:hover {
+  background-color: #d1fae5;
+}
+
+.function-btn.view {
+  background-color: #eff6ff;
+  color: #1e40af;
+  border-color: #bfdbfe;
+}
+
+.function-btn.view:hover {
+  background-color: #dbeafe;
+}
+
 .table-header {
   display: flex;
   justify-content: space-between;
@@ -694,4 +808,19 @@
 .btn-disabled {
   opacity: 0.6;
   cursor: not-allowed;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .function-container {
+    grid-template-columns: 1fr;
+  }
+  
+  .modal-container {
+    width: 95%;
+  }
+  
+  .function-details {
+    grid-template-columns: 1fr;
+  }
 }

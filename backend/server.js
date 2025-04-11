@@ -8,13 +8,14 @@ import customerRoutes from './routes/customerRoutes.js';
 import categoryRoutes from './routes/categoryRoutes.js';
 import adminRoutes from './routes/adminRoutes.js';
 import supplierRoutes from './routes/supplierRoutes.js';
-
 import feedbackRoutes from './routes/feedbackRoutes.js';
-
 import paymentRoutes from './routes/paymentRoutes.js';
 import cartRoutes from './routes/cartRoutes.js';
+import deliveryRouts  from './routes/deliveryRoutes.js';
 import bodyParser from "body-parser";
 import { connectToDatabase } from "./db/mongodbConnection.js";
+import backupRoutes from './routes/backupRoutes.js';
+import reviewRoutes from './routes/reviewRoutes.js';
 
 
 const app = express();
@@ -41,6 +42,8 @@ app.use("/api/admin", adminRoutes);
 app.use("/api/category", categoryRoutes);
 app.use('/api/payment', paymentRoutes);
 app.use("/api/cart", cartRoutes);
+app.use('/api/backups', backupRoutes);
+app.use('/api/delivery', deliveryRouts);
 
 
 app.use("/api/images/products", express.static("uploads/products"));
@@ -50,6 +53,7 @@ app.use("/api/images/default", express.static("uploads/defaults"));
 
 app.use('/api/suppliers', supplierRoutes);
 app.use('/api/feedback', feedbackRoutes);
+app.use('/api/reviews', reviewRoutes);
 app.listen(5000, () => {
     console.log('Server started on http://localhost:5000');
 });

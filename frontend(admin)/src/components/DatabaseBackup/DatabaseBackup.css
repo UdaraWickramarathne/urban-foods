@@ -1,0 +1,358 @@
+/* Database Backup Styling */
+
+.backup-button {
+  background-color: #5F2EEA;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  padding: 10px 20px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.3s;
+  margin-top: 10px;
+  display: inline-flex;
+  align-items: center;
+}
+
+.backup-button:hover {
+  background-color: #4a24c0;
+}
+
+.backup-button.loading {
+  background-color: #7e5af0;
+  cursor: not-allowed;
+  position: relative;
+}
+
+.backup-button.loading:before {
+  content: '';
+  display: inline-block;
+  width: 14px;
+  height: 14px;
+  margin-right: 10px;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-radius: 50%;
+  border-top-color: #fff;
+  animation: spin 1s ease-in-out infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+.message-alert {
+  margin: 20px 0;
+  padding: 12px;
+  border-radius: 4px;
+  position: relative;
+}
+
+.message-alert.info {
+  background-color: rgba(3, 169, 244, 0.1);
+  border-left: 4px solid #03A9F4;
+  color: #0277BD;
+}
+
+.message-alert.success {
+  background-color: rgba(54, 179, 126, 0.1);
+  border-left: 4px solid #36B37E;
+  color: #26734d;
+}
+
+.message-alert.error {
+  background-color: rgba(244, 67, 54, 0.1);
+  border-left: 4px solid #f44336;
+  color: #c62828;
+}
+
+.message-content {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.close-button {
+  background: none;
+  border: none;
+  font-size: 20px;
+  cursor: pointer;
+  color: inherit;
+  opacity: 0.7;
+}
+
+.close-button:hover {
+  opacity: 1;
+}
+
+.action-button {
+  background-color: transparent;
+  border: 1px solid #5F2EEA;
+  border-radius: 4px;
+  padding: 6px 12px;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  transition: all 0.3s;
+  color: #5F2EEA;
+}
+
+.action-button.download:hover {
+  background-color: #5F2EEA;
+  color: white;
+}
+
+.action-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.status-badge {
+  padding: 4px 8px;
+  border-radius: 30px;
+  font-size: 12px;
+  font-weight: 500;
+  display: inline-block;
+}
+
+.status-badge.status-completed {
+  background-color: rgba(54, 179, 126, 0.1);
+  color: #36B37E;
+}
+
+.status-badge.status-failed {
+  background-color: rgba(255, 100, 80, 0.1);
+  color: #FF6450;
+}
+
+.status-badge.status-pending {
+  background-color: rgba(255, 171, 0, 0.1);
+  color: #FFAB00;
+}
+
+.no-data {
+  text-align: center;
+  padding: 20px;
+  color: #777;
+  font-style: italic;
+}
+
+/* Database Backup Component Styles */
+
+/* Main container */
+.db-dashboard-content {
+  padding: 20px;
+  background-color: #f6f8fb;
+}
+
+/* Stats row styling */
+.db-stats-row {
+  display: flex;
+  gap: 20px;
+  margin-bottom: 24px;
+  flex-wrap: wrap;
+}
+
+.db-stat-card {
+  background-color: white;
+  border-radius: 8px;
+  padding: 20px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+  flex: 1;
+  min-width: 250px;
+  display: flex;
+  align-items: center;
+}
+
+.db-stat-icon {
+  width: 48px;
+  height: 48px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: 16px;
+}
+
+.db-stat-content {
+  flex: 1;
+}
+
+.db-stat-content h3 {
+  font-size: 14px;
+  color: #6e7191;
+  margin: 0 0 8px;
+}
+
+.db-stat-value {
+  font-size: 24px;
+  font-weight: 600;
+  margin: 0 0 4px;
+  color: #14142b;
+}
+
+.db-stat-change {
+  font-size: 12px;
+  margin: 0;
+  color: #6e7191;
+}
+
+.db-stat-change.db-positive {
+  color: #36B37E;
+}
+
+/* Backup button styling */
+.db-backup-button {
+  padding: 10px 16px;
+  background-color: #5F2EEA;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.db-backup-button:hover {
+  background-color: #4a23c0;
+}
+
+.db-backup-button.db-loading {
+  background-color: #a48fec;
+  cursor: not-allowed;
+}
+
+/* Message alert styles */
+.db-message-alert {
+  margin-bottom: 20px;
+  padding: 12px 16px;
+  border-radius: 8px;
+  background-color: #E5E8FF;
+  color: #3F51B5;
+}
+
+.db-message-alert.success {
+  background-color: #E6F7EF;
+  color: #36B37E;
+}
+
+.db-message-alert.error {
+  background-color: #FFE8E8;
+  color: #FF5252;
+}
+
+.db-message-alert.info {
+  background-color: #E5F0FF;
+  color: #2196F3;
+}
+
+.db-message-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.db-close-button {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 18px;
+  color: inherit;
+}
+
+/* Tables row styling */
+.db-tables-row {
+  margin-bottom: 20px;
+}
+
+.db-table-card {
+  background-color: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+  overflow: hidden;
+}
+
+.db-card-header {
+  padding: 16px 20px;
+  border-bottom: 1px solid #f0f0f0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.db-card-header h3 {
+  margin: 0;
+  font-size: 16px;
+  color: #14142b;
+}
+
+.db-time-selector {
+  padding: 6px 12px;
+  border: 1px solid #e1e1e1;
+  border-radius: 4px;
+  background-color: white;
+}
+
+/* Table styling */
+.db-dashboard-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.db-dashboard-table th {
+  text-align: left;
+  padding: 12px 20px;
+  font-weight: 500;
+  color: #6e7191;
+  background-color: #f8f9fa;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.db-dashboard-table td {
+  padding: 12px 20px;
+  border-bottom: 1px solid #f0f0f0;
+  color: #14142b;
+}
+
+.db-status-badge {
+  display: inline-block;
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.db-status-badge.db-status-completed {
+  background-color: #E6F7EF;
+  color: #36B37E;
+}
+
+.db-action-button {
+  display: flex;
+  align-items: center;
+  padding: 6px 12px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 12px;
+  font-weight: 500;
+  gap: 4px;
+}
+
+.db-action-button.db-download {
+  background-color: #E5F0FF;
+  color: #2196F3;
+}
+
+.db-action-button.db-download:hover {
+  background-color: #d0e5ff;
+}
+
+.db-no-data {
+  text-align: center;
+  color: #6e7191;
+  padding: 30px 0;
+}

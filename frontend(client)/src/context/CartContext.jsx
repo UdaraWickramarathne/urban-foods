@@ -33,6 +33,7 @@ export const CartProvider = ({ children }) => {
     }
   }, [userId]);
 
+
   // Add product to cart
   const addToCart = async (product) => {
     const result = await handleAddToCart(product.productId, 1);
@@ -85,17 +86,18 @@ export const CartProvider = ({ children }) => {
 
     const result = await updateCartItem(productId, newQuantity);
     if (result.success) {
-      showNotification("Cart updated", "success");
+      showNotification(result.message, "success");
+      setCartItems(prevItems => 
+        prevItems.map(item => 
+          item.productId === productId 
+            ? { ...item, quantity: newQuantity } 
+            : item
+        )
+      );
     } else {
-      showNotification("Failed to update cart", "error");
+      showNotification(result.message, "error");
     }
-    setCartItems(prevItems => 
-      prevItems.map(item => 
-        item.productId === productId 
-          ? { ...item, quantity: newQuantity } 
-          : item
-      )
-    );
+    
   };
 
   // Get quantity of a specific product

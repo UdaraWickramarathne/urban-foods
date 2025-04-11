@@ -2,7 +2,6 @@ import React, { useState } from "react";
 import "./Dashboard.css";
 import ProductTable from "../../components/ProductTable/ProductTable";
 import CustomerTable from "../../components/CustomerTable/CustomerTable";
-import SalesTable from "../../components/SalesTable/SalesTable";
 import DashboardContent from "../../components/DashboardContent/DashboardContent";
 import StoreProcedure from "../../components/StoreProcedure/StoreProcedure";
 import DbUserManagement from "../../components/DbUserManagement/DbUserManagement";
@@ -14,6 +13,9 @@ import { useAuth } from "../../context/authContext";
 import { hasPermission, PERMISSIONS } from "../../utils/permissions";
 import SupplierTable from "../../components/SupplierTable/SupplierTable";
 import OrderTable from "../../components/OrderTable/OrderTable";
+import DatabaseBackup from "../../components/DatabaseBackup/DatabaseBackup";
+import DeliveryTable from "../../components/DeliveryTable/DeliveryTable";
+
 
 // Product shape:
 // id: number
@@ -26,90 +28,6 @@ import OrderTable from "../../components/OrderTable/OrderTable";
 
 const Dashboard = () => {
   // Sample data
-
-  // Sample sales data
-  const [sales, setSales] = useState([
-    {
-      id: "ORD-1001",
-      customer: "John Doe",
-      date: "2023-10-15",
-      products: "3 items",
-      amount: 258.75,
-      status: "Completed",
-    },
-    {
-      id: "ORD-1002",
-      customer: "Sarah Williams",
-      date: "2023-10-14",
-      products: "1 item",
-      amount: 125.99,
-      status: "Processing",
-    },
-    {
-      id: "ORD-1003",
-      customer: "Michael Brown",
-      date: "2023-10-14",
-      products: "5 items",
-      amount: 432.2,
-      status: "Completed",
-    },
-    {
-      id: "ORD-1004",
-      customer: "Lisa Johnson",
-      date: "2023-10-13",
-      products: "2 items",
-      amount: 189.5,
-      status: "Pending",
-    },
-    {
-      id: "ORD-1005",
-      customer: "Robert Miller",
-      date: "2023-10-12",
-      products: "4 items",
-      amount: 345.8,
-      status: "Completed",
-    },
-    {
-      id: "ORD-1006",
-      customer: "Emily Davis",
-      date: "2023-10-11",
-      products: "1 item",
-      amount: 78.99,
-      status: "Refunded",
-    },
-    {
-      id: "ORD-1007",
-      customer: "Daniel Wilson",
-      date: "2023-10-10",
-      products: "3 items",
-      amount: 214.75,
-      status: "Completed",
-    },
-    {
-      id: "ORD-1008",
-      customer: "Olivia Martin",
-      date: "2023-10-09",
-      products: "2 items",
-      amount: 159.9,
-      status: "Processing",
-    },
-    {
-      id: "ORD-1009",
-      customer: "William Taylor",
-      date: "2023-10-08",
-      products: "6 items",
-      amount: 521.3,
-      status: "Completed",
-    },
-    {
-      id: "ORD-1010",
-      customer: "Sophia Anderson",
-      date: "2023-10-07",
-      products: "1 item",
-      amount: 89.99,
-      status: "Refunded",
-    },
-  ]);
 
   const [currentPage, setCurrentPage] = useState(1);
   const [activeComponent, setActiveComponent] = useState("dashboard");
@@ -197,7 +115,6 @@ const Dashboard = () => {
 
   return (
     <div className="app-container">
-      {/* Sidebar */}
       <aside className="sidebar">
         <div className="logo-container">
           <svg
@@ -219,7 +136,7 @@ const Dashboard = () => {
           <span className="logo-text">Urban Food</span>
         </div>
 
-        <nav className="nav-menu">
+        <nav className="nav-menu" style={{ maxHeight: "calc(100vh - 160px)", overflowY: "auto", paddingRight: "5px" }}>
           <ul>
             <li
               className={`nav-item ${
@@ -324,31 +241,6 @@ const Dashboard = () => {
               </li>
             )}
 
-            {hasPermission(userPermissions, PERMISSIONS.VIEW_ORDERS) && (
-              <li
-                className={`nav-item ${
-                  activeComponent === "sales" ? "active" : ""
-                }`}
-                onClick={() => handleNavClick("sales")}
-              >
-                <div className="nav-icon">
-                  <svg
-                    width="18"
-                    height="18"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    xmlns="http://www.w3.org/2000/svg"
-                  >
-                    <path
-                      d="M19 3H5C3.9 3 3 3.9 3 5V19C3 20.1 3.9 21 5 21H19C20.1 21 21 20.1 21 19V5C21 3.9 20.1 3 19 3ZM9 17H7V10H9V17ZM13 17H11V7H13V17ZM17 17H15V13H17V17Z"
-                      fill="currentColor"
-                    />
-                  </svg>
-                </div>
-                Sales
-              </li>
-            )}
-
             {hasPermission(userPermissions, PERMISSIONS.VIEW_CUSTOMERS) && (
               <li
                 className={`nav-item ${
@@ -371,6 +263,54 @@ const Dashboard = () => {
                   </svg>
                 </div>
                 Customers
+              </li>
+            )}
+            {hasPermission(userPermissions, PERMISSIONS.VIEW_ORDERS) && (
+              <li
+                className={`nav-item ${
+                  activeComponent === "orders" ? "active" : ""
+                }`}
+                onClick={() => handleNavClick("orders")}
+              >
+                <div className="nav-icon">
+                  <svg
+                    width="18"
+                    height="18"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    xmlns="http://www.w3.org/2000/svg"
+                  >
+                    <path
+                      d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-5 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z"
+                      fill="currentColor"
+                    />
+                  </svg>
+                </div>
+                Orders
+              </li>
+            )}
+            {hasPermission(userPermissions, PERMISSIONS.VIEW_ORDERS) && (
+              <li
+                className={`nav-item ${
+                  activeComponent === "delivery" ? "active" : ""
+                }`}
+                onClick={() => handleNavClick("delivery")}
+              >
+                <div className="nav-icon">
+                  <svg
+                    width="18"
+                    height="18"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    xmlns="http://www.w3.org/2000/svg"
+                  >
+                    <path
+                      d="M19.15 8h-1.3V5c0-1.1-.9-2-2-2H4c-1.1 0-2 .9-2 2v11h2c0 1.66 1.34 3 3 3s3-1.34 3-3h6c0 1.66 1.34 3 3 3s3-1.34 3-3h2v-5l-3.85-3zM7 17c-.55 0-1-.45-1-1s.45-1 1-1 1 .45 1 1-.45 1-1 1zm10 0c-.55 0-1-.45-1-1s.45-1 1-1 1 .45 1 1-.45 1-1 1zm-1-6V8h2.35l2.5 3H16z"
+                      fill="currentColor"
+                    />
+                  </svg>
+                </div>
+                Delivery
               </li>
             )}
             {hasPermission(userPermissions, PERMISSIONS.VIEW_SUPPLIERS) && (
@@ -398,31 +338,6 @@ const Dashboard = () => {
               </li>
             )}
 
-            {hasPermission(userPermissions, PERMISSIONS.VIEW_ORDERS) && (
-              <li
-                className={`nav-item ${
-                  activeComponent === "orders" ? "active" : ""
-                }`}
-                onClick={() => handleNavClick("orders")}
-              >
-                <div className="nav-icon">
-                  <svg
-                    width="18"
-                    height="18"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    xmlns="http://www.w3.org/2000/svg"
-                  >
-                    <path
-                      d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-5 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z"
-                      fill="currentColor"
-                    />
-                  </svg>
-                </div>
-                Orders
-              </li>
-            )}
-
             <li
               className={`nav-item ${
                 activeComponent === "analytics" ? "active" : ""
@@ -438,7 +353,7 @@ const Dashboard = () => {
                   xmlns="http://www.w3.org/2000/svg"
                 >
                   <path
-                    d="M20 3H4C2.9 3 2 3.9 2 5V19C2 20.1 2.9 21 4 21H20C21.1 21 22 20.1 22 19V5C22 3.9 21.1 3 20 3ZM4 19V5H20V19H4Z"
+                    d="M20 3H4C2.9 3 2 3.9 2 5V19C2 20.1 2.9 21 22 19V5C22 3.9 21.1 3 20 3ZM4 19V5H20V19H4Z"
                     fill="currentColor"
                   />
                   <path d="M6 7H11V9H6V7Z" fill="currentColor" />
@@ -536,9 +451,9 @@ const Dashboard = () => {
 
             <li
               className={`nav-item ${
-                activeComponent === "settings" ? "active" : ""
+                activeComponent === "backup" ? "active" : ""
               }`}
-              onClick={() => handleNavClick("settings")}
+              onClick={() => handleNavClick("backup")}
             >
               <div className="nav-icon">
                 <svg
@@ -549,12 +464,28 @@ const Dashboard = () => {
                   xmlns="http://www.w3.org/2000/svg"
                 >
                   <path
-                    d="M19.14 12.94C19.18 12.64 19.2 12.33 19.2 12C19.2 11.68 19.18 11.36 19.13 11.06C20.42 10.61 21.24 9.39 21.01 8.07C20.87 7.27 20.38 6.56 19.67 6.14C18.96 5.73 18.12 5.65 17.36 5.92C16.85 4.81 16.13 3.82 15.26 3C13.52 1.36 11.24 0.4 8.79 0.4C3.93 0.4 0 4.33 0 9.19C0 12.14 1.44 14.78 3.62 16.45C3.39 17.5 2.8 18.48 1.88 19.06C1.6 19.24 1.5 19.59 1.63 19.9C1.76 20.2 2.07 20.39 2.4 20.36C4.06 20.21 5.66 19.46 6.79 18.3C7.47 18.52 8.18 18.65 8.92 18.65C9.59 18.65 10.25 18.53 10.88 18.34C12.19 20.26 14.88 21.94 18.13 21.58C19.4 21.44 20.61 20.83 21.43 19.87C21.66 19.61 21.62 19.21 21.35 18.99C20.24 18.07 19.63 16.7 19.64 15.23C21.38 14.34 22.46 12.48 21.95 10.58C21.67 9.54 20.88 8.7 19.9 8.28C19.74 7.67 19.5 7.08 19.14 12.94ZM17.75 13.75C17.5 13.75 17.25 13.88 17.13 14.1C16.7 14.85 16 15.38 15.19 15.57C14.92 15.63 14.69 15.82 14.58 16.08C14.47 16.34 14.5 16.63 14.66 16.87C14.82 17.1 15.09 17.23 15.37 17.2C15.62 17.17 15.85 17.11 16.08 17.05C15.94 17.36 15.76 17.67 15.56 17.94C14.97 18.78 14.07 19.33 13.05 19.38C10.74 19.5 8.61 17.96 7.9 16.28C7.85 16.17 7.75 16.09 7.64 16.04C7.5 15.98 7.34 15.96 7.2 15.99C6.95 16.04 6.71 16.06 6.46 16.06C5.85 16.06 5.25 15.95 4.69 15.74C5.05 15.35 5.35 14.9 5.57 14.41C5.7 14.12 5.63 13.79 5.42 13.58C3.64 11.76 2.8 10.02 2.8 9.19C2.8 5.9 5.49 3.2 8.79 3.2C12.08 3.2 14.78 5.9 14.78 9.19C14.78 9.35 14.77 9.5 14.76 9.66C14.73 10.09 15.03 10.47 15.44 10.56C16.44 10.79 17.4 11.15 18.1 11.95C18.59 12.54 18.68 13.23 18.69 13.75C18.68 13.83 18.1 13.75 17.75 13.75Z"
+                    d="M12 2C6.48 2 2 4.02 2 6.5V17.5C2 19.98 6.48 22 12 22S22 19.98 22 17.5V6.5C22 4.02 17.52 2 12 2ZM12 4C16.42 4 20 5.38 20 6.5C20 7.62 16.42 9 12 9S4 7.62 4 6.5C4 5.38 7.58 4 12 4Z"
                     fill="currentColor"
                   />
+                  <path
+                    d="M4 10V13.5C4 14.62 7.58 16 12 16C16.42 16 20 14.62 20 13.5V10"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                  />
+                  <path
+                    d="M4 13V17.5C4 18.62 7.58 20 12 20C16.42 20 20 18.62 20 17.5V13"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                  />
+                  <path
+                    d="M15 11L12 8L9 11"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                  />
+                  <path d="M12 16V8" stroke="currentColor" strokeWidth="2" />
                 </svg>
               </div>
-              Settings
+              DB Backup
             </li>
           </ul>
         </nav>
@@ -592,7 +523,10 @@ const Dashboard = () => {
 
             <div className="user-profile">
               <div className="avatar">
-                <img src="https://img.freepik.com/free-vector/blue-circle-with-white-user_78370-4707.jpg" alt="Profile" />
+                <img
+                  src="https://img.freepik.com/free-vector/blue-circle-with-white-user_78370-4707.jpg"
+                  alt="Profile"
+                />
               </div>
             </div>
           </div>
@@ -606,9 +540,7 @@ const Dashboard = () => {
               setCurrentPage={setCurrentPage}
             />
           )}
-          {activeComponent === "dashboard" && (
-            <DashboardContent/>
-          )}
+          {activeComponent === "dashboard" && <DashboardContent />}
           {activeComponent === "categories" && (
             <CategoryTable
               currentPage={currentPage}
@@ -621,38 +553,26 @@ const Dashboard = () => {
               setCurrentPage={setCurrentPage}
             />
           )}
-          {activeComponent === "sales" && (
-            <SalesTable
-              sales={sales}
-              currentPage={currentPage}
-              setCurrentPage={setCurrentPage}
-            />
-          )}
+
           {activeComponent === "analytics" && <StoreProcedure />}
           {activeComponent === "dbusers" && <DbUserManagement />}
           {activeComponent === "sqltriggers" && <SQLTriggerTable />}
           {activeComponent === "sqlfunctions" && <SQLFunctionTable />}
           {activeComponent === "notifications" && <NotificationTable />}
+          {activeComponent === "delivery" && <DeliveryTable currentPage={currentPage} setCurrentPage={setCurrentPage}/>}
           {activeComponent === "suppliers" && (
             <SupplierTable
               currentPage={currentPage}
               setCurrentPage={setCurrentPage}
             />
           )}
-          {activeComponent === "settings" && (
-            <div className="settings-placeholder">
-              <h2>Settings Content</h2>
-              <p>System settings and configuration will appear here.</p>
-            </div>
+          {activeComponent === "backup" && <DatabaseBackup/>}
+          {activeComponent === "orders" && (
+            <OrderTable
+              currentPage={currentPage}
+              setCurrentPage={setCurrentPage}
+            />
           )}
-          {
-            activeComponent === "orders" && (
-              <OrderTable
-                currentPage={currentPage}
-                setCurrentPage={setCurrentPage}
-              />
-            )
-          }
         </div>
       </main>
     </div>
