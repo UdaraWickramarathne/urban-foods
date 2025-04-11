@@ -16,3 +16,4 @@ export const DEFAULT_IMAGE = `${BASE_URL}/images/default/default-image.jpg`;
 export const PRODUCTS = `${BASE_URL}/products`;
 export const ORDERS = `${BASE_URL}/orders`;
 export const BACKUPS = `${BASE_URL}/backups`;
+export const DELIVERY = `${BASE_URL}/delivery`;

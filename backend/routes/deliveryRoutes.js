@@ -4,9 +4,9 @@ import deliveryController from "../controllers/deliveryController.js";
 const router = express.Router();
 
 router.get("/", deliveryController.getAllDeliveries);
-router.get("/:deliveryId", deliveryController.getDeliveryById);
-router.post("/add", deliveryController.insertDelivery);
-router.delete("/:deliveryId", deliveryController.deleteDelivery);
-router.put("/:deliveryId", deliveryController.updateDelivery);
+router.get("/agents", deliveryController.getDeliveryAgents);
+router.post("/update-status", deliveryController.updateDeliveryStatus);
+router.post("/assign-agent", deliveryController.assignDeliveryAgent);
+router.get('/agent/:agentId', deliveryController.getDeliveryByAgentId);
 
 export default router;

@@ -1,7 +1,7 @@
 import axios from "axios";
 import { create } from "zustand";
 import HttpStatus from "../enums/httpsStatus";
-import { GET_CATEGORY, CUSTOMERS, SUPPLIERS, REQUEST_OTP, VALIDATE_OTP, USERS, PRODUCTS, ADMIN, ORDERS, BACKUPS } from "./constants";
+import { GET_CATEGORY, CUSTOMERS, SUPPLIERS, REQUEST_OTP, VALIDATE_OTP, USERS, PRODUCTS, ADMIN, ORDERS, BACKUPS, DELIVERY } from "./constants";
 
 export const apiContext = create((set, get) => ({
   // Category API
@@ -516,6 +516,50 @@ export const apiContext = create((set, get) => ({
         return error.response.data;
       }
       return { success: false, message: "Failed to retrieve customer count" };
+    }
+  },
+  getAllDeliveries: async () => {
+    try {
+      const response = await axios.get(`${DELIVERY}`);
+      return response.data;
+    } catch (error) {
+      if (error.response) {
+        return error.response.data;
+      }
+      return { success: false, message: "Failed to retrieve deliveries" };
+    }
+  },
+  getDeliveryAgents: async () => {
+    try {
+      const response = await axios.get(`${DELIVERY}/agents`);
+      return response.data;
+    } catch (error) {
+      if (error.response) {
+        return error.response.data;
+      }
+      return { success: false, message: "Failed to retrieve delivery agents" };
+    }
+  },
+  updateDeliveryStatus: async (deliveryId, status) => {
+    try {
+      const response = await axios.post(`${DELIVERY}/update-status`, { deliveryId, status });
+      return response.data;
+    } catch (error) {
+      if (error.response) {
+        return error.response.data;
+      }
+      return { success: false, message: "Failed to update delivery status" };
+    }
+  },
+  assignDeliveryAgent: async (deliveryId, agentId) => {
+    try {
+      const response = await axios.post(`${DELIVERY}/assign-agent`, { deliveryId, agentId });
+      return response.data;
+    } catch (error) {
+      if (error.response) {
+        return error.response.data;
+      }
+      return { success: false, message: "Failed to assign delivery agent" };
     }
   },
 }));

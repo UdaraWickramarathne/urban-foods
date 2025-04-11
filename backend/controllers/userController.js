@@ -45,9 +45,8 @@ const registerCustomer = async (req, res) => {
       });
     }
 
-    const isEmailExists = await customerRepository.getCustomerByEmail(email);
-
-    if (isEmailExists) {
+    const isEmailExists = await userRepository.checkEmailExists(email);
+    if(isEmailExists.exists){
       return res.status(HttpStatus.BAD_REQUEST).json({
         success: false,
         message: "Email is already exists",
@@ -170,6 +169,14 @@ const registerSupplier = async (req, res) => {
       return res.status(HttpStatus.BAD_REQUEST).json({
         success: false,
         message: "Username is already exists",
+      });
+    }
+
+    const isEmailExists = await userRepository.checkEmailExists(email);
+    if(isEmailExists.exists){
+      return res.status(HttpStatus.BAD_REQUEST).json({
+        success: false,
+        message: "Email is already exists",
       });
     }
 
@@ -443,6 +450,84 @@ const deleteUser = async (req, res) => {
   }
 }
 
+const saveDeliveryAgent = async (req, res) => {
+  try {
+    const { username, password, role } = req.body;
+
+    const { name, email } = req.body;
+
+    if (!username || !password) {
+      return res.status(HttpStatus.BAD_REQUEST).json({
+        success: false,
+        message: "Username and password are required",
+      });
+    }
+
+    if (password.length < 6) {
+      return res.status(HttpStatus.BAD_REQUEST).json({
+        success: false,
+        message: "Password must be at least 6 characters long",
+      });
+    }
+
+    const isUsernameExists = await userRepository.getUserByUsername(username);
+    if (isUsernameExists) {
+      return res.status(HttpStatus.BAD_REQUEST).json({
+        success: false,
+        message: "Username is already exists",
+      });
+    }
+
+    const isEmailExists = await userRepository.checkEmailExists(email);
+    if(isEmailExists.exists){
+      return res.status(HttpStatus.BAD_REQUEST).json({
+        success: false,
+        message: "Email is already exists",
+      });
+    }
+
+    const userData = {
+      username,
+      password,
+      role: role || "delivery_agent", // Default role
+    };
+
+    const deliveryAgentData = {
+      name,
+      email,
+    }
+
+    const result = await userRepository.saveDeliveryAgent({ userData, deliveryAgentData });
+
+    if (!result) {
+      return res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
+        success: false,
+        message: "An error occurred during registration",
+      });
+    }
+
+    if (!result.success) {
+      return res.status(HttpStatus.BAD_REQUEST).json({
+        success: false,
+        message: result.message,
+      });
+    }
+
+    return res.status(HttpStatus.CREATED).json({
+      success: true,
+      message: result.message,
+      token: result.token,
+      userId: result.userId,
+    });
+  } catch (error) {
+    console.error("Registration error:", error);
+    return res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
+      success: false,
+      message: "Error registering delivery agent",
+    });
+  }
+}
+
 export default {
   getUsers,
   registerCustomer,
@@ -450,5 +535,6 @@ export default {
   login,
   registerAdmin,
   validateToken,
-  deleteUser
+  deleteUser,
+  saveDeliveryAgent
 };

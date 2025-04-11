@@ -11,6 +11,7 @@ import supplierRoutes from './routes/supplierRoutes.js';
 import feedbackRoutes from './routes/feedbackRoutes.js';
 import paymentRoutes from './routes/paymentRoutes.js';
 import cartRoutes from './routes/cartRoutes.js';
+import deliveryRouts  from './routes/deliveryRoutes.js';
 import bodyParser from "body-parser";
 import { connectToDatabase } from "./db/mongodbConnection.js";
 import backupRoutes from './routes/backupRoutes.js';
@@ -40,6 +41,7 @@ app.use("/api/category", categoryRoutes);
 app.use('/api/payment', paymentRoutes);
 app.use("/api/cart", cartRoutes);
 app.use('/api/backups', backupRoutes);
+app.use('/api/delivery', deliveryRouts);
 
 app.use("/api/images/products", express.static("uploads/products"));
 app.use("/api/images/suppliers", express.static("uploads/suppliers"));

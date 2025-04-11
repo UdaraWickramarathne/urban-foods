@@ -1,5 +1,6 @@
 import { getConnection } from "../db/dbConnection.js";
 import oracledb from "oracledb";
+import deliveyRepository from "./deliveryRepository.js";
 
 const getAllOrders = async () => {
   try {
@@ -120,6 +121,9 @@ const addOrder = async (orderData, orderItemsData) => {
       );
     }
     await connection.commit();
+
+    await deliveyRepository.addDelevery(orderId);
+
     return { success: true, orderId: orderId };
   } catch (error) {
     await connection.rollback();

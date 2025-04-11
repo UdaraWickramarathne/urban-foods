@@ -1,133 +1,199 @@
 import { getConnection } from "../db/dbConnection.js";
-import Delivery from "../models/delivery.js";
-import oracledb from 'oracledb';
-import { format } from 'date-fns';
+
+// Function to generate unique tracking numbers
+const generateTrackingNumber = () => {
+  // Prefix for tracking number
+  const prefix = "TRK";
+  
+  // Current timestamp in milliseconds
+  const timestamp = Date.now().toString().slice(-8);
+  
+  // Random alphanumeric component (6 characters)
+  const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+  let random = '';
+  for (let i = 0; i < 6; i++) {
+    random += characters.charAt(Math.floor(Math.random() * characters.length));
+  }
+  
+  // Combine into tracking number format
+  return `${prefix}-${timestamp}-${random}`; 
+};
+
+const addDelevery = async (orderId) => {
+    try {
+        const connection = await getConnection();
+
+        const query = `INSERT INTO deliveries (order_id, status, tracking_number)
+                     VALUES (:orderId, :deliveryStatus, :trackingNumber)`;
+    
+        const binds = {
+            orderId,
+            deliveryStatus: "PENDING",
+            trackingNumber: generateTrackingNumber(),
+        };
+    
+        await connection.execute(query, binds);
+        await connection.commit();
+        await connection.close();
+    
+        return { success: true };
+    } catch (error) {
+        console.error("Error adding delivery:", error.message);
+        return { success: false, message: error.message };
+    }
+}
 
 const getAllDeliveries = async () => {
-  let connection;
-  try {
-    connection = await getConnection();
-    const result = await connection.execute(`SELECT * FROM Deliveries`);
-    return result.rows.map((row) => Delivery.fromDbRow(row, result.metaData));
-  } catch (error) {
-    console.error("Error retrieving deliveries:", error.message);
-    return [];
-  } finally {
-    if (connection) {
-      await connection.close();
-    }
-  }
-};
+    try {
+        const connection = await getConnection();
+        const query = `SELECT 
+        d.delivery_id, 
+        d.order_id, 
+        c.first_name || ' ' || c.last_name AS customer_name,
+        d.status,
+        d.tracking_number,
+        d.estimated_date,
+        d.assign_agent_id
+        FROM deliveries d
+        JOIN Orders o ON d.order_id = o.order_id
+        JOIN Customers c ON o.customer_id = c.customer_id
+        ORDER BY d.delivery_id DESC`;
 
-const getDeliveryById = async (deliveryId) => {
-  let connection;
-  try {
-    connection = await getConnection();
-    const result = await connection.execute(
-      `SELECT * FROM Deliveries WHERE delivery_id = :deliveryId`,
-      { deliveryId }
-    );
-    return result.rows.length ? Delivery.fromDbRow(result.rows[0], result.metaData) : null;
-  } catch (error) {
-    console.error("Error retrieving delivery by ID:", error.message);
-    return null;
-  } finally {
-    if (connection) {
-      await connection.close();
-    }
-  }
-};
-
-const insertDelivery = async (deliveryData) => {
-  console.log("insertDelivery repository");
-  console.log(deliveryData);
-  let connection;
-  try {
-    connection = await getConnection();
-    // Use a simpler approach for getting the ID back
-    const result = await connection.execute(
-  `INSERT INTO Deliveries (order_id, status, estimated_date, tracking_number) 
-   VALUES (:orderId, :status, TO_DATE(:estimatedDate, 'YYYY-MM-DD'), :trackingNumber) 
-   RETURNING delivery_id INTO :deliveryId`,
-  {
-    orderId: deliveryData.orderId,
-    status: deliveryData.status,
-    estimatedDate: deliveryData.estimatedDate,
-    trackingNumber: deliveryData.trackingNumber,
-    deliveryId: { dir: oracledb.BIND_OUT, type: oracledb.NUMBER }
-  },
-  { autoCommit: true } // Ensure auto-commit
-);
-    
-    console.log("Query executed successfully");
-    console.log(result);
-    
-    // Make sure we're accessing the outBinds correctly
-    const deliveryId = result.outBinds.deliveryId[0];
-    return { success: true, deliveryId };
-  } catch (error) {
-    console.error("Error inserting delivery:", error);  // Log full error object
-    return { success: false, message: error.message };
-  } finally {
-    if (connection) {
-      try {
+        const result = await connection.execute(query);
+        const deliveries = result.rows.map((row) => {
+            return {
+                deliveryId: row[0],
+                orderId: row[1],
+                customerName: row[2],
+                status: row[3],
+                trackingNumber: row[4],
+                estimatedDate: row[5],
+                assignedAgentId: row[6]
+            };
+        });
         await connection.close();
-        console.log("Connection closed");
-      } catch (err) {
-        console.error("Error closing connection:", err.message);
-      }
+        return deliveries;
+    } catch (error) {
+        console.error("Error fetching deliveries:", error.message);
+        return null;
     }
-  }
-};
+}
 
-const deleteDelivery = async (deliveryId) => {
-  let connection;
-  try {
-    connection = await getConnection();
-    await connection.execute("DELETE FROM Deliveries WHERE delivery_id = :deliveryId", {
-      deliveryId,
-    });
-    await connection.commit();
-    return { success: true, message: "Delivery deleted successfully" };
-  } catch (error) {
-    console.error("Error deleting delivery:", error.message);
-    return { success: false, message: "Error deleting delivery" };
-  } finally {
-    if (connection) {
-      await connection.close();
+const getDeliveryAgents = async () => {
+    try {
+        const connection = await getConnection();
+        const query = `SELECT * FROM delivery_agents`;
+        const result = await connection.execute(query);
+        const agents = result.rows.map((row) => {
+            return {
+                agentId: row[0],
+                name: row[1],
+                email: row[2],
+            };
+        });
+        await connection.close();
+        return agents;
+    } catch (error) {
+        console.error("Error fetching delivery agents:", error.message);
+        return null;
     }
-  }
-};
+}
 
-const updateDelivery = async (deliveryId, updatedData) => {
-  let connection;
-  try {
-    connection = await getConnection();
-    await connection.execute(
-      `UPDATE Deliveries SET 
-        order_id = :orderId, 
-        status = :status, 
-        estimated_date = TO_DATE(:estimatedDate, 'YYYY-MM-DD'), 
-        tracking_number = :trackingNumber 
-       WHERE delivery_id = :deliveryId`,
-      {
-        orderId: updatedData.orderId,
-        status: updatedData.status,
-        estimatedDate: updatedData.estimatedDate, // Ensure this is in 'YYYY-MM-DD' format
-        trackingNumber: updatedData.trackingNumber,
-        deliveryId,
-      },
-      { autoCommit: true }
-    );
-    return { success: true, message: "Delivery updated successfully" };
-  } catch (error) {
-    console.error("Error updating delivery:", error.message);
-    return { success: false, message: "Error updating delivery" };
-  } finally {
-    if (connection) {
-      await connection.close();
+const updateDeliveryStatus = async (deliveryId, status) => {
+    try {
+        const connection = await getConnection();
+        const query = `UPDATE deliveries SET status = :status WHERE delivery_id = :deliveryId`;
+        const binds = {
+            status,
+            deliveryId,
+        };
+        await connection.execute(query, binds);
+        await connection.commit();
+        await connection.close();
+        return { success: true };
+    } catch (error) {
+        console.error("Error updating delivery status:", error.message);
+        return { success: false, message: error.message };
     }
-  }
-};
+}
 
-export default { getAllDeliveries, getDeliveryById, insertDelivery, deleteDelivery, updateDelivery };
+const assignDeliveryAgent = async (deliveryId, agentId) => {
+    try {
+        console.log("Assigning delivery agent:", agentId);
+        
+        const connection = await getConnection();
+        const status = agentId === '' ? "PENDING" : "IN TRANSIT";
+        
+        // Update agent and status in one query
+        const agentQuery = `
+            UPDATE deliveries 
+            SET assign_agent_id = :agentId, 
+                status = :status 
+            WHERE delivery_id = :deliveryId`;
+                
+        const agentBinds = {
+            agentId: { val: agentId },
+            status: { val: status },
+            deliveryId: { val: deliveryId }
+        };
+        
+        await connection.execute(agentQuery, agentBinds);
+        
+        // Update estimated date based on agent assignment
+        const dateQuery = agentId === '' 
+            ? `UPDATE deliveries SET estimated_date = NULL WHERE delivery_id = :deliveryId`
+            : `UPDATE deliveries SET estimated_date = SYSDATE + 3 WHERE delivery_id = :deliveryId`;
+            
+        const dateBinds = {
+            deliveryId: { val: deliveryId }
+        };
+        
+        await connection.execute(dateQuery, dateBinds);
+        
+        await connection.commit();
+        await connection.close();
+        return { success: true };
+    } catch (error) {
+        console.error("Error assigning delivery agent:", error.message);
+        return { success: false, message: error.message };
+    }
+}
+
+const getDeliveryByAgentId = async (agentId) => {
+    try {
+        const connection = await getConnection();
+        const query = `
+        SELECT d.delivery_id, d.order_id, d.status, d.tracking_number, d.estimated_date, o.address, c.first_name || ' ' || c.last_name AS customer_name
+        FROM deliveries d 
+        JOIN Orders o ON d.order_id = o.order_id
+        JOIN Customers c ON o.customer_id = c.customer_id
+        WHERE d.assign_agent_id = :agentId`;
+        const binds = { agentId };
+        const result = await connection.execute(query, binds);
+        const deliveries = result.rows.map((row) => {
+            return {
+                deliveryId: row[0],
+                orderId: row[1],
+                status: row[2],
+                trackingNumber: row[3],
+                estimatedDate: row[4],
+                address: row[5],
+                customerName: row[6]
+            };
+        });
+        await connection.close();
+        return deliveries;
+    } catch (error) {
+        console.error("Error fetching deliveries by agent ID:", error.message);
+        return null;
+    }
+}
+
+export default {
+    addDelevery,
+    getAllDeliveries,
+    getDeliveryAgents,
+    updateDeliveryStatus,
+    assignDeliveryAgent,
+    getDeliveryByAgentId
+}
