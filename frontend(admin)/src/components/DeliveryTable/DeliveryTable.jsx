@@ -285,6 +285,12 @@ const DeliveryTable = ({ currentPage, setCurrentPage }) => {
               </th>
               <th>
                 <div className="th-content">
+                  Delivered Date
+                  <ChevronDownIcon />
+                </div>
+              </th>
+              <th>
+                <div className="th-content">
                   Delivery Agent
                   <ChevronDownIcon />
                 </div>
@@ -310,7 +316,14 @@ const DeliveryTable = ({ currentPage, setCurrentPage }) => {
                   <td>#{delivery.deliveryId}</td>
                   <td>#{delivery.orderId}</td>
                   <td>{delivery.customerName}</td>
-                  <td>{delivery.estimatedDate ? formatDate(delivery.estimatedDate) : 'NOT-SCHEDULED'}</td>
+                  <td className={!delivery.estimatedDate ? 'date-not-available' : ''}>
+                    {delivery.estimatedDate ? formatDate(delivery.estimatedDate) : 
+                    <span className="not-available-label">NOT-SCHEDULED</span>}
+                  </td>
+                  <td className={!delivery.deliveredDate ? 'date-not-available' : ''}>
+                    {delivery.deliveredDate ? formatDate(delivery.deliveredDate) : 
+                    <span className="not-available-label">NOT-DELIVERED</span>}
+                  </td>
                   <td>
                     <div className="agent-dropdown-container">
                       <select
@@ -328,7 +341,7 @@ const DeliveryTable = ({ currentPage, setCurrentPage }) => {
                         <option value="">Select Delivery Agent</option>
                         {deliveryAgents.map(agent => (
                           <option key={agent.agentId} value={agent.agentId}>
-                            {agent.name}
+                            {agent.agentId} - {agent.name}
                           </option>
                         ))}
                       </select>
@@ -470,7 +483,7 @@ const DeliveryTable = ({ currentPage, setCurrentPage }) => {
                   <div className="agent-assign-container">
                     <select
                       className="agent-dropdown-modal"
-                      value={selectedDelivery.agentId || ""}
+                      value={selectedDelivery.assignedAgentId || ""}
                       onChange={(e) => {
                         handlePermissionCheck(
                           PERMISSIONS.EDIT_DELIVERIES,
@@ -485,8 +498,8 @@ const DeliveryTable = ({ currentPage, setCurrentPage }) => {
                     >
                       <option value="">Select Delivery Agent</option>
                       {deliveryAgents.map(agent => (
-                        <option key={agent.id} value={agent.id}>
-                          {agent.name} - {agent.vehicleType}
+                        <option key={agent.agentId} value={agent.agentId}>
+                          {agent.agentId} - {agent.name}
                         </option>
                       ))}
                     </select>
